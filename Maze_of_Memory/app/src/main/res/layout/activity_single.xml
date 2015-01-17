@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <RelativeLayout
+        android:layout_width="160dp"
+        android:layout_height="50dp"
+        android:background="#fff6ffbd"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="50dp">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/star"
+            android:src="@drawable/star"
+            android:scaleType="fitXY"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="Count"
+            android:textSize="25dp"
+            android:id="@+id/test"
+            android:layout_toRightOf="@+id/star"
+            android:gravity="center|right"
+            android:paddingRight="15dp"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            android:text="StageName"
+            android:id="@+id/stage"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="100dp"
+            />
+        </RelativeLayout>
+
+</LinearLayout>
