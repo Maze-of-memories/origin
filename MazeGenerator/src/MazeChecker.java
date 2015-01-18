@@ -9,7 +9,18 @@ public class MazeChecker {
 	public int pathCnt1, pathCnt2;
 	public int minPathLength1, minPathLength2;
 	
-	public MazeChecker(Maze maze) {
+	public void checkForSingle(Maze maze) {
+		int maxIdx = maze.getSize() - 1;
+		
+		// 플레이어의 시작점과 목표점
+		s1 = new Point(maxIdx, 0);
+		g1 = new Point(0, maxIdx);
+		
+		pathCnt1 = numOfPaths(maze, s1, g1);
+	}
+	
+	public void checkForMulti(Maze maze) {
+		
 		int maxIdx = maze.getSize() - 1;
 		
 		// 두 플레이어의 시작점과 목표점
@@ -21,13 +32,19 @@ public class MazeChecker {
 		
 		pathCnt1 = numOfPaths(maze, s1, g1);
 		pathCnt2 = numOfPaths(maze, s2, g2);
-
 	}
 	
-	public boolean isVaild() {
+	public boolean isValidForMulti() {
 		// 두 출발점으로부터 각각의 목적지 까지 최단 경로의 길이가 같다면 
 		// 유효한 미로로 설정한다.
 		if(pathCnt1 != 0 && pathCnt2 != 0 && pathCnt1 == pathCnt2 && minPathLength1 == minPathLength2)
+			isValid = true;
+		
+		return isValid;
+	}
+	
+	public boolean isValidForSingle() {
+		if(pathCnt1 != 0)
 			isValid = true;
 		
 		return isValid;

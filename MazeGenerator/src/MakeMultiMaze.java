@@ -1,11 +1,8 @@
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Scanner;
 
 // 테스트용 main메서드가 있는 클래스
-public class MakeMaze {
+public class MakeMultiMaze {
 
 	public static void main(String[] args) {
 		
@@ -38,47 +35,49 @@ public class MakeMaze {
 			while (true) {
 				MazeGenerator mg = new MazeGenerator();
 				Maze maze = mg.randomGenerate(size, numOfWalls);
-				MazeChecker mc = new MazeChecker(maze);
-				if (mc.isVaild()) {	
+				MazeChecker mc = new MazeChecker();
+				mc.checkForMulti(maze);
+				if (mc.isValidForMulti()) {	
 					// set에 미로를 저장한다.
 					mazeSet.add(maze.toString());
 					
-//					
-//					System.out.println("No. " + (mazeSet.size() + 1));
-//					maze.print();
-//					System.out.println(maze.toString());
-//					System.out.println("[플레이어 1] 경로 수 : " + mc.pathCnt1
-//							+ ", 최단경로 : " + mc.minPathLength1);
-//					System.out.println("[플레이어 2] 경로 수 : " + mc.pathCnt2
-//							+ ", 최단경로 : " + mc.minPathLength2);
-//					System.out.println("유효한 맵!");
-//					System.out.println("");
-//					System.out.println("");
-//					System.out.println("");
+					
+					System.out.println("No. " + (mazeSet.size()));
+					maze.print();
+					System.out.println(maze.toString());
+					System.out.println("[플레이어 1] 경로 수 : " + mc.pathCnt1
+							+ ", 최단경로 : " + mc.minPathLength1);
+					System.out.println("[플레이어 2] 경로 수 : " + mc.pathCnt2
+							+ ", 최단경로 : " + mc.minPathLength2);
+					System.out.println("유효한 맵!");
+					System.out.println("");
+					System.out.println("");
+					System.out.println("");
 
 					break;
 				}
 			}
 		}
 		
-		PrintWriter pw = null;
-		try {
-			pw = new PrintWriter(fileName);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-		
-		
-		Iterator<String> i = mazeSet.iterator();
-		while(i.hasNext()) {
-			pw.println(i.next());
-		}
-		
-		pw.close();
-		
-		System.out.println(fileName + "파일이 생성되었습니다!");
+		// 생성된 미로의 set을 파일에 쓴다.
+//		PrintWriter pw = null;
+//		try {
+//			pw = new PrintWriter(fileName);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//			System.exit(-1);
+//		}
+//		
+//		
+//		
+//		Iterator<String> i = mazeSet.iterator();
+//		while(i.hasNext()) {
+//			pw.println(i.next());
+//		}
+//		
+//		pw.close();
+//		
+//		System.out.println(fileName + "파일이 생성되었습니다!");
 		long end = System.currentTimeMillis();
 
 		System.out.println( "\n경과 시간 : " + ( end - start )/1000.0 );

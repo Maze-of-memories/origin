@@ -100,12 +100,12 @@ public class MazeGenerator {
 			}
 		}
 
-		// 시작지점 표시
-		map[map.length - 1][0] = 'A';
-		map[map.length - 1][map.length - 1] = 'B';
-
-		// 목표지점 표시
-		map[0][map.length - 1] = 'A';
-		map[0][0] = 'B';
+//		// 시작지점 표시
+//		map[map.length - 1][0] = 'A';
+//		map[map.length - 1][map.length - 1] = 'B';
+//
+//		// 목표지점 표시
+//		map[0][map.length - 1] = 'A';
+//		map[0][0] = 'B';
 	}
 }
