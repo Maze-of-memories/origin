@@ -5,20 +5,32 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.plus.PlusClient;
+import com.google.android.gms.plus.model.people.Person;
 
-public class MainActivity extends Activity  implements View.OnClickListener, ConnectionCallbacks, OnConnectionFailedListener {
+import com.google.android.gms.plus.model.people.Person.Image;
+import com.google.android.gms.plus.model.people.PersonBuffer;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends Activity  implements View.OnClickListener, ConnectionCallbacks,
+        OnConnectionFailedListener{
 
     private static final int RC_SIGN_IN = 0;
 
@@ -27,10 +39,6 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
     private boolean mIntentInProgress;
 
     private boolean mSignInClicked;
-
-    private PlusClient mPlusClient;
-
-    private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
 
     private ProgressDialog mConnectionProgressDialog;
 
@@ -51,7 +59,7 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
                 .build();
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
-
+        findViewById(R.id.sign_out_button).setOnClickListener(this);
 
         btn = (Button)findViewById(R.id.single);
         btn.setOnClickListener(new Button.OnClickListener(){
@@ -120,17 +128,31 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
             resolveSignInError();
         }
 
+        if (view.getId() == R.id.sign_out_button) {
+            if (mGoogleApiClient.isConnected()) {
+                Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+                Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient)
+                        .setResultCallback(new ResultCallback<Status>() {
+
+                            @Override
+                            public void onResult(Status status) {
+                                // mGoogleApiClient is now disconnected and access has been revoked.
+                                // Trigger app logic to comply with the developer policies
+                            }
+                        });
+                                mGoogleApiClient.disconnect();
+                mGoogleApiClient.connect();
+            }
+        }
     }
     private void resolveSignInError() {
-
-        System.out.println(mConnectionResult.hasResolution());
-        System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
         if (mConnectionResult.hasResolution()) {
             try {
                 mIntentInProgress = true;
                 startIntentSenderForResult(mConnectionResult.getResolution().getIntentSender(),
                         RC_SIGN_IN, null, 0, 0, 0);
+
             } catch (SendIntentException e) {
                 // The intent was canceled before it was sent.  Return to the default
                 // state and attempt to connect to get an updated ConnectionResult.
@@ -144,14 +166,25 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
     @Override
     public void onConnected(Bundle connectionHint) {
         mSignInClicked = false;
-        //Toast.makeText(this, "User is connected!", Toast.LENGTH_LONG).show();
-        Toast.makeText(this,"환영합니다", Toast.LENGTH_LONG).show();
-        // 연결 오류를 해결했습니다.
+        Toast.makeText(this, "환영합니다", Toast.LENGTH_LONG).show();
+
+        String personName = null;
+        String personGooglePlusProfile = null;
+        if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
+            Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+            personName = currentPerson.getDisplayName();
+            Image personPhoto = currentPerson.getImage();
+            personGooglePlusProfile = currentPerson.getUrl();
+        }
+        Log.i("personName", personName);
+
+        Log.i("personGooglePlusProfile", personGooglePlusProfile);
     }
 
 
     public void onConnectionSuspended(int cause) {
         mGoogleApiClient.connect();
     }
+
 }
 
