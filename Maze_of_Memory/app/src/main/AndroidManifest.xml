@@ -25,12 +25,14 @@
     <category android:name="android.intent.category.LAUNCHER" />
 </intent-filter>
     </activity>
-    <activity android:name=".MainActivity"></activity>
-    <activity android:name=".SingleActivity"></activity>
-    <activity android:name=".MultiActivity"></activity>
-    <activity android:name=".NicnameActivity"></activity>
+    <activity android:name=".MainActivity"
+        android:screenOrientation="portrait"></activity>
+    <activity android:name=".SingleActivity"
+        android:screenOrientation="portrait"></activity>
+    <activity android:name=".MultiActivity"
+        android:screenOrientation="portrait"></activity>
+    <activity android:name=".NicnameActivity"
+        android:screenOrientation="portrait"></activity>
     </application>
-
-
 
 </manifest>
