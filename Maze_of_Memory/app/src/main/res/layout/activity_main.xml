@@ -121,7 +121,7 @@
             android:layout_height="50dp"
             android:layout_marginLeft="20dp"
             android:text="도움말"
-            android:id="@+id/button8"
+            android:id="@+id/btnHelp"
             android:layout_toRightOf="@+id/button7"
             />
 
