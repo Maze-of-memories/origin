@@ -2,29 +2,28 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.mazeofmemory" >
 
-
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-
-        <meta-data android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".IntroActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-    <category android:name="android.intent.category.LAUNCHER" />
-</intent-filter>
-    </activity>
     <activity android:name=".MainActivity"
         android:screenOrientation="portrait"></activity>
     <activity android:name=".SingleActivity"
@@ -33,6 +32,13 @@
         android:screenOrientation="portrait"></activity>
     <activity android:name=".NicnameActivity"
         android:screenOrientation="portrait"></activity>
+
+    <activity
+        android:name=".HelpActivity"
+        android:label="@string/title_activity_help">
+
+    </activity>
+
     </application>
 
 </manifest>

@@ -77,6 +77,11 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
             }
         });
 
+        // 도움말 버튼 초기화 및 이벤트리스너 설정
+        Button btnHelp = (Button)findViewById(R.id.btnHelp);
+        btnHelp.setOnClickListener(this);
+
+
     }
 
     protected void onStart() {
@@ -126,6 +131,9 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
                 && !mGoogleApiClient.isConnecting()) {
             mSignInClicked = true;
             resolveSignInError();
+        } else if(view.getId() == R.id.btnHelp) {
+            // 도움말 버튼 클릭시 도움말 화면을 출력한다.
+            startActivity(new Intent(this, HelpActivity.class));
         }
 
         if (view.getId() == R.id.sign_out_button) {
@@ -144,7 +152,9 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
                 mGoogleApiClient.connect();
             }
         }
+
     }
+
     private void resolveSignInError() {
 
         if (mConnectionResult.hasResolution()) {
