@@ -2,9 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.mazeofmemory" >
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
         android:allowBackup="true"
@@ -25,20 +22,34 @@
         </activity>
 
     <activity android:name=".MainActivity"
-        android:screenOrientation="portrait"></activity>
+        android:screenOrientation="portrait">
+        </activity>
+
     <activity android:name=".SingleActivity"
-        android:screenOrientation="portrait"></activity>
+        android:screenOrientation="portrait">
+        </activity>
+
     <activity android:name=".MultiActivity"
-        android:screenOrientation="portrait"></activity>
+        android:screenOrientation="portrait">
+        </activity>
+
     <activity android:name=".NicnameActivity"
-        android:screenOrientation="portrait"></activity>
+        android:screenOrientation="portrait">
+        </activity>
 
     <activity
         android:name=".HelpActivity"
         android:label="@string/title_activity_help">
+    </activity>
 
+    <activity android:name=".SingleTutorialActivity"
+        android:screenOrientation="portrait">
     </activity>
 
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
 
 </manifest>

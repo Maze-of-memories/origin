@@ -2,8 +2,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:background="#ff75ff70"
-    >
+    android:background="#ff75ff70">
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -14,131 +13,127 @@
         <com.google.android.gms.common.SignInButton
             android:id="@+id/sign_in_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"/>
 
         <Button
             android:id="@+id/sign_out_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="logout"
-            android:layout_toRightOf="@+id/sign_in_button"/>
+            android:text="logout"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="이미 계정이 있으신가요?"
-            android:textSize="15sp"
+            android:textSize="15dp"
             android:id="@+id/textView"
             android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@+id/button4"
+            android:layout_toLeftOf="@+id/sign_in_button"
             />
-
-        <Button
-            android:layout_alignParentRight="true"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:text="google+"
-            android:id="@+id/button4"/>
-
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:background="#ff0550ff">
+        android:background="#ffffff">
 
-        <Button
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:text="picture"
-            android:id="@+id/button5"/>
-
-        <TextView
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="계정"
-            android:textSize="25dp"
-            android:id="@+id/textView2"
-            android:layout_below="@+id/button5"
-            android:layout_centerHorizontal="true"
-            />
+            android:layout_centerInParent="true">
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/R_Logo"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:background="@drawable/sea"
+                    android:id="@+id/Logo"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/R_Play_btn"
+                android:layout_below="@+id/R_Logo"
+                android:gravity="center">
+
+                <RelativeLayout
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:background="#ffb9a2ff"
+                    android:gravity="center">
+
+                    <Button
+                        android:layout_width="fill_parent"
+                        android:layout_height="80dp"
+                        android:text="Single"
+                        android:id="@+id/single" />
+
+                    <Button
+                        android:layout_below="@+id/single"
+                        android:layout_width="fill_parent"
+                        android:layout_height="80dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Multi"
+                        android:id="@+id/multi"
+                        />
+                    <Button
+                        android:layout_below="@+id/multi"
+                        android:layout_width="fill_parent"
+                        android:layout_height="80dp"
+                        android:layout_marginTop="10dp"
+                        android:text="Store"
+                        android:id="@+id/button3"
+                        />
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_below="@+id/R_Play_btn">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#ff1cfffa">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:text="버튼음"
+                    android:id="@+id/button6"
+                    />
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:text="배경음"
+                    android:id="@+id/button7"
+                    android:layout_toRightOf="@+id/button6"
+                />
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="20dp"
+                    android:text="도움말"
+                    android:id="@+id/btnHelp"
+                    android:layout_toRightOf="@+id/button7"
+                    />
+
+                </RelativeLayout>
+            </RelativeLayout>
         </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:background="#ffb9a2ff"
-        android:gravity="center"
-        android:layout_gravity="center"
-        >
-
-        <Button
-            android:layout_centerHorizontal="true"
-            android:layout_width="fill_parent"
-            android:layout_height="80dp"
-            android:text="Single"
-            android:id="@+id/single" />
-
-        <Button
-            android:layout_below="@+id/single"
-            android:layout_centerHorizontal="true"
-            android:layout_width="fill_parent"
-            android:layout_height="80dp"
-            android:layout_marginTop="10dp"
-            android:text="Multi"
-            android:id="@+id/multi"
-            />
-        <Button
-            android:layout_below="@+id/multi"
-            android:layout_centerHorizontal="true"
-            android:layout_width="fill_parent"
-            android:layout_height="80dp"
-            android:layout_marginTop="10dp"
-            android:text="Store"
-            android:id="@+id/button3"
-            />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#ff1cfffa"
-        android:gravity="center">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:text="버튼음"
-            android:id="@+id/button6"
-            />
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_marginLeft="20dp"
-            android:text="배경음"
-            android:id="@+id/button7"
-            android:layout_toRightOf="@+id/button6"
-        />
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_marginLeft="20dp"
-            android:text="도움말"
-            android:id="@+id/btnHelp"
-            android:layout_toRightOf="@+id/button7"
-            />
-
-        </RelativeLayout>
-
-
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="#ffe9ff15">
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -148,6 +143,7 @@
 
             </RelativeLayout>
         </RelativeLayout>
+
 
 
 </LinearLayout>
