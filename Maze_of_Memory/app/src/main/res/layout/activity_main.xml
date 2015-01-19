@@ -16,11 +16,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
+        <Button
+            android:id="@+id/sign_out_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="logout"
+            android:layout_toRightOf="@+id/sign_in_button"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="이미 계정이 있으신가요?"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:id="@+id/textView"
             android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@+id/button4"
