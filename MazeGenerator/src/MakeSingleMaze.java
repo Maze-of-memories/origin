@@ -38,7 +38,7 @@ public class MakeSingleMaze {
 				Maze maze = mg.randomGenerate(size, numOfWalls);
 				MazeChecker mc = new MazeChecker();
 				mc.checkForSingle(maze);
-				if (mc.isValidForSingle() && mc.minPathLength1 == minPathLength) {	
+				if (mc.isValidForSingle() && mc.minPathLength1 >= minPathLength) {	
 					// set에 미로를 저장한다.
 					mazeSet.add(maze.toString());
 					

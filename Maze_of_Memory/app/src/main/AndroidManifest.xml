@@ -24,15 +24,15 @@
             </intent-filter>
         </activity>
 
-    <activity android:name=".MainActivity"></activity>
-    <activity android:name=".SingleActivity"></activity>
-    <activity android:name=".MultiActivity"></activity>
-    <activity android:name=".NicnameActivity"></activity>
-    <activity
-        android:name=".HelpActivity"
-        android:label="@string/title_activity_help">
+        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".SingleActivity"></activity>
+        <activity android:name=".MultiActivity"></activity>
+        <activity android:name=".NicnameActivity"></activity>
+        <activity
+            android:name=".HelpActivity"
+            android:label="@string/title_activity_help">
 
-    </activity>
+        </activity>
 
     </application>
 
