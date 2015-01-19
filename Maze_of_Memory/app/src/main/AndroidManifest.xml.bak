@@ -24,6 +24,15 @@
             </intent-filter>
         </activity>
 
+<<<<<<< HEAD
+        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".SingleActivity"></activity>
+        <activity android:name=".MultiActivity"></activity>
+        <activity android:name=".NicnameActivity"></activity>
+        <activity
+            android:name=".HelpActivity"
+            android:label="@string/title_activity_help">
+=======
     <activity android:name=".MainActivity"
         android:screenOrientation="portrait"></activity>
     <activity android:name=".SingleActivity"
@@ -36,7 +45,7 @@
     <activity
         android:name=".HelpActivity"
         android:label="@string/title_activity_help">
-
+>>>>>>> 547f9806344b0bf17fa6b93a96b5dd11abc5b15e
 
         </activity>
 
