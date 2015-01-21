@@ -49,17 +49,31 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
             android:layout_below="@+id/stage_info"
-            android:id="@+id/R_single_map">
+            android:id="@+id/R_single_map"
+            android:layout_centerHorizontal="true">
 
             <ImageView
-                android:layout_width="300dp"
-                android:layout_height="300dp"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
                 android:id="@+id/imageView"
                 android:background="@drawable/game"/>
+
+            <GridView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:id="@+id/game_move"
+                android:numColumns="5" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/single_chess"
+                android:layout_marginTop="240dp"
+                android:background="@drawable/left_game_profile"
+                />
 
         </RelativeLayout>
 
