@@ -1,4 +1,4 @@
-package com.example.mazeofmemory;
+package com.sy.mazeofmemory;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -10,24 +10,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.plus.model.people.Person;
 
 import com.google.android.gms.plus.model.people.Person.Image;
-import com.google.android.gms.plus.model.people.PersonBuffer;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends Activity  implements View.OnClickListener, ConnectionCallbacks,
         OnConnectionFailedListener{
@@ -189,6 +183,7 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
         Log.i("personName", personName);
 
         Log.i("personGooglePlusProfile", personGooglePlusProfile);
+        
     }
 
 

@@ -1,4 +1,4 @@
-package com.example.mazeofmemory;
+package com.sy.mazeofmemory;
 
 import android.net.Uri;
 import android.support.v4.app.FragmentActivity;

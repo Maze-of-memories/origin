@@ -1,4 +1,4 @@
-package com.example.mazeofmemory;
+package com.sy.mazeofmemory;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
