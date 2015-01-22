@@ -70,7 +70,7 @@ public class HelpListAdapter extends BaseExpandableListAdapter {
 
         if( v == null ) {
             LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = (LinearLayout)inflater.inflate(R.layout.listview_group_item, null);
+            v = (LinearLayout)inflater.inflate(R.layout.activity_help_listview_group_item, null);
         }
 
         TextView textGroup = (TextView)v.findViewById(R.id.textGroup);
@@ -87,7 +87,7 @@ public class HelpListAdapter extends BaseExpandableListAdapter {
 
         if(v == null) {
             LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = (LinearLayout)inflater.inflate(R.layout.listview_child_item, null);
+            v = (LinearLayout)inflater.inflate(R.layout.activity_help_listview_child_item, null);
         }
 
         TextView textChild = (TextView)v.findViewById(R.id.textChild);

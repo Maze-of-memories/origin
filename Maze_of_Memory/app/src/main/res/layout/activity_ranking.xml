@@ -30,32 +30,62 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:padding="15dp"
-        android:background="#7d30646d">
+        android:background="#adcbe3"
+        android:padding="15dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:text="IMAGE"
-            android:id="@+id/textView3"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center"
-            android:background="#FFFFFF"
-            android:layout_weight="1" />
+        <LinearLayout
+            android:id="@+id/onLogoutLayout"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
 
-        <TextView
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:text="IMAGE"
+                android:id="@+id/textView3"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:background="#FFFFFF"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Now check the ranking of your friends!"
+                android:id="@+id/textView4"
+                android:gravity="center"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp" />
+
+            <com.facebook.widget.LoginButton
+                android:id="@+id/authButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/onLoginLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Now check the ranking of your friends!"
-            android:id="@+id/textView4"
-            android:gravity="center"
-            android:paddingTop="15dp"
-            android:paddingBottom="15dp" />
+            android:orientation="vertical">
 
-        <com.facebook.widget.LoginButton
-            android:id="@+id/authButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal" />
+
+            <ListView
+                android:id="@+id/rankListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView android:id="@+id/empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="No Friends"
+                android:gravity="center"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
     </LinearLayout>
+
 </LinearLayout>
