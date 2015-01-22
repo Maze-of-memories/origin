@@ -16,6 +16,7 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.games.Games;
 import com.google.android.gms.plus.Plus;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -38,6 +39,8 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
 
     private ConnectionResult mConnectionResult;
 
+    private Games.GamesOptions apiOptions;
+
     Button btn;
 
     @Override
@@ -45,11 +48,14 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        apiOptions = Games.GamesOptions.builder().setShowConnectingPopup(true).build();
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Plus.API)
                 .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addApi(Games.API, apiOptions)
                 .build();
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
@@ -133,6 +139,7 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
         if (view.getId() == R.id.sign_out_button) {
             if (mGoogleApiClient.isConnected()) {
                 Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+                /*권한까지 지워버림
                 Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient)
                         .setResultCallback(new ResultCallback<Status>() {
 
@@ -142,7 +149,8 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
                                 // Trigger app logic to comply with the developer policies
                             }
                         });
-                                mGoogleApiClient.disconnect();
+                */
+                mGoogleApiClient.disconnect();
                 mGoogleApiClient.connect();
             }
         }
@@ -170,8 +178,9 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
     @Override
     public void onConnected(Bundle connectionHint) {
         mSignInClicked = false;
-        Toast.makeText(this, "환영합니다", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "환영합니다", Toast.LENGTH_LONG).show();
 
+        //google 사용자 정보가져 오기
         String personName = null;
         String personGooglePlusProfile = null;
         if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {

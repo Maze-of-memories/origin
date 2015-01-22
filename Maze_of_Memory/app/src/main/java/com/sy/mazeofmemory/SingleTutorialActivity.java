@@ -2,16 +2,20 @@ package com.sy.mazeofmemory;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
+
 
 public class SingleTutorialActivity extends Activity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_tutorial);
 
+
+
+
+        /*해상도 구하기
         DisplayMetrics metrics = new DisplayMetrics();
 
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -24,7 +28,8 @@ public class SingleTutorialActivity extends Activity {
 
         Log.i("normal", "( " + screenWidth + ", " + screenHeight + " )");
         Log.i("normal", "DPI : " + metrics.xdpi + ", " + metrics.ydpi);
-
+        */
 
     }
+
 }
