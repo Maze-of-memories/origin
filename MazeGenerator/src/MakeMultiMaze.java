@@ -1,4 +1,7 @@
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Scanner;
 
 // 테스트용 main메서드가 있는 클래스
@@ -42,17 +45,17 @@ public class MakeMultiMaze {
 					mazeSet.add(maze.toString());
 					
 					
-					System.out.println("No. " + (mazeSet.size()));
-					maze.print();
-					System.out.println(maze.toString());
-					System.out.println("[플레이어 1] 경로 수 : " + mc.pathCnt1
-							+ ", 최단경로 : " + mc.minPathLength1);
-					System.out.println("[플레이어 2] 경로 수 : " + mc.pathCnt2
-							+ ", 최단경로 : " + mc.minPathLength2);
-					System.out.println("유효한 맵!");
-					System.out.println("");
-					System.out.println("");
-					System.out.println("");
+//					System.out.println("No. " + (mazeSet.size()));
+//					maze.print();
+//					System.out.println(maze.toString());
+//					System.out.println("[플레이어 1] 경로 수 : " + mc.pathCnt1
+//							+ ", 최단경로 : " + mc.minPathLength1);
+//					System.out.println("[플레이어 2] 경로 수 : " + mc.pathCnt2
+//							+ ", 최단경로 : " + mc.minPathLength2);
+//					System.out.println("유효한 맵!");
+//					System.out.println("");
+//					System.out.println("");
+//					System.out.println("");
 
 					break;
 				}
@@ -60,24 +63,24 @@ public class MakeMultiMaze {
 		}
 		
 		// 생성된 미로의 set을 파일에 쓴다.
-//		PrintWriter pw = null;
-//		try {
-//			pw = new PrintWriter(fileName);
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//			System.exit(-1);
-//		}
-//		
-//		
-//		
-//		Iterator<String> i = mazeSet.iterator();
-//		while(i.hasNext()) {
-//			pw.println(i.next());
-//		}
-//		
-//		pw.close();
-//		
-//		System.out.println(fileName + "파일이 생성되었습니다!");
+		PrintWriter pw = null;
+		try {
+			pw = new PrintWriter(fileName);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+		
+		
+		Iterator<String> i = mazeSet.iterator();
+		while(i.hasNext()) {
+			pw.println(i.next());
+		}
+		
+		pw.close();
+		
+		System.out.println(fileName + "파일이 생성되었습니다!");
 		long end = System.currentTimeMillis();
 
 		System.out.println( "\n경과 시간 : " + ( end - start )/1000.0 );

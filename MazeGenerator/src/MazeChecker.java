@@ -101,7 +101,7 @@ public class MazeChecker {
 			// 위쪽 벽 검사
 			if(curPt.getRow() - 1 >= 0 && !isVisited[curPt.getRow() - 2][ curPt.getCal()]) {
 				// 위쪽에 벽이 없으면 스택에 위쪽 cell의 좌표를 push한다.
-				if(map[curPt.getRow() - 1][curPt.getCal()] == ' ') {
+				if(map[curPt.getRow() - 1][curPt.getCal()] == 'o') {
 					nextPoint.push(new Point(curPt.getRow() - 2, curPt.getCal()));
 					openedWallCnt++;
 				}
@@ -110,7 +110,7 @@ public class MazeChecker {
 			// 왼쪽 벽 검사
 			if(curPt.getCal() - 1 >= 0  && !isVisited[curPt.getRow()][curPt.getCal() - 2]) {
 				// 왼쪽에 벽이 없으면 스택에 왼쪽 cell의 좌표를 push한다.
-				if(map[curPt.getRow()][curPt.getCal() - 1] == ' ') {
+				if(map[curPt.getRow()][curPt.getCal() - 1] == 'o') {
 					nextPoint.push(new Point(curPt.getRow(), curPt.getCal() - 2));
 					openedWallCnt++;
 				}
@@ -119,7 +119,7 @@ public class MazeChecker {
 			// 아래쪽 벽 검사
 			if(curPt.getRow() + 1 < map.length && !isVisited[curPt.getRow() + 2][curPt.getCal()] ) {
 				// 아래쪽에 벽이 없으면 스택에 아래쪽 cell의 좌표를 push한다.
-				if(map[curPt.getRow() + 1][curPt.getCal()] == ' ') {
+				if(map[curPt.getRow() + 1][curPt.getCal()] == 'o') {
 					nextPoint.push(new Point(curPt.getRow() + 2, curPt.getCal()));
 					openedWallCnt++;
 				}
@@ -128,7 +128,7 @@ public class MazeChecker {
 			// 오른쪽 벽 검사
 			if(curPt.getCal() + 1 < map.length && !isVisited[curPt.getRow()][curPt.getCal() + 2]) {
 				// 오른쪽에 벽이 없으면 스택에 오른쪽 cell의 좌표를 push한다.
-				if(map[curPt.getRow()][curPt.getCal() + 1] == ' ') {
+				if(map[curPt.getRow()][curPt.getCal() + 1] == 'o') {
 					nextPoint.push(new Point(curPt.getRow(), curPt.getCal() + 2));
 					openedWallCnt++;
 				}

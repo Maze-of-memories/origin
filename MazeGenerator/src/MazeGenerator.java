@@ -62,11 +62,11 @@ public class MazeGenerator {
 		while (wallCnt != 0) {
 			r = ran.nextInt(realSize);
 			if (r % 2 == 0) {
-				walChar = '-';
+				walChar = 'x';
 				c = ran.nextInt(size - 1) * 2 + 1;
 			}
 			else {
-				walChar = '|';
+				walChar = 'x';
 				c = ran.nextInt(size) * 2;
 			}
 
@@ -89,7 +89,7 @@ public class MazeGenerator {
 		// 길을 표시한다.
 		for (int i = 0; i < map.length; i++) {
 			for (int j = 0; j < map[i].length; j++) {
-				map[i][j] = ' ';
+				map[i][j] = 'o';
 			}
 		}
 		
