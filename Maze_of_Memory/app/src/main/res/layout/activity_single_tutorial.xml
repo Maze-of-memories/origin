@@ -69,15 +69,11 @@
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:id="@+id/game_move"
-                    android:numColumns="5" />
-
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:id="@+id/single_chess"
-                    android:layout_marginTop="240dp"
-                    android:background="@drawable/left_game_profile"
+                    android:numColumns="5"
+                    android:columnWidth="60dp"
                     />
+
+
             </RelativeLayout>
         </RelativeLayout>
 
