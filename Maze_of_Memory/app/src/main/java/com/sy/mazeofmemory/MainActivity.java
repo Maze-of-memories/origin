@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -41,6 +42,8 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
 
     private Games.GamesOptions apiOptions;
 
+    private BackPressCloseHandler backPressCloseHandler;
+
     Button btn;
 
     @Override
@@ -66,6 +69,7 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
             public void onClick(View v){
                 Intent intent = new Intent(MainActivity.this, SingleActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
         btn = (Button)findViewById(R.id.multi);
@@ -81,15 +85,18 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
         Button btnHelp = (Button)findViewById(R.id.btnHelp);
         btnHelp.setOnClickListener(this);
 
+        backPressCloseHandler = new BackPressCloseHandler(this);
 
     }
 
     protected void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
+        if(!mGoogleApiClient.isConnected())
+            mGoogleApiClient.connect();
     }
 
     protected void onStop() {
+
         super.onStop();
 
         if (mGoogleApiClient.isConnected()) {
@@ -200,5 +207,15 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
         mGoogleApiClient.connect();
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                    backPressCloseHandler.onBackPressed();
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }
 

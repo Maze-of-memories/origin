@@ -2,12 +2,9 @@ package com.sy.mazeofmemory;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,19 +12,21 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
+import android.view.View.OnClickListener;
 
 
-public class SingleTutorialActivity extends Activity{
+public class SingleGameActivity extends Activity{
 
     public Integer[] chess = {
             0, 0, 0, 0, 0,
             0, 0, 0, 0, 0,
             0, 0, 0, 0, 0,
             0, 0, 0, 0, 0,
-            R.drawable.single_toturial1, 0, 0, 0, 0
+            R.drawable.left_game_profile, 0, 0, 0, 0
     };
     public ImageAdapter imageAdapter;
-    private int touch_cnt = 0;
+    public int touch_cnt = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,35 +37,35 @@ public class SingleTutorialActivity extends Activity{
         gridView.setAdapter(imageAdapter = new ImageAdapter(this));
         gridView.setOnItemClickListener(gridviewOnItemClickListener);
 
+        /*해상도 구하기
+        DisplayMetrics metrics = new DisplayMetrics();
+
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        int screenWidth = metrics.widthPixels;
+        int screenHeight = metrics.heightPixels;
+
+        float xdpi = metrics.xdpi;
+        float ydpi = metrics.ydpi;
+
+        Log.i("normal", "( " + screenWidth + ", " + screenHeight + " )");
+        Log.i("normal", "DPI : " + metrics.xdpi + ", " + metrics.ydpi);
+        */
+
     }
     public GridView.OnItemClickListener gridviewOnItemClickListener
-            = new GridView.OnItemClickListener()  {
+            = new GridView.OnItemClickListener() {
 
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
-            for (int i = 0; i < 25; i++) {
+            Toast.makeText(SingleGameActivity.this,""+position, Toast.LENGTH_LONG).show();
+
+            for(int i=0; i<25; i++) {
                 chess[i] = 0;
             }
-            if(touch_cnt >= 1) {
-                chess[position] = R.drawable.left_game_profile;
-            }
+            chess[position] = R.drawable.left_game_profile;
+            imageAdapter.notifyDataSetChanged();
 
-            long downTime = SystemClock.uptimeMillis();
-            long eventTime = SystemClock.uptimeMillis() + 100;
-            float x = 0.0f;
-            float y = 0.0f;
-
-            int metaState = 0;
-
-            MotionEvent motionEvent = MotionEvent.obtain(
-                    downTime,
-                    eventTime,
-                    MotionEvent.ACTION_DOWN,
-                    x,
-                    y,
-                    metaState
-            );
-            onTouchEvent(motionEvent);
         }
     };
 
@@ -105,38 +104,21 @@ public class SingleTutorialActivity extends Activity{
             return imageView;
         }
     }
+
+
     public boolean onTouchEvent(MotionEvent event){
+        int x,y;
+
+        x= (int) event.getX();
+        y= (int) event.getY();
+        Log.i("x,y",x+","+y);
 
         if(event.getAction() == MotionEvent.ACTION_DOWN){
 
-            touch_cnt++;
-            if(touch_cnt == 1) {
-                findViewById(R.id.single_tutorial_message).setVisibility(View.GONE);
-                chess[20] = R.drawable.left_game_profile;
-            }
-            imageAdapter.notifyDataSetChanged();
-            if(touch_cnt == 5){
-                Intent intent = new Intent(SingleTutorialActivity.this, NicknameActivity.class);
-                startActivity(intent);
-                finish();
-            }
+            findViewById(R.id.single_tutorial_message).setVisibility(View.GONE);
 
         }
 
         return super.onTouchEvent(event);
     }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_BACK:
-                Intent intent = new Intent(SingleTutorialActivity.this, SingleActivity.class);
-                startActivity(intent);
-                finish();
-                return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
 }
