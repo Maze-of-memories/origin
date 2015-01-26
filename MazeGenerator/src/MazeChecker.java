@@ -8,6 +8,7 @@ public class MazeChecker {
 	private Point s1, s2, g1, g2;
 	public int pathCnt1, pathCnt2;
 	public int minPathLength1, minPathLength2;
+	public int maxPathLength1, maxPathLength2;
 	
 	public void checkForSingle(Maze maze) {
 		int maxIdx = maze.getSize() - 1;
@@ -168,6 +169,7 @@ public class MazeChecker {
 		return pathCnt;
 	}
 	
+	// 방문한 경로의 길이를 리턴한다.
 	private int getPathLength(boolean [][] isVisited) {
 		int length = 0;
 		

@@ -69,24 +69,6 @@ public class RankingFragment extends Fragment {
             rankListView.setEmptyView(getView().findViewById(R.id.empty));
             items = new ArrayList();
 
-            // 더미 데이터 추가
-            /*
-            items.add(new RankingItem("http://www.google.co.kr", "me", 5, 100));
-            items.add(new RankingItem("http://www.google.co.kr", "you", 10, 3200));
-            items.add(new RankingItem("http://www.google.co.kr", "me", 5, 100));
-            items.add(new RankingItem("http://www.google.co.kr", "you", 10, 3200));
-            items.add(new RankingItem("http://www.google.co.kr", "me", 5, 100));
-            items.add(new RankingItem("http://www.google.co.kr", "you", 10, 3200));
-            items.add(new RankingItem("http://www.google.co.kr", "me", 5, 100));
-            items.add(new RankingItem("http://www.google.co.kr", "you", 10, 3200));
-            items.add(new RankingItem("http://www.google.co.kr", "me", 5, 100));
-            items.add(new RankingItem("http://www.google.co.kr", "you", 10, 3200));
-            items.add(new RankingItem("http://www.google.co.kr", "me", 5, 100));
-            items.add(new RankingItem("http://www.google.co.kr", "you", 10, 3200));
-            items.add(new RankingItem("http://www.google.co.kr", "me", 5, 100));
-            items.add(new RankingItem("http://www.google.co.kr", "you", 10, 3200));
-            items.add(new RankingItem("http://www.google.co.kr", "me", 5, 100));
-            items.add(new RankingItem("http://www.google.co.kr", "you", 10, 3200));*/
             adapter = new RankingListAdapter(getActivity(), R.layout.activity_ranking_listview_item, items);
             rankListView.setAdapter(adapter);
 
@@ -122,7 +104,7 @@ public class RankingFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+      public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // uiHelper 초기화

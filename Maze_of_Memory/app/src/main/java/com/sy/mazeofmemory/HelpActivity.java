@@ -1,10 +1,15 @@
 package com.sy.mazeofmemory;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
+
+import com.facebook.Session;
+import com.facebook.SessionState;
+import com.facebook.UiLifecycleHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +20,22 @@ public class HelpActivity extends ActionBarActivity {
     ExpandableListView helpListView;
     private ArrayList<String> arrayGroup;
     private HashMap<String, ArrayList<String>> arrayChild;
+
+    // facebook 관련 멤버
+    private UiLifecycleHelper uiHelper;
+
+    // 세션 변경 이벤트 리스너
+    private Session.StatusCallback callback = new Session.StatusCallback() {
+        @Override
+        public void call(Session session, SessionState state, Exception exception) {
+            onSessionStateChange(session, state, exception);
+        }
+    };
+
+    // 세션 상태 변경시 호출되는 메서드
+    private void onSessionStateChange(Session session, SessionState state, Exception exception) {
+        ;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +76,10 @@ public class HelpActivity extends ActionBarActivity {
                 return false;
             }
         });
+
+        // uiHelper 초기화
+        uiHelper = new UiLifecycleHelper(this, callback);
+        uiHelper.onCreate(savedInstanceState);
     }
 
     private void setArrayData() {
@@ -80,8 +105,30 @@ public class HelpActivity extends ActionBarActivity {
         arrayChild.put(arrayGroup.get(4), arrayAccount);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-   /*
+        // For scenarios where the main activity is launched and user
+        // session is not null, the session state change notification
+        // may not be triggered. Trigger it if it's open/closed.
+        // 이미 세션이 열려있으면, callback 메서드를 직접 호출한다.
+        Session session = Session.getActiveSession();
+        if (session != null &&
+                (session.isOpened() || session.isClosed()) ) {
+            onSessionStateChange(session, session.getState(), null);
+        }
+
+        uiHelper.onResume();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        uiHelper.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

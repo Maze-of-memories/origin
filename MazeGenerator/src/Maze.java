@@ -1,9 +1,17 @@
 // 미로를 나타내는  클래스
 public class Maze {
 	private char[][] map;
+	public int minPathLength1;
+	public int minPathLength2;
+	public int pathCnt1;
+	public int pathCnt2;
 	
 	public Maze(char[][] map) {
 		this.map = map;
+		minPathLength1 = 0;
+		minPathLength2 = 0;
+		pathCnt1 = 0;
+		pathCnt2 = 0;
 	}
 	
 	// map을 리턴한다.
