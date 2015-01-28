@@ -9,40 +9,33 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.plus.Plus;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.plus.model.people.Person;
 
-import com.google.android.gms.plus.model.people.Person.Image;
 
 public class MainActivity extends Activity  implements View.OnClickListener, ConnectionCallbacks,
         OnConnectionFailedListener{
 
     private static final int RC_SIGN_IN = 0;
-
     private GoogleApiClient mGoogleApiClient;
-
     private boolean mIntentInProgress;
-
     private boolean mSignInClicked;
-
     private ProgressDialog mConnectionProgressDialog;
-
     private ConnectionResult mConnectionResult;
-
     private Games.GamesOptions apiOptions;
-
     private BackPressCloseHandler backPressCloseHandler;
+
+    private String personName;
+    private String personPhotoUrl;
+    private String personGooglePlusProfile;
 
     Button btn;
 
@@ -76,6 +69,7 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
         btn.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v){
                 Intent intent = new Intent(MainActivity.this, MultiActivity.class);
+                intent.putExtra("url",personPhotoUrl);
                 startActivity(intent);
 
             }
@@ -91,14 +85,13 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
 
     protected void onStart() {
         super.onStart();
-        if(!mGoogleApiClient.isConnected())
+        if (!mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
+        }
     }
 
     protected void onStop() {
-
         super.onStop();
-
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
@@ -106,13 +99,9 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
 
     public void onConnectionFailed(ConnectionResult result) {
         if (!mIntentInProgress) {
-            // Store the ConnectionResult so that we can use it later when the user clicks
-            // 'sign-in'.
             mConnectionResult = result;
 
             if (mSignInClicked) {
-                // The user has already clicked 'sign-in' so we attempt to resolve all
-                // errors until the user is signed in, or they cancel.
                 resolveSignInError();
             }
         }
@@ -146,7 +135,7 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
         if (view.getId() == R.id.sign_out_button) {
             if (mGoogleApiClient.isConnected()) {
                 Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-                /*권한까지 지워버림
+                /* 토큰 권한 삭제
                 Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApiClient)
                         .setResultCallback(new ResultCallback<Status>() {
 
@@ -161,7 +150,6 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
                 mGoogleApiClient.connect();
             }
         }
-
     }
 
     private void resolveSignInError() {
@@ -173,14 +161,11 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
                         RC_SIGN_IN, null, 0, 0, 0);
 
             } catch (SendIntentException e) {
-                // The intent was canceled before it was sent.  Return to the default
-                // state and attempt to connect to get an updated ConnectionResult.
                 mIntentInProgress = false;
                 mGoogleApiClient.connect();
             }
         }
     }
-
 
     @Override
     public void onConnected(Bundle connectionHint) {
@@ -188,20 +173,17 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
         //Toast.makeText(this, "환영합니다", Toast.LENGTH_LONG).show();
 
         //google 사용자 정보가져 오기
-        String personName = null;
-        String personGooglePlusProfile = null;
         if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
             Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
             personName = currentPerson.getDisplayName();
-            Image personPhoto = currentPerson.getImage();
+            personPhotoUrl = currentPerson.getImage().getUrl();
             personGooglePlusProfile = currentPerson.getUrl();
         }
         Log.i("personName", personName);
-
+        Log.i("personPhotoUrl",personPhotoUrl);
         Log.i("personGooglePlusProfile", personGooglePlusProfile);
-        
-    }
 
+    }
 
     public void onConnectionSuspended(int cause) {
         mGoogleApiClient.connect();
@@ -217,5 +199,6 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
         }
         return super.onKeyDown(keyCode, event);
     }
+
 }
 

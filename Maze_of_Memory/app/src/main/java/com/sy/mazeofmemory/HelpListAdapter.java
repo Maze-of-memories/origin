@@ -24,7 +24,7 @@ import java.util.HashMap;
  * Created by Jun on 2015-01-18.
  * 도움말 리스트뷰의 어댑터
  */
-public class HelpListAdapter extends BaseExpandableListAdapter {
+public class HelpListAdapter extends BaseExpandableListAdapter  {
     private Context context;
     private ArrayList<String> arrayGroup;
     private HashMap<String, ArrayList<String>> arrayChild;
@@ -35,6 +35,7 @@ public class HelpListAdapter extends BaseExpandableListAdapter {
         this.context = context;
         this.arrayGroup = arrayGroup;
         this.arrayChild = arrayChild;
+
     }
 
     @Override
