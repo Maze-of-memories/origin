@@ -32,7 +32,8 @@ public class MultiActivity extends Activity {
 
         imageView = (ImageView) findViewById(R.id.personphoto);
         //imageUrl DB 저장 고려
-        setProfilePicture(imageView, url);
+        if(url != null)
+            setProfilePicture(imageView, url);
     }
 
     // 이미지의 URL을 이용하여 view에 출력한다.

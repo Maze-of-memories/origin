@@ -34,7 +34,7 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
     private BackPressCloseHandler backPressCloseHandler;
 
     private String personName;
-    private String personPhotoUrl;
+    private String personPhotoUrl = null;
     private String personGooglePlusProfile;
 
     Button btn;

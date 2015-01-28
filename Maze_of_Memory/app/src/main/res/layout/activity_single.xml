@@ -1,48 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:orientation="vertical"
     android:padding="15dp">
+
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp">
 
         <ImageView
+            android:id="@+id/star"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:id="@+id/star"
-            android:src="@drawable/star"
-            android:scaleType="fitXY"/>
+            android:scaleType="fitXY"
+            android:src="@drawable/star" />
 
         <TextView
+            android:id="@+id/test"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:text="Count"
-            android:textSize="25dp"
-            android:id="@+id/test"
             android:layout_toRightOf="@+id/star"
-            android:paddingRight="15dp"
             android:background="#fffffda3"
             android:gravity="center"
-            android:paddingLeft="15dp" />
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:text="Count"
+            android:textSize="25dp" />
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:layout_alignParentTop="false"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true">
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="false"
+            android:layout_centerVertical="true"
+            android:orientation="vertical">
 
             <Button
+                android:id="@+id/btnShowRank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Show rank"
-                android:id="@+id/btnShowRank"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                android:text="Show rank" />
         </LinearLayout>
 
     </RelativeLayout>
@@ -51,14 +52,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <Button
-            android:layout_width="100dp"
-            android:layout_height="120dp"
-            android:text="Tutorial"
-            android:id="@+id/single_tutorial"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="50dp"
-            />
-        </RelativeLayout>
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
+    </RelativeLayout>
 </LinearLayout>

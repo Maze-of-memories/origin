@@ -18,7 +18,7 @@
             android:layout_height="150dp"
             android:text="image"
             android:id="@+id/personphoto"
-            android:background="@drawable/sea"
+            android:background="@drawable/photo"
             android:scaleType="fitXY"
             />
 
