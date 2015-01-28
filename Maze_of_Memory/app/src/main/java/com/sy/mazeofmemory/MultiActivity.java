@@ -20,8 +20,7 @@ import java.net.URL;
 
 public class MultiActivity extends Activity {
 
-    final int REQ_CODE_SELECT_IMAGE = 100;
-    ImageView imagebtn;
+    ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +30,9 @@ public class MultiActivity extends Activity {
         Intent intent = getIntent();
         String url = intent.getExtras().getString("url");
 
-        imagebtn = (ImageView) findViewById(R.id.personphoto);
+        imageView = (ImageView) findViewById(R.id.personphoto);
         //imageUrl DB 저장 고려
-        setProfilePicture(imagebtn, url);
+        setProfilePicture(imageView, url);
     }
 
     // 이미지의 URL을 이용하여 view에 출력한다.
