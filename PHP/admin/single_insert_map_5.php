@@ -6,7 +6,7 @@ $db_connect = mysql_connect('localhost', 'root', 'ahnlab');
 mysql_select_db('mazeofmemories');
 
 
-$uploaddir = '/var/www/html/admin/maps/';
+$uploaddir = '/root/mom/maps/';
 $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 
 echo '<pre>';
