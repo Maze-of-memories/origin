@@ -16,20 +16,4 @@
         android:textSize="16sp"
         android:layout_weight="1" />
 
-    <ToggleButton
-        android:layout_width="wrap_content"
-        android:layout_height="23dp"
-        android:id="@+id/facebookButton"
-        android:background="@drawable/custom_switch"
-        android:textOff=""
-        android:textOn=""/>
-
-    <ToggleButton
-        android:layout_width="wrap_content"
-        android:layout_height="23dp"
-        android:id="@+id/googleButton"
-        android:background="@drawable/custom_switch"
-        android:textOff=""
-        android:textOn=""/>
-
 </LinearLayout>

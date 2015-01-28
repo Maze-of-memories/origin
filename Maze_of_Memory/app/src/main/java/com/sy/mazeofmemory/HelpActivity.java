@@ -21,22 +21,6 @@ public class HelpActivity extends ActionBarActivity {
     private ArrayList<String> arrayGroup;
     private HashMap<String, ArrayList<String>> arrayChild;
 
-    // facebook 관련 멤버
-    private UiLifecycleHelper uiHelper;
-
-    // 세션 변경 이벤트 리스너
-    private Session.StatusCallback callback = new Session.StatusCallback() {
-        @Override
-        public void call(Session session, SessionState state, Exception exception) {
-            onSessionStateChange(session, state, exception);
-        }
-    };
-
-    // 세션 상태 변경시 호출되는 메서드
-    private void onSessionStateChange(Session session, SessionState state, Exception exception) {
-        ;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,16 +54,18 @@ public class HelpActivity extends ActionBarActivity {
 
                 // 차일드가 없는 그룹에 대해서만 이벤트를 준다.
                if(arrayChild.get(arrayGroup.get(groupPosition)).isEmpty()) {
-                   String menu = arrayGroup.get(groupPosition);
-                   Toast.makeText(HelpActivity.this, menu, Toast.LENGTH_SHORT).show();
+                   /*String menu = arrayGroup.get(groupPosition);
+                   Toast.makeText(HelpActivity.this, menu, Toast.LENGTH_SHORT).show();*/
+
+                   // 계정 등록 메뉴 선택시
+                   if(groupPosition == 4) {
+                       startActivity(new Intent(HelpActivity.this, AccountRegisterActivity.class));
+                   }
                }
                 return false;
             }
         });
 
-        // uiHelper 초기화
-        uiHelper = new UiLifecycleHelper(this, callback);
-        uiHelper.onCreate(savedInstanceState);
     }
 
     private void setArrayData() {
@@ -93,39 +79,22 @@ public class HelpActivity extends ActionBarActivity {
         arrayGameControl.add("싱글 플레이");
         arrayGameControl.add("멀티 플레이");
 
-        ArrayList<String> arrayAccount = new ArrayList<>();
-        arrayAccount.add("Facebook");
-        arrayAccount.add("Google+");
-
         // 각 그룹에 차일드를 붙힌다. 차일드가 없으면 빈 리스트를 붙힌다.
         arrayChild.put(arrayGroup.get(0), arrayGameControl);
         arrayChild.put(arrayGroup.get(1), new ArrayList<String>());
         arrayChild.put(arrayGroup.get(2), new ArrayList<String>());
         arrayChild.put(arrayGroup.get(3), new ArrayList<String>());
-        arrayChild.put(arrayGroup.get(4), arrayAccount);
+        arrayChild.put(arrayGroup.get(4), new ArrayList<String>());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        // For scenarios where the main activity is launched and user
-        // session is not null, the session state change notification
-        // may not be triggered. Trigger it if it's open/closed.
-        // 이미 세션이 열려있으면, callback 메서드를 직접 호출한다.
-        Session session = Session.getActiveSession();
-        if (session != null &&
-                (session.isOpened() || session.isClosed()) ) {
-            onSessionStateChange(session, session.getState(), null);
-        }
-
-        uiHelper.onResume();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        uiHelper.onActivityResult(requestCode, resultCode, data);
     }
 
     /*
