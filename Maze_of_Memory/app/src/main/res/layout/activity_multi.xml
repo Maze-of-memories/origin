@@ -1,201 +1,220 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#ff0550ff"
-        android:gravity="center"
-        android:layout_gravity="center"
-        android:layout_marginTop="50dp">
-
-
-        <ImageView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:text="image"
-            android:id="@+id/personphoto"
-            android:background="@drawable/photo"
-            android:scaleType="fitXY"
-            />
-
-        <TextView
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="계정"
-            android:textSize="25dp"
-            android:id="@+id/textView2"
-            android:layout_below="@+id/personphoto"
-            android:layout_centerHorizontal="true"
-            />
-    </RelativeLayout>
-
-    <TableLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center">
-
-        <TableRow
-        android:layout_marginTop="40dp"
-            android:gravity="center"
-            >
-
-        <TextView
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/row0_column0"
-            android:text="계  급"
-            android:background="#ffcd3fff"
-            android:textSize="30dp"
-             />
-        <TextView
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/row0_column1"
-            android:text="점  수"
-            android:background="#ffff7ada"
-            android:textSize="30dp"
-
-            />
-        <TextView
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/row0_column2"
-            android:text="승  률"
-            android:background="#ffff26a7"
-            android:textSize="30dp"
-
-            />
-    </TableRow>
-        <TableRow
-            android:gravity="center">
-            <TextView
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/row1_column0"
-                android:text="바  보"
-                android:background="#ffff26a7"
-                android:textSize="30dp"/>
-            <TextView
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/row1_column1"
-                android:text="1200"
-                android:background="#ffcd3fff"
-                android:textSize="30dp"
-                />
-            <TextView
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/row1_column2"
-                android:text="63%"
-                android:background="#ffff7ada"
-                android:textSize="30dp"
-                />
-        </TableRow>
-        <TableRow
-            android:gravity="center"
-            android:layout_marginTop="10dp">
-            <TextView
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/row3_column0"
-                android:text="승  리"
-                android:background="#ffcd3fff"
-                android:textSize="30dp"
-                />
-            <TextView
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/row3_column1"
-                android:text="무 승 부"
-                android:background="#ffff7ada"
-                android:textSize="30dp"
-
-                />
-            <TextView
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/row3_column2"
-                android:text="패  배"
-                android:background="#ffff26a7"
-                android:textSize="30dp"
-
-                />
-        </TableRow>
-
-        <TableRow
-            android:gravity="center">
-            <TextView
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/row4_column0"
-                android:text="213"
-                android:background="#ffff26a7"
-                android:textSize="30dp"/>
-            <TextView
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/row4_column1"
-                android:text="33"
-                android:background="#ffcd3fff"
-                android:textSize="30dp"
-                />
-            <TextView
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/row4_column2"
-                android:text="120"
-                android:background="#ffff7ada"
-                android:textSize="30dp"
-                />
-        </TableRow>
-        </TableLayout>
-
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center">
-
-        <Button
-            android:layout_width="300dp"
-            android:layout_height="80dp"
-            android:text="Play"
-            android:textSize="30dp"
-            android:id="@+id/play"/>
-
-        </RelativeLayout>
-    <RelativeLayout
+    <!-- 멀티 플레이 메인 화면 -->
+    <LinearLayout
+        android:id="@+id/screen_main"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:gravity="bottom"
-        android:background="#fff5ff56">
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:background="#ff0550ff"
+            android:gravity="center">
+
+
+            <ImageView
+                android:id="@+id/personphoto"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:background="@drawable/photo"
+                android:scaleType="fitXY"
+                android:text="image" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/personphoto"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:text="계정"
+                android:textSize="25dp" />
+        </RelativeLayout>
+
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <TableRow
+                android:layout_marginTop="40dp"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/row0_column0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffcd3fff"
+                    android:gravity="center"
+                    android:text="계  급"
+                    android:textSize="30dp" />
+
+                <TextView
+                    android:id="@+id/row0_column1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffff7ada"
+                    android:gravity="center"
+                    android:text="점  수"
+                    android:textSize="30dp"
+
+                    />
+
+                <TextView
+                    android:id="@+id/row0_column2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffff26a7"
+                    android:gravity="center"
+                    android:text="승  률"
+                    android:textSize="30dp"
+
+                    />
+            </TableRow>
+
+            <TableRow android:gravity="center">
+
+                <TextView
+                    android:id="@+id/row1_column0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffff26a7"
+                    android:gravity="center"
+                    android:text="바  보"
+                    android:textSize="30dp" />
+
+                <TextView
+                    android:id="@+id/row1_column1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffcd3fff"
+                    android:gravity="center"
+                    android:text="1200"
+                    android:textSize="30dp" />
+
+                <TextView
+                    android:id="@+id/row1_column2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffff7ada"
+                    android:gravity="center"
+                    android:text="63%"
+                    android:textSize="30dp" />
+            </TableRow>
+
+            <TableRow
+                android:layout_marginTop="10dp"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/row3_column0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffcd3fff"
+                    android:gravity="center"
+                    android:text="승  리"
+                    android:textSize="30dp" />
+
+                <TextView
+                    android:id="@+id/row3_column1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffff7ada"
+                    android:gravity="center"
+                    android:text="무 승 부"
+                    android:textSize="30dp"
+
+                    />
+
+                <TextView
+                    android:id="@+id/row3_column2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffff26a7"
+                    android:gravity="center"
+                    android:text="패  배"
+                    android:textSize="30dp"
+
+                    />
+            </TableRow>
+
+            <TableRow android:gravity="center">
+
+                <TextView
+                    android:id="@+id/row4_column0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffff26a7"
+                    android:gravity="center"
+                    android:text="213"
+                    android:textSize="30dp" />
+
+                <TextView
+                    android:id="@+id/row4_column1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffcd3fff"
+                    android:gravity="center"
+                    android:text="33"
+                    android:textSize="30dp" />
+
+                <TextView
+                    android:id="@+id/row4_column2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#ffff7ada"
+                    android:gravity="center"
+                    android:text="120"
+                    android:textSize="30dp" />
+            </TableRow>
+        </TableLayout>
 
         <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="30dp"
-            android:layout_alignParentBottom="true"
-            android:background="#ffff17f5">
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/button_play"
+                android:layout_width="300dp"
+                android:layout_height="80dp"
+                android:text="Play"
+                android:textSize="30dp" />
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#fff5ff56"
+            android:gravity="bottom">
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="30dp"
+                android:layout_alignParentBottom="true"
+                android:background="#ffff17f5">
+
+            </RelativeLayout>
+
         </RelativeLayout>
+    </LinearLayout>
 
+    <!-- "PLEASE WAIT" 화면 -->
+    <LinearLayout android:id="@+id/screen_wait" style="@style/LLScreen">
+        <TextView style="@style/Blurb" android:text="@string/please_wait" />
+    </LinearLayout>
 
-</LinearLayout>
+    <!-- "GAME PLAY" 화면 -->
+    <LinearLayout android:id="@+id/screen_game" style="@style/LLScreen">
+        <TextView style="@style/Blurb" android:text="This is game playing screen" />
+    </LinearLayout>
+
+</FrameLayout>
