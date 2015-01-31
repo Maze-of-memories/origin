@@ -19,15 +19,7 @@
         android:orientation="vertical"
         android:gravity="center"
         android:background="#ffd7ff3b">
-        <!--
-        <Button
-            android:id="@+id/single_tutorial"
-            android:layout_width="100dp"
-            android:layout_height="120dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginTop="50dp"
-            android:text="Tutorial" />
-        -->
+
         <TextView
             android:id="@+id/page_num"
             android:layout_width="wrap_content"

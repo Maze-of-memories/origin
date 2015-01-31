@@ -99,6 +99,7 @@ public class MultiActivity extends Activity
         if (url != null) {
             url = url.substring(0, url.length() - 6);
             setProfilePicture(imageView, url);
+        }
 
         // 클릭 이벤트 처리가 필요한 모든 뷰에 이벤트 리스너를 설정해준다.
         for (int id : CLICKABLES) {
