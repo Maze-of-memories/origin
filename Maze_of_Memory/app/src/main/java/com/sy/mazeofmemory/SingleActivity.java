@@ -15,7 +15,6 @@ import android.widget.Button;
 
 public class SingleActivity extends FragmentActivity {
 
-
     int MAX_PAGE = 3;
     Fragment cur_fragment = new Fragment();
 
@@ -51,6 +50,8 @@ public class SingleActivity extends FragmentActivity {
     }
 
     private class adapter extends FragmentPagerAdapter {
+        //private Context context;
+
         public adapter(FragmentManager fm) {
             super(fm);
         }
@@ -61,13 +62,16 @@ public class SingleActivity extends FragmentActivity {
                 return null;
             switch (position) {
                 case 0:
-                    cur_fragment = new page_1();
+                    cur_fragment = new SingleSubPage(getApplicationContext(), position);
                     break;
                 case 1:
-                    cur_fragment = new page_2();
+                    cur_fragment = new SingleSubPage(getApplicationContext(), position);
                     break;
                 case 2:
-                    cur_fragment = new page_3();
+                    cur_fragment = new SingleSubPage(getApplicationContext(), position);
+                    break;
+                default:
+                    cur_fragment = new SingleSubPage(getApplicationContext(), position);
                     break;
             }
             return cur_fragment;
