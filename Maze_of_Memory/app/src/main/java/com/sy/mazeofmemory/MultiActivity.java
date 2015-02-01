@@ -11,6 +11,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -31,6 +32,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -57,7 +61,8 @@ public class MultiActivity extends Activity
 
     // 클릭 가능한 모든 뷰의 리스트
     final static int[] CLICKABLES = {
-            R.id.button_play
+            R.id.button_play, R.id.button_clickme
+
     };
 
     // 화면 리스트
@@ -74,6 +79,9 @@ public class MultiActivity extends Activity
 
     // 현재 게임에 참가한 나의 ID
     private String mMyId = null;
+
+    // 전송할 메시지를 담을 버퍼
+    byte[] mMsgBuf = new byte[2];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +146,7 @@ public class MultiActivity extends Activity
         }.execute();
     }
 
-    // 클릭 이벤트 처리
+    // 버튼 클릭 이벤트 처리
     @Override
     public void onClick(View v) {
         switch(v.getId()) {
@@ -147,7 +155,44 @@ public class MultiActivity extends Activity
                 Log.i(TAG, "button_play clicked");
                 startMultiPlay();
                 break;
+
+            // Click Me!! 버튼 클릭(테스트용 : 메시지 전송)
+            case R.id.button_clickme:
+                Log.d(TAG,"clickme button clicked");
+                sendMessage();
+                break;
         }
+    }
+
+    /*
+        메시지 보내고 받기
+     */
+
+    // 멀티플레이 참가자들에게 실시간 메시지를 보내는 메소드
+    void sendMessage() {
+        // 전송할 메시지를 설정한다.
+        mMsgBuf[0] = (byte)'T';
+        mMsgBuf[1] = (byte)1;
+
+        // 모든 참가자에게 메시지 전송
+        for (Participant p : mParticipants) {
+
+            // 자기 자신은 제외한다.
+            if(p.getParticipantId().equals(mMyId))
+                continue;
+
+            // 실제 메시지를 보내는 static method
+            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf, mRoomId, p.getParticipantId());
+        }
+    }
+
+    // 실시간 메시지를 받았을 때 호출되는 메소드
+    @Override
+    public void onRealTimeMessageReceived(RealTimeMessage rtm) {
+        byte[] buf = rtm.getMessageData();
+        String sender = rtm.getSenderParticipantId();
+        Toast.makeText(this,"Message received: " + (char) buf[0] + "/" + (int) buf[1], Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
     }
 
     // 자동 매칭 멀티 게임을 시작한다.
@@ -163,6 +208,8 @@ public class MultiActivity extends Activity
         switchToScreen(R.id.screen_wait);
         keepScreenOn();
         resetGameVars();
+
+        // 리얼타임 멀티플레이 방을 생성한다.
         Games.RealTimeMultiplayer.create(mGoogleApiClient, rtmConfigBuilder.build());
     }
 
@@ -222,9 +269,10 @@ public class MultiActivity extends Activity
         mFinishedParticipants.clear();*/
     }
 
-    // 방이 만들어졌을 때 호출된다.
+    // 방이 만들어졌을 때(create() 호출시) 호출된다.
     @Override
     public void onRoomCreated(int statusCode, Room room) {
+        Log.d(TAG, "onRoomCreated called (" + room.getCreatorId() + ")");
         // 에러 발생시 처리
         if (statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onRoomCreated, status " + statusCode);
@@ -232,20 +280,21 @@ public class MultiActivity extends Activity
             return;
         }
 
-        // show the waiting room UI
+        // 기본 대기방 화면을 보여준다.
         showWaitingRoom(room);
     }
 
+    // join()메소드에 의해 호출되는 콜백
     @Override
     public void onJoinedRoom(int statusCode, Room room) {
-        Log.d(TAG, "onJoinedRoom(" + statusCode + ", " + room + ")");
+        Log.d(TAG, "onJoinedRoom(" + statusCode + ", " + room + ") : 방에 참가함");
         if (statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
             showGameError();
             return;
         }
 
-        // show the waiting room UI
+        // 기본 대기방 화면을 보여준다.
         showWaitingRoom(room);
     }
 
@@ -258,10 +307,25 @@ public class MultiActivity extends Activity
         switchToMainScreen();
     }
 
-    // 방이 완전히 연결되었을 때 호출된다.
+    // 방이 완전히 연결되었을 때(플레이어간 매칭이 성사되었을 때) 호출된다.
     @Override
     public void onRoomConnected(int statusCode, Room room) {
         Log.d(TAG, "onRoomConnected(" + statusCode + ", " + room + ")");
+        Log.d(TAG, mMyId);
+        Log.d(TAG, mParticipants.get(0).getParticipantId());
+
+        // 참가자 리스트를 ID릴 기준으로 정렬한다(플레이어간 동일한 리스트 유지)
+        Collections.sort(mParticipants, new Comparator<Participant>() {
+
+            @Override
+            public int compare(Participant lhs, Participant rhs) {
+                return lhs.getParticipantId().compareTo(rhs.getParticipantId());
+            }
+        });
+        // 선 정하기
+        if(mParticipants.get(0).getParticipantId().equals(mMyId))
+            Toast.makeText(this, "You have first turn", Toast.LENGTH_SHORT).show();
+
         if (statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
             showGameError();
@@ -317,16 +381,8 @@ public class MultiActivity extends Activity
         findViewById(R.id.invitation_popup).setVisibility(showInvPopup ? View.VISIBLE : View.GONE);*/
     }
 
-    // 실시간 메시지를 받았을 떄 호출되는 메소드
-    @Override
-    public void onRealTimeMessageReceived(RealTimeMessage rtm) {
-        byte[] buf = rtm.getMessageData();
-        String sender = rtm.getSenderParticipantId();
-        Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
-    }
-
     /*
-     * RoomStatusUpdate 콜백 메소드
+     * RoomStatusUpdate(방 상태 업데이트)관련 콜백 메소드
      */
     @Override
     public void onRoomConnecting(Room room) {updateRoom(room);}
@@ -346,6 +402,7 @@ public class MultiActivity extends Activity
     @Override
     public void onPeerLeft(Room room, List<String> strings) {updateRoom(room);}
 
+    // 방에 연결되었을 때 호출된다.
     @Override
     public void onConnectedToRoom(Room room) {
         Log.d(TAG, "onConnectedToRoom.");
@@ -364,6 +421,7 @@ public class MultiActivity extends Activity
     // 방과의 연결이 끊길 때 호출된다. (메인 화면으로 돌아감)
     @Override
     public void onDisconnectedFromRoom(Room room) {
+        Toast.makeText(this, "Disconnected from room(server)", Toast.LENGTH_SHORT).show();
         Log.i(TAG, "onDisconnectedFromRoom(room) called.");
         mRoomId = null;
         showGameError();
@@ -390,6 +448,7 @@ public class MultiActivity extends Activity
         }
     }
 
+    // 구글 계정 로그인 성공시 호출
     @Override
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "onConnected() called. Sign in successful!");
@@ -403,12 +462,14 @@ public class MultiActivity extends Activity
         mGoogleApiClient.connect();
     }
 
+    // 구글 계정 로그인 실패시 호출
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.d(TAG, "onConnectionFailed() called, result: " + connectionResult);
     }
 
     // Handle back key to make sure we cleanly leave a game if we are in the middle of one
+    // 게임중 백키(back key)를 눌렀을 때 정상적으로 게임을 끝낼 수 있도록 이벤트처리를 해준다.
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent e) {
         if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_game) {

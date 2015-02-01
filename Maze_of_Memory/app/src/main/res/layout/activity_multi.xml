@@ -215,6 +215,11 @@
     <!-- "GAME PLAY" 화면 -->
     <LinearLayout android:id="@+id/screen_game" style="@style/LLScreen">
         <TextView style="@style/Blurb" android:text="This is game playing screen" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Click Me!!"
+            android:id = "@+id/button_clickme"/>
     </LinearLayout>
 
 </FrameLayout>
