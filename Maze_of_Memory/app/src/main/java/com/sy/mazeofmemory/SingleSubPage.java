@@ -1,7 +1,6 @@
 package com.sy.mazeofmemory;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -16,7 +15,11 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +33,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 public class SingleSubPage extends android.support.v4.app.Fragment {
+
+    private Integer[] btn = {
+            R.drawable.sea, R.drawable.sea, R.drawable.sea,
+            R.drawable.sea, R.drawable.sea, R.drawable.sea,
+            R.drawable.sea, R.drawable.sea, R.drawable.sea
+    };
+    private ImageAdapter imageAdapter;
 
     private static final String dbName = "single.db";
     private static final String tableName = "SINGLE_MAP_5";
@@ -66,54 +76,21 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
 
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        final int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
-        final int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120, getResources().getDisplayMetrics());
-
-        Button[] btnWord = new Button[btnCnt];
         LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.activity_single_sub_page, container, false);
-        LinearLayout R_sub_page = (LinearLayout) linearLayout.findViewById(R.id.R_sub_page);
-        LinearLayout R_sub_btn = (LinearLayout) linearLayout.findViewById(R.id.R_sub_btn);
 
-        for (int i = 0; i < btnWord.length; i++) {
-            btnWord[i] = new Button(this.context);
-            btnWord[i].setHeight(height);
-            btnWord[i].setWidth(width);
+        GridView gridView = (GridView) linearLayout.findViewById(R.id.single_game_btn);
+        gridView.setAdapter(imageAdapter = new ImageAdapter(getActivity()));
+        gridView.setOnItemClickListener(gridviewOnItemClickListener);
 
-            btnWord[i].setTag(i);
-            btnWord[i].setOnClickListener(btnClicked);
-            R_sub_btn.addView(btnWord[i]);
-        }
 
         TextView page_num = (TextView) linearLayout.findViewById(R.id.page_num);
         page_num.setText(String.valueOf(pageCnt));
-        R_sub_page.setBackground(new ColorDrawable(0xff6dc6d2));
 
         return linearLayout;
     }
-
-    View.OnClickListener btnClicked = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Object tag = v.getTag();
-            Intent intent;
-
-            //튜토리얼 클릭
-            if (pageCnt == 0 && tag.toString().equals("0")) {
-                intent = new Intent(context, SingleTutorialActivity.class);
-            } else {
-                intent = new Intent(context, SingleGameActivity.class);
-                //Log.i("map_info , pageCnt", map.get((int) tag) + "," + pageCnt);
-            }
-            intent.putExtra("map_info", map.get((int) tag));
-            startActivity(intent);
-            getActivity().finish();
-            //Toast.makeText(context, "버튼" + tag + " : 클릭됨", Toast.LENGTH_SHORT).show();
-        }
-    };
 
     public void select() {
 
@@ -183,6 +160,68 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
             Log.i("SingleDBManager : ", "DB not exists.");
             return false;
         }
+    }
+
+    public GridView.OnItemClickListener gridviewOnItemClickListener
+            = new GridView.OnItemClickListener() {
+
+        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+            Intent intent;
+
+            //튜토리얼 클릭
+            if (pageCnt == 0 && position == 0) {
+                intent = new Intent(context, SingleTutorialActivity.class);
+            } else {
+                intent = new Intent(context, SingleGameActivity.class);
+            }
+            intent.putExtra("map_info", map.get(position));
+            startActivity(intent);
+            getActivity().finish();
+
+            //Toast.makeText(context, "버튼" + position + " : 클릭됨", Toast.LENGTH_SHORT).show();
+
+        }
+    };
+
+    public class ImageAdapter extends BaseAdapter {
+        private Context mContext;
+
+        public ImageAdapter(Context c) {
+            mContext = c;
+        }
+
+        public int getCount() {
+            return btn.length;
+        }
+
+        public Object getItem(int position) {
+            return null;
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            ImageView imageView;
+
+            final int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics());
+
+            final int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 150, getResources().getDisplayMetrics());
+
+            if (convertView == null) {
+                imageView = new ImageView(mContext);
+            } else {
+                imageView = (ImageView) convertView;
+            }
+            imageView.setLayoutParams(new GridView.LayoutParams(width, height));
+
+            imageView.setImageResource(btn[position]);
+
+            return imageView;
+        }
+
     }
 
 

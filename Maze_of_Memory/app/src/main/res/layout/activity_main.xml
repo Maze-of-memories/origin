@@ -1,8 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:background="#ff75ff70">
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -48,13 +47,14 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/R_Logo"
-                android:gravity="center">
+                android:gravity="center"
+                android:layout_marginBottom="20dp">
 
                 <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    android:background="@drawable/sea"
-                    android:id="@+id/Logo"/>
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:background="@drawable/main_logo"
+                    android:id="@+id/Logo" />
 
             </RelativeLayout>
 

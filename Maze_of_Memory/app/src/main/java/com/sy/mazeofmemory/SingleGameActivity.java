@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -78,6 +79,12 @@ public class SingleGameActivity extends Activity {
 
         pre_chess_Position = chess_startPosition;
         map_info_Postion = map_info_startPosition;
+
+        Log.i("map_info",map_info.get(0));
+
+        if(touch_cnt >= 1){
+
+        }
     }
 
     public void move(int position) {
@@ -85,6 +92,7 @@ public class SingleGameActivity extends Activity {
         chess[pre_chess_Position] = 0;
         chess[position] = R.drawable.left_game_profile;
         pre_chess_Position = position;
+
     }
 
     public void game_Move(int position) {
@@ -121,6 +129,7 @@ public class SingleGameActivity extends Activity {
                 || (position == pre_chess_Position - 1 && map[map_info_Postion - 1].equals("x"))
                 || (position == pre_chess_Position + 1 && map[map_info_Postion + 1].equals("x"))) {
             game_init();
+            touchEvent();
         }
     }
 
@@ -199,6 +208,10 @@ public class SingleGameActivity extends Activity {
 
             touch_cnt++;
             Log.i("touch_cnt", "" + touch_cnt);
+
+            if(pre_chess_Position == 4){
+                Toast.makeText(this, "도착하였습니다.", Toast.LENGTH_SHORT).show();
+            }
 
             imageAdapter.notifyDataSetChanged();
 

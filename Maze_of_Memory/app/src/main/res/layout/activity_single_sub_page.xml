@@ -10,7 +10,13 @@
         android:orientation="horizontal"
         android:id="@+id/R_sub_btn">
 
-        </LinearLayout>
+        <GridView
+            android:layout_width="fill_parent"
+            android:layout_height="450dp"
+            android:id="@+id/single_game_btn"
+            android:numColumns="3"
+            android:gravity="center" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/R_sub_page"
