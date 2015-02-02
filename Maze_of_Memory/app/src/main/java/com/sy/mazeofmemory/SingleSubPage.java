@@ -1,6 +1,7 @@
 package com.sy.mazeofmemory;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class SingleSubPage extends android.support.v4.app.Fragment {
 
@@ -40,7 +42,7 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
     private int pageCnt;
 
     private int number;
-    private String map_info;
+    private ArrayList<String> map = new ArrayList<String>();
 
     public SingleSubPage(Context context, int position) {
         this.context = context;
@@ -97,30 +99,33 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
         @Override
         public void onClick(View v) {
             Object tag = v.getTag();
+            Intent intent;
 
             //튜토리얼 클릭
             if (pageCnt == 0 && tag.toString().equals("0")) {
-                Intent intent = new Intent(context, SingleTutorialActivity.class);
-                startActivity(intent);
+                intent = new Intent(context, SingleTutorialActivity.class);
+            } else {
+                intent = new Intent(context, SingleGameActivity.class);
+                //Log.i("map_info , pageCnt", map.get((int) tag) + "," + pageCnt);
             }
-            Toast.makeText(context, "버튼" + tag + " : 클릭됨", Toast.LENGTH_SHORT).show();
+            intent.putExtra("map_info", map.get((int) tag));
+            startActivity(intent);
+            getActivity().finish();
+            //Toast.makeText(context, "버튼" + tag + " : 클릭됨", Toast.LENGTH_SHORT).show();
         }
     };
 
     public void select() {
 
-        int i;
-
         Cursor cursr = db.query(tableName, null, null, null, null, null, null);
 
         cursr.moveToPosition(position);
 
-        for (i = 0; i < btnCnt; i++) {
+        for (int i = 0; i < btnCnt; i++) {
 
             number = cursr.getInt(cursr.getColumnIndex("NUMBER"));
-            map_info = cursr.getString(cursr.getColumnIndex("MAP_INFO"));
 
-            Log.i("number, map_info", number + "," + map_info);
+            map.add(cursr.getString(cursr.getColumnIndex("MAP_INFO")));
 
             cursr.moveToNext();
         }
@@ -164,7 +169,7 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
             is.close();
 
         } catch (IOException e) {
-            Log.e("AddressDBManager : ", e.getMessage());
+            Log.e("SingleDBManager : ", e.getMessage());
         }
     }
 
@@ -172,10 +177,10 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
         File addressDB = new File("/data/data/com.sy.mazeofmemory/databases/" + dbName);
 
         if (addressDB.exists()) {
-            Log.i("AddressDBManager : ", "DB exists.");
+            Log.i("SingleDBManager : ", "DB exists.");
             return true;
         } else {
-            Log.i("AddressDBManager : ", "DB not exists.");
+            Log.i("SingleDBManager : ", "DB not exists.");
             return false;
         }
     }

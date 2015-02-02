@@ -71,7 +71,6 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
                 Intent intent = new Intent(MainActivity.this, MultiActivity.class);
                 intent.putExtra("url",personPhotoUrl);
                 startActivity(intent);
-
             }
         });
 
