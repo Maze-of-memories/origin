@@ -212,6 +212,69 @@
         <TextView style="@style/Blurb" android:text="@string/please_wait" />
     </LinearLayout>
 
+    <!-- "WAITING ROOM" 화면  : 테스트중 -->
+    <LinearLayout android:id="@+id/screen_waiting_room"
+        style="@style/LLScreen"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:id="@+id/my_picture"
+                    android:background="@drawable/photo"
+                    android:layout_gravity="center_horizontal" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MyNick"
+                    android:id="@+id/my_nick"
+                    android:layout_gravity="center_horizontal" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VS"
+                android:id="@+id/textView7"
+                android:layout_gravity="center"
+                android:layout_margin="15dp" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:id="@+id/peer_picture"
+                    android:background="@drawable/photo"
+                    android:layout_gravity="center_horizontal" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="searching..."
+                    android:id="@+id/peer_nick"
+                    android:layout_gravity="center_horizontal" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView style="@style/Blurb" android:text="waiting for player..." />
+    </LinearLayout>
+
     <!-- "GAME PLAY" 화면 -->
     <LinearLayout android:id="@+id/screen_game" style="@style/LLScreen">
         <TextView style="@style/Blurb" android:text="This is game playing screen" />

@@ -11,6 +11,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -26,6 +27,7 @@ import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.realtime.RoomStatusUpdateListener;
 import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
 import java.io.IOException;
@@ -59,6 +61,14 @@ public class MultiActivity extends Activity
     // 프로필 사진 이미지뷰
     ImageView imageView;
 
+    // 대기 화면의 프로필 사진 이미지뷰
+    ImageView myPicture;
+    ImageView peerPicture;
+
+    // 대기 화면의 닉네임
+    TextView myNickname;
+    TextView peerNickname;
+
     // 클릭 가능한 모든 뷰의 리스트
     final static int[] CLICKABLES = {
             R.id.button_play, R.id.button_clickme
@@ -67,7 +77,8 @@ public class MultiActivity extends Activity
 
     // 화면 리스트
     final static int[] SCREENS = {
-            R.id.screen_main, R.id.screen_wait, R.id.screen_game
+            R.id.screen_main, R.id.screen_wait, R.id.screen_game,
+            R.id.screen_waiting_room
     };
     int mCurScreen = -1;    /* 현재 화면을 저장하는 변수 */
 
@@ -86,6 +97,8 @@ public class MultiActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 레이아웃 설정
         setContentView(R.layout.activity_multi);
 
         // Plus와 Game에 엑세스 하는 Google API Client 생성
@@ -102,11 +115,27 @@ public class MultiActivity extends Activity
         // MainActivity로부터 프로필 사진의 주소를 받아 이미지뷰에 출력한다.
         Intent intent = getIntent();
         String url = intent.getExtras().getString("url");
+
+        // 메인화면 프로필 사진
         imageView = (ImageView) findViewById(R.id.personphoto);
+
+        // 대기화면 프로필 사진
+        myPicture = (ImageView)findViewById(R.id.my_picture);
+        peerPicture = (ImageView)findViewById(R.id.peer_picture);
+
+        // 대기화면 닉네임 : 일단은 구글 이름 출력
+        myNickname = (TextView)findViewById(R.id.my_nick);
+        peerNickname = (TextView)findViewById(R.id.peer_nick);
+
         //imageUrl DB 저장 고려
         if (url != null) {
             url = url.substring(0, url.length() - 6);
+
+            // 멀티플레이 메인 화면의 프로필 사진
             setProfilePicture(imageView, url);
+
+            // 대기 화면의 프로필 사진
+            setProfilePicture(myPicture, url);
         }
 
         // 클릭 이벤트 처리가 필요한 모든 뷰에 이벤트 리스너를 설정해준다.
@@ -229,6 +258,7 @@ public class MultiActivity extends Activity
                 break;
             case RC_WAITING_ROOM:
                 // we got the result from the "waiting room" UI.
+                // 대기방 화면에서 받은 결과값
                 if (responseCode == Activity.RESULT_OK) {
                     // ready to start playing
                     // 게임을 시작할 준비가 되었을 경우 게임 화면을 띄우고 게임을 시작한다.
@@ -272,7 +302,12 @@ public class MultiActivity extends Activity
     // 방이 만들어졌을 때(create() 호출시) 호출된다.
     @Override
     public void onRoomCreated(int statusCode, Room room) {
-        Log.d(TAG, "onRoomCreated called (" + room.getCreatorId() + ")");
+        Log.d(TAG, "onRoomCreated called (" + room.getCreatorId() + "/" + room.getRoomId() + ")");
+
+        // 방이 생성되면 나의 Id와 방 ID를 바로 초기화 한다.
+        mMyId = room.getCreatorId();
+        mRoomId = room.getRoomId();
+
         // 에러 발생시 처리
         if (statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onRoomCreated, status " + statusCode);
@@ -281,21 +316,30 @@ public class MultiActivity extends Activity
         }
 
         // 기본 대기방 화면을 보여준다.
-        showWaitingRoom(room);
+        //showWaitingRoom(room);
+
+        // 상대 플레어의 사진을 기본 사진으로 초기화
+        peerPicture.setImageResource(R.drawable.photo);
+
+        // 상대 플레이어의 닉네임을 초기화
+        peerNickname.setText("searching...");
+
+        // 커스텀 대기방 화면을 보여준다.
+        switchToScreen(R.id.screen_waiting_room);
     }
 
-    // join()메소드에 의해 호출되는 콜백
-    @Override
-    public void onJoinedRoom(int statusCode, Room room) {
-        Log.d(TAG, "onJoinedRoom(" + statusCode + ", " + room + ") : 방에 참가함");
-        if (statusCode != GamesStatusCodes.STATUS_OK) {
-            Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
-            showGameError();
+        // join()메소드에 의해 호출되는 콜백
+        @Override
+        public void onJoinedRoom(int statusCode, Room room) {
+            Log.d(TAG, "onJoinedRoom(" + statusCode + ", " + room + ") : 방에 참가함");
+            if (statusCode != GamesStatusCodes.STATUS_OK) {
+                Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
+                showGameError();
             return;
         }
 
         // 기본 대기방 화면을 보여준다.
-        showWaitingRoom(room);
+        //showWaitingRoom(room);
     }
 
     // 정상적으로 방을 나갔을 때 호출되는 메소드(leaveRoom() 호출을 통한)
@@ -310,11 +354,17 @@ public class MultiActivity extends Activity
     // 방이 완전히 연결되었을 때(플레이어간 매칭이 성사되었을 때) 호출된다.
     @Override
     public void onRoomConnected(int statusCode, Room room) {
+
+        // 방 ID, 참가자들의 ID, 나의 ID를 가져온다.
+        mRoomId = room.getRoomId();
+        mParticipants = room.getParticipants();
+        mMyId = room.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient));
+
         Log.d(TAG, "onRoomConnected(" + statusCode + ", " + room + ")");
         Log.d(TAG, mMyId);
         Log.d(TAG, mParticipants.get(0).getParticipantId());
 
-        // 참가자 리스트를 ID릴 기준으로 정렬한다(플레이어간 동일한 리스트 유지)
+        // 참가자 리스트를 ID 기준으로 정렬한다(플레이어간 동일한 리스트 유지)
         Collections.sort(mParticipants, new Comparator<Participant>() {
 
             @Override
@@ -332,9 +382,12 @@ public class MultiActivity extends Activity
             return;
         }
         updateRoom(room);
+
+        switchToScreen(R.id.screen_game);
     }
 
     // 다른 플레이어가 방에 들어오고 연결되는 과정을 track할 수 있도록 방 대기 화면을 보여준다.
+    // onRoomConnected 와 onJoinedRoom 에서 호출됨
     void showWaitingRoom(Room room) {
         // minimum number of players required for our game
         // For simplicity, we require everyone to join the game before we start it
@@ -397,7 +450,26 @@ public class MultiActivity extends Activity
     public void onPeerDeclined(Room room, List<String> strings) {updateRoom(room);}
 
     @Override
-    public void onPeerJoined(Room room, List<String> strings) {updateRoom(room);}
+    public void onPeerJoined(Room room, List<String> strings) {
+        Log.d(TAG, "onPeerJoined() called : " + strings.toString());
+        updateRoom(room);
+        // 상대방의 프로필 사진과 닉네임을 출력한다.
+            String url;
+            for(Participant p : mParticipants) {
+
+                if(p.getParticipantId().equals(mMyId))
+                    continue;
+                else {
+                    Log.d(TAG, "mMyId : " + mMyId);
+                    Log.d(TAG, "participant id : " + p.getParticipantId());
+                    Log.d(TAG, "IconImageUrl : " + p.getIconImageUrl());
+
+                    url = p.getIconImageUrl();
+                    setProfilePicture(peerPicture, url);
+                    peerNickname.setText(p.getDisplayName());
+                }
+        }
+    }
 
     @Override
     public void onPeerLeft(Room room, List<String> strings) {updateRoom(room);}
@@ -406,6 +478,7 @@ public class MultiActivity extends Activity
     @Override
     public void onConnectedToRoom(Room room) {
         Log.d(TAG, "onConnectedToRoom.");
+        Log.d(TAG, room.toString());
 
         // 방 ID, 참가자들의 ID, 나의 ID를 가져온다.
         mRoomId = room.getRoomId();
@@ -439,6 +512,7 @@ public class MultiActivity extends Activity
     @Override
     public void onP2PDisconnected(String s) {}
 
+    // 방의 상태를 업데이트 한다.
     void updateRoom(Room room) {
         if (room != null) {
             mParticipants = room.getParticipants();
@@ -452,6 +526,10 @@ public class MultiActivity extends Activity
     @Override
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "onConnected() called. Sign in successful!");
+
+        // 로그인한 계정의 이름 출력
+        Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
+        myNickname.setText(currentPerson.getDisplayName());
 
         Log.d(TAG, "Sign-in succeeded.");
     }
@@ -474,6 +552,12 @@ public class MultiActivity extends Activity
     public boolean onKeyDown(int keyCode, KeyEvent e) {
         if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_game) {
             // 게임 플레이 중 백키를 누르면 방을 나간다.
+            leaveRoom();
+            return true;
+        }
+
+        if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_waiting_room) {
+            // 대기방에서 백키를 누르면 방을 나간다.
             leaveRoom();
             return true;
         }
