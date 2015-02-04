@@ -83,7 +83,7 @@ public class SingleGameActivity extends Activity {
         Log.i("map_info",map_info.get(0));
 
         if(touch_cnt >= 1){
-
+            Toast.makeText(this, "틀렸습니다. 시작 위치로 돌아갑니다.", Toast.LENGTH_SHORT).show();
         }
     }
 
