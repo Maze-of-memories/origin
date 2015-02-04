@@ -29,6 +29,7 @@ public class SingleGameActivity extends Activity {
             0, 0, 0, 0, 0,
             R.drawable.left_game_profile, 0, 0, 0, 0
     };
+
     private ImageAdapter imageAdapter;
     private int touch_cnt = 0;
 
@@ -199,7 +200,6 @@ public class SingleGameActivity extends Activity {
 
             return imageView;
         }
-
     }
 
     public boolean onTouchEvent(MotionEvent event) {
