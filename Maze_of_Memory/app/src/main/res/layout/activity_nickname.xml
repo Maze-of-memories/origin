@@ -17,8 +17,8 @@
             android:layout_width="200sp"
             android:layout_height="48dp"
             android:id="@+id/nicname"
-            android:text="특수문자를 제외한 문자"
-            android:background="#ffffff"/>
+            android:background="#ffffff"
+            android:hint="특수문자를 제외한 문자" />
 
         <Button
             android:layout_width="wrap_content"

@@ -6,15 +6,16 @@ $conn = mysqli_connect("localhost", "root", "ahnlab", "mazeofmemories");
 $nickname = $_GET["nickname"];
 
 $result = mysqli_query($conn, "SELECT COUNT(NICKNAME) as cnt FROM ACCOUNT where NICKNAME = '" .$nickname."'");
-$result2 = mysqli_query($conn, "INSERT INTO NICKNAME VALUE (".$nickname.") FROM ACCOUNT");
 
 while($row = mysqli_fetch_array($result, MYSQLI_ASSOC)){
-	
-	echo $row[cnt];
-	echo "<br>";
-	
-}
 
+	if($row[cnt] == 1){
+		echo "fault";
+	}else if($row[cnt] == 0){
+		mysqli_query($conn, "INSERT INTO ACCOUNT (NICKNAME) VALUES ('".$nickname."')");
+		echo "success";
+	}
+}
 
 mysqli_close($conn);
 

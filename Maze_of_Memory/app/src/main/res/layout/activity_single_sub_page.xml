@@ -17,20 +17,4 @@
             android:numColumns="3"
             android:gravity="center" />
     </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/R_sub_page"
-        android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:background="#ffd7ff3b">
-
-        <TextView
-            android:id="@+id/page_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="50dp" />
-    </LinearLayout>
 </LinearLayout>

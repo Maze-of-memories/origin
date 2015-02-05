@@ -4,31 +4,29 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-
 import com.google.android.gms.games.Games;
 import com.google.android.gms.plus.Plus;
-
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.plus.model.people.Person;
 
 
-public class MainActivity extends Activity  implements View.OnClickListener, ConnectionCallbacks,
-        OnConnectionFailedListener{
+public class MainActivity extends Activity implements View.OnClickListener, ConnectionCallbacks,
+        OnConnectionFailedListener {
 
     private static final int RC_SIGN_IN = 0;
     private GoogleApiClient mGoogleApiClient;
     private boolean mIntentInProgress;
     private boolean mSignInClicked;
-    private ProgressDialog mConnectionProgressDialog;
     private ConnectionResult mConnectionResult;
     private Games.GamesOptions apiOptions;
     private BackPressCloseHandler backPressCloseHandler;
@@ -36,13 +34,22 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
     private String personName;
     private String personPhotoUrl = null;
     private String personGooglePlusProfile;
+    private String personEmail;
 
     Button btn;
+
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dialog = new ProgressDialog(MainActivity.this);
+        dialog.setMessage("Data translating...");
+        dialog.setIndeterminate(true);
+        dialog.setCancelable(true);
+        dialog.show();
 
         apiOptions = Games.GamesOptions.builder().setShowConnectingPopup(true).build();
 
@@ -57,25 +64,25 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
 
-        btn = (Button)findViewById(R.id.single);
-        btn.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View v){
+        btn = (Button) findViewById(R.id.single);
+        btn.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SingleActivity.class);
                 startActivity(intent);
                 finish();
             }
         });
-        btn = (Button)findViewById(R.id.multi);
-        btn.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View v){
+        btn = (Button) findViewById(R.id.multi);
+        btn.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MultiActivity.class);
-                intent.putExtra("url",personPhotoUrl);
+                intent.putExtra("url", personPhotoUrl);
                 startActivity(intent);
             }
         });
 
         // 도움말 버튼 초기화 및 이벤트리스너 설정
-        Button btnHelp = (Button)findViewById(R.id.btnHelp);
+        Button btnHelp = (Button) findViewById(R.id.btnHelp);
         btnHelp.setOnClickListener(this);
 
         backPressCloseHandler = new BackPressCloseHandler(this);
@@ -84,9 +91,11 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
 
     protected void onStart() {
         super.onStart();
+
         if (!mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
         }
+
     }
 
     protected void onStop() {
@@ -97,6 +106,11 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
     }
 
     public void onConnectionFailed(ConnectionResult result) {
+
+        dialog.dismiss();
+        findViewById(R.id.R_login).setVisibility(View.VISIBLE);
+        findViewById(R.id.R_main).setVisibility(View.GONE);
+
         if (!mIntentInProgress) {
             mConnectionResult = result;
 
@@ -107,6 +121,7 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
     }
 
     protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
+
         if (requestCode == RC_SIGN_IN) {
             if (responseCode != RESULT_OK) {
                 mSignInClicked = false;
@@ -126,7 +141,7 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
                 && !mGoogleApiClient.isConnecting()) {
             mSignInClicked = true;
             resolveSignInError();
-        } else if(view.getId() == R.id.btnHelp) {
+        } else if (view.getId() == R.id.btnHelp) {
             // 도움말 버튼 클릭시 도움말 화면을 출력한다.
             startActivity(new Intent(this, HelpActivity.class));
         }
@@ -147,6 +162,9 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
                 */
                 mGoogleApiClient.disconnect();
                 mGoogleApiClient.connect();
+
+                findViewById(R.id.R_main).setVisibility(View.GONE);
+                findViewById(R.id.R_login).setVisibility(View.VISIBLE);
             }
         }
     }
@@ -169,7 +187,10 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
     @Override
     public void onConnected(Bundle connectionHint) {
         mSignInClicked = false;
-        //Toast.makeText(this, "환영합니다", Toast.LENGTH_LONG).show();
+
+        dialog.dismiss();
+        findViewById(R.id.R_login).setVisibility(View.GONE);
+        findViewById(R.id.R_main).setVisibility(View.VISIBLE);
 
         //google 사용자 정보가져 오기
         if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
@@ -177,12 +198,16 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
             personName = currentPerson.getDisplayName();
             personPhotoUrl = currentPerson.getImage().getUrl();
             personGooglePlusProfile = currentPerson.getUrl();
+            personEmail = Plus.AccountApi.getAccountName(mGoogleApiClient);
+
         }
         Log.i("personName", personName);
-        Log.i("personPhotoUrl",personPhotoUrl);
+        Log.i("personPhotoUrl", personPhotoUrl);
         Log.i("personGooglePlusProfile", personGooglePlusProfile);
+        Log.i("personEmail", personEmail);
 
     }
+
 
     public void onConnectionSuspended(int cause) {
         mGoogleApiClient.connect();
@@ -193,7 +218,7 @@ public class MainActivity extends Activity  implements View.OnClickListener, Con
 
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                    backPressCloseHandler.onBackPressed();
+                backPressCloseHandler.onBackPressed();
                 return true;
         }
         return super.onKeyDown(keyCode, event);

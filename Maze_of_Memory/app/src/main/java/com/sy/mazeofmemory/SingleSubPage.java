@@ -85,10 +85,6 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
         gridView.setAdapter(imageAdapter = new ImageAdapter(getActivity()));
         gridView.setOnItemClickListener(gridviewOnItemClickListener);
 
-
-        TextView page_num = (TextView) linearLayout.findViewById(R.id.page_num);
-        page_num.setText(String.valueOf(pageCnt));
-
         return linearLayout;
     }
 
