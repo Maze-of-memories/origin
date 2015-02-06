@@ -9,6 +9,7 @@ $result = mysqli_query($conn, "SELECT COUNT(NICKNAME) as cnt FROM ACCOUNT where 
 
 while($row = mysqli_fetch_array($result, MYSQLI_ASSOC)){
 
+
 	if($row[cnt] = 1){
 		echo "false";
 	}else if($row[cnt] = 0){
@@ -16,8 +17,6 @@ while($row = mysqli_fetch_array($result, MYSQLI_ASSOC)){
 		echo "success";
 	}
 }
-
-
 
 mysqli_close($conn);
 

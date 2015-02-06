@@ -215,7 +215,8 @@
     <!-- "WAITING ROOM" 화면  : 테스트중 -->
     <LinearLayout android:id="@+id/screen_waiting_room"
         style="@style/LLScreen"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="invisible">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -272,7 +273,9 @@
             </LinearLayout>
         </LinearLayout>
 
-        <TextView style="@style/Blurb" android:text="waiting for player..." />
+        <TextView style="@style/Blurb"
+            android:text="waiting for player..."
+            android:id="@+id/waiting_room_status" />
     </LinearLayout>
 
     <!-- "GAME PLAY" 화면 -->
