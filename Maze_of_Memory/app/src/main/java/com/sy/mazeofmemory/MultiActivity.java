@@ -1,6 +1,7 @@
 package com.sy.mazeofmemory;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -60,6 +61,15 @@ public class MultiActivity extends Activity
     // Google APIs와 상호작용하기 위해 사용되는 클라이언트
     private GoogleApiClient mGoogleApiClient;
 
+    private boolean isBackKeyPressedOnWait = false;
+
+    // 프로그래스 다이얼로그
+    ProgressDialog mPDialog;
+
+    // 메인화면의 프로필 사진과 닉네임
+    ImageView mainProfilePicture;
+    TextView mainNickname;
+
     // 나와 상대방의 프로필 사진 주소
     String myPictureURL;
     String peerPictureURL;
@@ -67,9 +77,6 @@ public class MultiActivity extends Activity
     // 나와 상대방의 닉네임
     String strMyNick;
     String strPeerNick;
-
-    // 프로필 사진 이미지뷰
-    ImageView imageView;
 
     // 대기 화면의 프로필 사진 이미지뷰
     ImageView myPicture;
@@ -119,6 +126,12 @@ public class MultiActivity extends Activity
         // 레이아웃 설정
         setContentView(R.layout.activity_multi);
 
+        mPDialog = new ProgressDialog(this);
+        mPDialog.setMessage("Please wait...");
+        mPDialog.setCanceledOnTouchOutside(false);
+        mPDialog.setCancelable(false);
+        mPDialog.show();
+
         // Plus와 Game에 엑세스 하는 Google API Client 생성
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -134,8 +147,9 @@ public class MultiActivity extends Activity
         Intent intent = getIntent();
         myPictureURL = intent.getExtras().getString("url");
 
-        // 메인화면 프로필 사진
-        imageView = (ImageView) findViewById(R.id.personphoto);
+        // 메인화면 프로필 사진 및 닉네임
+        mainProfilePicture = (ImageView) findViewById(R.id.personphoto);
+        mainNickname = (TextView)findViewById(R.id.main_nickname);
 
         // 대기화면 프로필 사진
         myPicture = (ImageView)findViewById(R.id.my_picture);
@@ -153,7 +167,7 @@ public class MultiActivity extends Activity
             myPictureURL = myPictureURL.substring(0, myPictureURL.length() - 6);
 
             // 멀티플레이 메인 화면의 프로필 사진
-            setProfilePicture(imageView, myPictureURL);
+            setProfilePicture(mainProfilePicture, myPictureURL);
 
             // 대기 화면의 프로필 사진
             setProfilePicture(myPicture, myPictureURL);
@@ -192,6 +206,7 @@ public class MultiActivity extends Activity
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 view.setImageBitmap(bmp);
+                mPDialog.dismiss();
             }
         }.execute();
     }
@@ -326,7 +341,7 @@ public class MultiActivity extends Activity
         rtmConfigBuilder.setMessageReceivedListener(this);
         rtmConfigBuilder.setRoomStatusUpdateListener(this);
         rtmConfigBuilder.setAutoMatchCriteria(autoMatchCriteria);
-        switchToScreen(R.id.screen_wait);
+        switchToScreen(R.id.screen_waiting_room);
         keepScreenOn();
         resetGameVars();
 
@@ -363,6 +378,13 @@ public class MultiActivity extends Activity
         // 방이 생성되면 나의 Id와 방 ID를 바로 초기화 한다.
         mMyId = room.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient));
         mRoomId = room.getRoomId();
+
+        // 방 생성 대기 중 백키가 눌렸으면 방을 떠난다.
+        if(isBackKeyPressedOnWait) {
+            leaveRoom();
+            isBackKeyPressedOnWait = false;
+            return;
+        }
 
         // 에러 발생시 처리
         if (statusCode != GamesStatusCodes.STATUS_OK) {
@@ -622,9 +644,14 @@ public class MultiActivity extends Activity
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "onConnected() called. Sign in successful!");
 
-        // 로그인한 계정의 이름 출력
         Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
         strMyNick = currentPerson.getDisplayName();
+
+
+        // 메인 화면 닉네임 출력
+        mainNickname.setText(strMyNick);
+
+        // 대기 화면의 닉네임 출력
         myNickname.setText(strMyNick);
 
         Log.d(TAG, "Sign-in succeeded.");
@@ -654,6 +681,7 @@ public class MultiActivity extends Activity
 
         if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_waiting_room) {
             // 대기방에서 백키를 누르면 방을 나간다.
+            isBackKeyPressedOnWait = true;
             leaveRoom();
             return true;
         }
@@ -674,7 +702,7 @@ public class MultiActivity extends Activity
         if (mRoomId != null) {
             Games.RealTimeMultiplayer.leave(mGoogleApiClient, this, mRoomId);
             mRoomId = null;
-            switchToScreen(R.id.screen_wait);
+            //switchToScreen(R.id.screen_wait);
         } else {
             switchToMainScreen();
         }
