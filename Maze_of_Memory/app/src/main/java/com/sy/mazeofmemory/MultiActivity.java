@@ -109,6 +109,9 @@ public class MultiActivity extends Activity
     // 전송할 메시지를 담을 버퍼
     byte[] mMsgBuf = new byte[2];
 
+    // 맵 정보
+    String map_info;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -310,6 +313,7 @@ public class MultiActivity extends Activity
             Toast.makeText(this,"Message received: " + (char) buf[0] + "/" + (int) buf[1], Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
         }
+
     }
 
     // 자동 매칭 멀티 게임을 시작한다.
@@ -432,7 +436,6 @@ public class MultiActivity extends Activity
     @Override
     public void onJoinedRoom(int statusCode, Room room) {
         Log.d(TAG, "onJoinedRoom(" + statusCode + ", " + room + ") : 방에 참가함");
-
         if (statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onJoinedRoom, status " + statusCode);
             showGameError();
@@ -736,7 +739,6 @@ public class MultiActivity extends Activity
     void stopKeepingScreenOn() {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
-
 
     // 서버에서 맵을 가져온다.
     String downloadMultiMap() {

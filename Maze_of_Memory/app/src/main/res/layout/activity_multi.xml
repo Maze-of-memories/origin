@@ -8,7 +8,8 @@
         android:id="@+id/screen_main"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -279,13 +280,128 @@
     </LinearLayout>
 
     <!-- "GAME PLAY" 화면 -->
-    <LinearLayout android:id="@+id/screen_game" style="@style/LLScreen">
-        <TextView style="@style/Blurb" android:text="This is game playing screen" />
-        <Button
-            android:layout_width="wrap_content"
+    <LinearLayout android:id="@+id/screen_game"
+        android:visibility="invisible"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="15dp">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Click Me!!"
-            android:id = "@+id/button_clickme"/>
+            android:gravity="center_vertical"
+            android:background="#ff57bb00"
+            android:padding="5dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="my nickname"
+                    android:id="@+id/textView9" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="class"
+                    android:id="@+id/textView10" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="score"
+                    android:id="@+id/textView13" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="time"
+                android:id="@+id/textView8"
+                android:layout_weight="1"
+                android:gravity="center" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="peer nickname"
+                    android:id="@+id/textView12" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="class"
+                    android:id="@+id/textView11" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="score"
+                    android:id="@+id/textView14" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#ffffebb9">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/map"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:src="@drawable/multi_game"
+                android:layout_gravity="center"
+                android:layout_centerInParent="true" />
+
+            <GridView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/gridView"
+                android:layout_gravity="center"
+                android:numColumns="5"
+                android:layout_centerInParent="true"
+                android:drawSelectorOnTop="false"
+                android:layout_alignTop="@+id/map"
+                android:layout_alignLeft="@+id/map"
+                android:layout_alignRight="@+id/map"
+                android:layout_alignBottom="@+id/map"
+                android:visibility="invisible" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|right"
+            android:background="#ff005fff">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Click Me!!"
+                android:id = "@+id/button_clickme" />
+        </LinearLayout>
+
     </LinearLayout>
 
 </FrameLayout>
