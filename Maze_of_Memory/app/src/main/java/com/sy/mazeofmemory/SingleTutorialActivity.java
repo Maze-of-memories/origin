@@ -116,9 +116,11 @@ public class SingleTutorialActivity extends Activity{
             }
             imageAdapter.notifyDataSetChanged();
             if(touch_cnt == 5){
+                /*
                 Intent intent = new Intent(SingleTutorialActivity.this, NicknameActivity.class);
                 startActivity(intent);
                 finish();
+                */
             }
 
         }

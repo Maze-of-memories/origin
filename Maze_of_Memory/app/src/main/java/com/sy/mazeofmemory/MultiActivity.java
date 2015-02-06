@@ -94,9 +94,6 @@ public class MultiActivity extends Activity
     // 전송할 메시지를 담을 버퍼
     byte[] mMsgBuf = new byte[2];
 
-    // 맵 정보
-    String map_info;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -223,16 +220,8 @@ public class MultiActivity extends Activity
     public void onRealTimeMessageReceived(RealTimeMessage rtm) {
         byte[] buf = rtm.getMessageData();
         String sender = rtm.getSenderParticipantId();
-
-        // 맵 정보를 받았을 때
-        if((char)buf[0] == 'o') {
-            map_info = new String(buf);
-            Log.d(TAG, "Map info received: " + map_info);
-        } else {
-            Toast.makeText(this,"Message received: " + (char) buf[0] + "/" + (int) buf[1], Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
-        }
-
+        Toast.makeText(this,"Message received: " + (char) buf[0] + "/" + (int) buf[1], Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
     }
 
     // 자동 매칭 멀티 게임을 시작한다.
@@ -383,14 +372,9 @@ public class MultiActivity extends Activity
                 return lhs.getParticipantId().compareTo(rhs.getParticipantId());
             }
         });
-        // 리스트의 첫번 째 참가자가 서버에서 맵을 다운받는다.
-        if(mParticipants.get(0).getParticipantId().equals(mMyId)) {
+        // 선 정하기
+        if(mParticipants.get(0).getParticipantId().equals(mMyId))
             Toast.makeText(this, "You have first turn", Toast.LENGTH_SHORT).show();
-
-            // 맵 다운로드
-            downloadMultiMap();
-
-        }
 
         if (statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onRoomConnected, status " + statusCode);
@@ -609,33 +593,5 @@ public class MultiActivity extends Activity
     // Clears the flag that keeps the screen on.
     void stopKeepingScreenOn() {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    }
-
-    // 서버에서 맵을 가져온다.
-    void downloadMultiMap() {
-        String server = getString(R.string.server) + getString(R.string.multi_map_load);
-
-        new HttpAsyncTask(server, null) {
-
-            @Override
-            protected void onPostExecute(String result) {
-                // 가져온 맵 정보를 저장한다
-                map_info = result;
-                Log.i(TAG + "/Map Info", map_info);
-
-                byte[] msg = map_info.getBytes();
-
-                // 모든 참가자에게 메시지 전송
-                for (Participant p : mParticipants) {
-
-                    // 자기 자신은 제외한다.
-                    if(p.getParticipantId().equals(mMyId))
-                        continue;
-
-                    // 실제 메시지를 보내는 static method
-                    Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg, mRoomId, p.getParticipantId());
-                }
-            }
-        }.execute();
     }
 }

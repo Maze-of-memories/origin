@@ -11,8 +11,4 @@
     <string name="game_problem">An error occurred while starting the game. Please try again.</string>
     <string name="please_wait">Please wait...</string>
 
-    <!-- 서버 주소 관련 -->
-    <string name="server">http://53.vs.woobi.co.kr/</string>
-    <string name="multi_map_load">MultiMapLoad.php</string>
-
 </resources>

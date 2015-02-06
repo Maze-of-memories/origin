@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -18,6 +19,12 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.games.Games;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 
 public class MainActivity extends Activity implements View.OnClickListener, ConnectionCallbacks,
@@ -188,9 +195,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
     public void onConnected(Bundle connectionHint) {
         mSignInClicked = false;
 
-        dialog.dismiss();
-        findViewById(R.id.R_login).setVisibility(View.GONE);
-        findViewById(R.id.R_main).setVisibility(View.VISIBLE);
 
         //google 사용자 정보가져 오기
         if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
@@ -206,8 +210,58 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
         Log.i("personGooglePlusProfile", personGooglePlusProfile);
         Log.i("personEmail", personEmail);
 
+        accountCreate();
+
     }
 
+    public void accountCreate() {
+        new AsyncTask<Void, Void, Void>() {
+
+            boolean exist;
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                StringBuffer sb = new StringBuffer();
+
+                try {
+
+                    //공백 예외
+                    URL url = new URL("http://53.vs.woobi.co.kr/MOM/AccountCreate.php?email=" + personEmail + "&nickname=" + personName);
+
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(url.openStream()));
+
+                    String str = null;
+                    while ((str = reader.readLine()) != null) {
+                        sb.append(str);
+                    }
+
+                    if (sb.toString().equals("success")) {
+                        exist = true;
+                    } else if (sb.toString().equals("fail")) {
+                        exist = false;
+                    }
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                //작업 후 보여질 화면
+                dialog.dismiss();
+
+                    findViewById(R.id.R_login).setVisibility(View.GONE);
+                    findViewById(R.id.R_main).setVisibility(View.VISIBLE);
+
+            }
+        }.execute();
+
+    }
 
     public void onConnectionSuspended(int cause) {
         mGoogleApiClient.connect();
