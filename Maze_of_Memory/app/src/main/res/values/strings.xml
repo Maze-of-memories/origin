@@ -12,7 +12,7 @@
     <string name="please_wait">Please wait...</string>
 
     <!-- 서버 주소 관련 -->
-    <string name="server">http://53.vs.woobi.co.kr/</string>
+    <string name="server">http://53.vs.woobi.co.kr/MOM/</string>
     <string name="multi_map_load">MultiMapLoad.php</string>
 
-</resources>
+    </resources>
