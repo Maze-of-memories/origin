@@ -9,6 +9,8 @@ $max;
 
 $nickname = str_replace("_"," ",$nickname);
 
+echo $nickname;
+
 $result = mysqli_query($conn, "SELECT MAX(NUMBER) as max FROM ACCOUNT");
 $result2 = mysqli_query($conn, "SELECT COUNT(G_MAIL) as cnt FROM ACCOUNT where G_MAIL = '".$email."'");
 

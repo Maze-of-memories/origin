@@ -195,7 +195,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
     public void onConnected(Bundle connectionHint) {
         mSignInClicked = false;
 
-
         //google 사용자 정보가져 오기
         if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
             Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
@@ -209,6 +208,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
         Log.i("personPhotoUrl", personPhotoUrl);
         Log.i("personGooglePlusProfile", personGooglePlusProfile);
         Log.i("personEmail", personEmail);
+
+        personName = personName.replaceAll("\\p{Space}","_");
+
+        Log.i("personName", personName);
 
         accountCreate();
 
