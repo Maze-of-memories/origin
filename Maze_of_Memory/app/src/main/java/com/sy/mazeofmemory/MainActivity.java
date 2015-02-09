@@ -53,9 +53,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
         setContentView(R.layout.activity_main);
 
         dialog = new ProgressDialog(MainActivity.this);
-        dialog.setMessage("Data translating...");
+        dialog.setMessage(getString(R.string.please_wait));
         dialog.setIndeterminate(true);
-        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
         dialog.show();
 
         apiOptions = Games.GamesOptions.builder().setShowConnectingPopup(true).build();
@@ -76,7 +77,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SingleActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
         btn = (Button) findViewById(R.id.multi);

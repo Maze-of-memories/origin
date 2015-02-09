@@ -1,13 +1,17 @@
 package com.sy.mazeofmemory;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +19,12 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -66,6 +75,7 @@ public class SingleGameActivity extends Activity {
         gridView.setAdapter(imageAdapter = new ImageAdapter(this));
         gridView.setOnItemClickListener(gridviewOnItemClickListener);
 
+
     }
 
     public void game_init() {
@@ -81,7 +91,7 @@ public class SingleGameActivity extends Activity {
         pre_chess_Position = chess_startPosition;
         map_info_Postion = map_info_startPosition;
 
-        Log.i("map_info",map_info.get(0));
+        //Log.i("map_info",map_info.get(0));
 
         if(touch_cnt >= 1){
             Toast.makeText(this, "틀렸습니다. 시작 위치로 돌아갑니다.", Toast.LENGTH_SHORT).show();
@@ -129,8 +139,9 @@ public class SingleGameActivity extends Activity {
                 || (position == pre_chess_Position - 5 && map[map_info_Postion - 9].equals("x"))
                 || (position == pre_chess_Position - 1 && map[map_info_Postion - 1].equals("x"))
                 || (position == pre_chess_Position + 1 && map[map_info_Postion + 1].equals("x"))) {
-            game_init();
+
             touchEvent();
+            game_init();
         }
     }
 
@@ -210,8 +221,13 @@ public class SingleGameActivity extends Activity {
             Log.i("touch_cnt", "" + touch_cnt);
 
             if(pre_chess_Position == 4){
-                Toast.makeText(this, "도착하였습니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Game Clear!!!", Toast.LENGTH_SHORT).show();
+                //finish();
+                alertDialog();
             }
+
+            TextView textview = (TextView) findViewById(R.id.cnt);
+            textview.setText(""+touch_cnt);
 
             imageAdapter.notifyDataSetChanged();
 
@@ -220,17 +236,12 @@ public class SingleGameActivity extends Activity {
         return super.onTouchEvent(event);
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    private void alertDialog(){
+        AlertDialog.Builder ab = new AlertDialog.Builder(SingleGameActivity.this);
+        ab.setMessage(Html.fromHtml("<strong><font color=\"#ff0000\"> " + "Html 표현여부 "
+                + "</font></strong><br>HTML 이 제대로 표현되는지 본다."));
+        ab.setPositiveButton("ok", null);
+        ab.show();
 
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_BACK:
-                Intent intent = new Intent(SingleGameActivity.this, SingleActivity.class);
-                startActivity(intent);
-                finish();
-                return true;
-        }
-        return super.onKeyDown(keyCode, event);
     }
-
 }

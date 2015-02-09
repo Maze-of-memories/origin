@@ -85,15 +85,25 @@
         <RelativeLayout
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:gravity="right">
 
             <ImageView
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_alignParentRight="true"
-                android:background="@drawable/single_star" />
+                android:background="@drawable/single_star"
+                android:id="@+id/star"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/cnt"
+                android:text="0"
+                android:textSize="25dp"
+                android:layout_toRightOf="@+id/star"
+                android:layout_centerInParent="true"/>
 
         </RelativeLayout>
+
     </LinearLayout>
 
 </FrameLayout>

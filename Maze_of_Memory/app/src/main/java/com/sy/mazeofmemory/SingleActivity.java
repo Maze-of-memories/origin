@@ -38,7 +38,6 @@ public class SingleActivity extends FragmentActivity {
     }
 
     private class adapter extends FragmentPagerAdapter {
-        //private Context context;
 
         public adapter(FragmentManager fm) {
             super(fm);
@@ -70,19 +69,4 @@ public class SingleActivity extends FragmentActivity {
             return MAX_PAGE;
         }
     }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_BACK:
-                Intent intent = new Intent(SingleActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-                return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-
 }

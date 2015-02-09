@@ -60,7 +60,6 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
         this.pageCnt = position;
     }
 
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -172,7 +171,6 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
             }
             intent.putExtra("map_info", map.get(position));
             startActivity(intent);
-            getActivity().finish();
 
             //Toast.makeText(context, "버튼" + position + " : 클릭됨", Toast.LENGTH_SHORT).show();
 
