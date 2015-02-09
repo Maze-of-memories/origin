@@ -5,11 +5,4 @@
     tools:context="com.sy.mazeofmemory.HelpActivity">
 
 
-    <ExpandableListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/helpListView"
-        android:groupIndicator="@null"
-        android:padding="10dp" />
-
 </LinearLayout>

@@ -48,6 +48,7 @@ public class SingleGameActivity extends Activity {
             "0", "0", "0", "0", "0", "0", "0", "0", "0",
             "0", "0", "0", "0", "0", "0", "0", "0", "0"
     };
+
     private int map_info_startPosition = 72;
     private int map_info_Postion = map_info_startPosition;
 
@@ -199,7 +200,6 @@ public class SingleGameActivity extends Activity {
 
             return imageView;
         }
-
     }
 
     public boolean onTouchEvent(MotionEvent event) {

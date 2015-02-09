@@ -2,16 +2,26 @@ package com.sy.mazeofmemory;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +46,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -46,7 +55,8 @@ import java.util.concurrent.ExecutionException;
 public class MultiActivity extends Activity
         implements View.OnClickListener, RoomUpdateListener, RealTimeMessageReceivedListener,
         RoomStatusUpdateListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        AdapterView.OnItemClickListener {
 
     private static final String TAG = "MultiActivity";
 
@@ -58,10 +68,12 @@ public class MultiActivity extends Activity
     // Request code used to invoke sign in user interactions.
     private static final int RC_SIGN_IN = 9001;
 
+    // 말의 위치
+    final int LEFT_MARKER = 1;
+    final int RIGHT_MARKER = 2;
+
     // Google APIs와 상호작용하기 위해 사용되는 클라이언트
     private GoogleApiClient mGoogleApiClient;
-
-    private boolean isBackKeyPressedOnWait = false;
 
     // 프로그래스 다이얼로그
     ProgressDialog mPDialog;
@@ -91,13 +103,12 @@ public class MultiActivity extends Activity
 
     // 클릭 가능한 모든 뷰의 리스트
     final static int[] CLICKABLES = {
-            R.id.button_play, R.id.button_clickme
-
+            R.id.button_play, R.id.button_pass_turn
     };
 
     // 화면 리스트
     final static int[] SCREENS = {
-            R.id.screen_main, R.id.screen_wait, R.id.screen_game,
+            R.id.screen_main, R.id.screen_game,
             R.id.screen_waiting_room
     };
     int mCurScreen = -1;    /* 현재 화면을 저장하는 변수 */
@@ -107,17 +118,34 @@ public class MultiActivity extends Activity
 
     // 현재 게임이 참가한 다른 플레이어
     ArrayList<Participant> mParticipants = null;
-    Participant peer = null;
     String mPeerId = null;
 
     // 현재 게임에 참가한 나의 ID
     private String mMyId = null;
 
-    // 전송할 메시지를 담을 버퍼
-    byte[] mMsgBuf = new byte[2];
+    // 턴 관련 변수
+    private final static int TURNCNT = 3;
+    private boolean isMyTurn = false;   /* 턴 여부 */
+    private int remainingTurn = TURNCNT;      /* 남은 턴 수 */
+
+    // 말
+    int myMarker;
+    int peerMarker;
+
+    // 각 플레이어의 시작 위치와 종료 위치
+    private static final int LEFT_START_POSITION = 20;
+    private static final int RIGHT_START_POSITION = 24;
+    private static final int LEFT_GOAL_POSITION = 4;
+    private static final int RIGHT_GOAL_POSITION = 0;
 
     // 맵 정보
     String map_info;
+
+    // 맵을 표현하는 그리드뷰
+    GridView gridMap;
+    ImageAdapter iAdapter;
+
+    private Integer[] gridItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +155,7 @@ public class MultiActivity extends Activity
         setContentView(R.layout.activity_multi);
 
         mPDialog = new ProgressDialog(this);
-        mPDialog.setMessage("Please wait...");
+        mPDialog.setMessage(getString(R.string.please_wait));
         mPDialog.setCanceledOnTouchOutside(false);
         mPDialog.setCancelable(false);
         mPDialog.show();
@@ -162,6 +190,24 @@ public class MultiActivity extends Activity
         // 대기화면 상태 메시지
         waitingRoomStatus = (TextView)findViewById(R.id.waiting_room_status);
 
+        // 말의 위치를 나타내는 배열 초기화
+        gridItems = new Integer[25];
+        for(int i = 0; i < 25; i++)
+            gridItems[i] = new Integer(0);
+
+        // 미로 그리드뷰 초기화
+        gridMap = (GridView)findViewById(R.id.gridView);
+        iAdapter = new ImageAdapter(this);
+        gridMap.setAdapter(iAdapter);
+        gridMap.setOnItemClickListener(this);
+        gridMap.setOnTouchListener(new View.OnTouchListener(){
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return event.getAction() == MotionEvent.ACTION_MOVE;
+            }
+        });
+
         //imageUrl DB 저장 고려
         if (myPictureURL != null) {
             myPictureURL = myPictureURL.substring(0, myPictureURL.length() - 6);
@@ -179,38 +225,6 @@ public class MultiActivity extends Activity
         }
     }
 
-
-    // 이미지의 URL을 이용하여 view에 출력한다.
-    private void setProfilePicture(final ImageView view, final String url) {
-        new AsyncTask<Void, Void, Void>() {
-
-            URL u = null;
-            Bitmap bmp = null;
-
-            @Override
-            protected Void doInBackground(Void... params) {
-
-                try {
-                    u = new URL(url);
-                    bmp = BitmapFactory.decodeStream(u.openConnection().getInputStream());
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                view.setImageBitmap(bmp);
-                mPDialog.dismiss();
-            }
-        }.execute();
-    }
-
     // 버튼 클릭 이벤트 처리
     @Override
     public void onClick(View v) {
@@ -218,37 +232,72 @@ public class MultiActivity extends Activity
             // play 버튼 클릭
             case R.id.button_play:
                 Log.i(TAG, "button_play clicked");
+                mPDialog.show();
                 startMultiPlay();
                 break;
 
-            // Click Me!! 버튼 클릭(테스트용 : 메시지 전송)
-            case R.id.button_clickme:
-                Log.d(TAG,"clickme button clicked");
-                sendMessage();
+            // 턴 넘김(턴 종료) 버튼 클릭
+            case R.id.button_pass_turn  :
+                if(!isMyTurn) return;
+
+                Log.d(TAG,"pass turn button clicked");
+                passTurn();
                 break;
         }
     }
 
-    /*
-        메시지 보내고 받기
-     */
-
-    // 멀티플레이 참가자들에게 실시간 메시지를 보내는 메소드
-    void sendMessage() {
-        // 전송할 메시지를 설정한다.
-        mMsgBuf[0] = (byte)'T';
-        mMsgBuf[1] = (byte)1;
-
-        // 모든 참가자에게 메시지 전송
-        for (Participant p : mParticipants) {
-
-            // 자기 자신은 제외한다.
-            if(p.getParticipantId().equals(mMyId))
-                continue;
-
-            // 실제 메시지를 보내는 static method
-            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, mMsgBuf, mRoomId, p.getParticipantId());
+    // 그리드뷰 아이템 클릭 이벤트 처리
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        // 내 턴이 아니면 말을 움직이지 않고 바로 빠져나온다.
+        if(!isMyTurn) {
+            Toast.makeText(this, "It is not your turn", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        // 벽 검사 루틴 들어가야함.
+
+        // 벽이 없으면 자신의 말을 이동시킨다.
+        moveMyMarkerPosition(position);
+    }
+
+    void moveMyMarkerPosition(int pos) {
+        // 자신의 말을 이동시킨다.
+        for(int i = 0; i < gridItems.length; i++) {
+            if(gridItems[i] == myMarker)
+                gridItems[i] = 0;
+        }
+        gridItems[pos] = myMarker;
+
+        // 변경사항을 어댑터에게 알린다.
+        iAdapter.notifyDataSetChanged();
+
+        // 턴 수를 하나 감소시키고 턴이 끝났으면 상대방에게 턴을 넘긴다.
+        if( --remainingTurn == 0 )
+            passTurn();
+    }
+
+    void movePeerMarkerPosition(int pos) {
+        // 상대방의 말을 이동시킨다.
+        for(int i = 0; i < gridItems.length; i++) {
+            if(gridItems[i] == peerMarker )
+                gridItems[i] = 0;
+        }
+        gridItems[pos] = peerMarker;
+
+        // 변경사항을 어댑터에게 알린다.
+        iAdapter.notifyDataSetChanged();
+    }
+
+    // 상대방에게 턴을 넘기는 메소드
+    void passTurn() {
+        // 전송할 메시지를 설정한다.
+        String msg = "PASSTURN";
+
+        // 실제 메시지를 보내는 static method
+        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
+
+        isMyTurn = false;
     }
 
     // 실시간 메시지를 받았을 때 호출되는 메소드
@@ -266,7 +315,11 @@ public class MultiActivity extends Activity
             map_info = bufString.substring("HS1:".length());
             Log.d(TAG, "Map info received: " + map_info);
 
-            Toast.makeText(this, "Map info received", Toast.LENGTH_SHORT).show();
+            // 상대방이 왼쪽 말을 가졌으므로 오른쪽 말을 갖는다.
+            myMarker = RIGHT_MARKER;
+            peerMarker = LEFT_MARKER;
+
+            Toast.makeText(this, "Player connected", Toast.LENGTH_SHORT).show();
 
             // 맵 정보를 받으면 프로필 사진의 URL을 전송해준다.
             String msg = "HS2:" + myPictureURL;
@@ -281,12 +334,8 @@ public class MultiActivity extends Activity
             setProfilePicture(peerPicture, peerPictureURL);
 
             // 프로필 사진의 URL을 전송해준다.
-            byte[] msg;
-            StringBuilder sb = new StringBuilder();
-            sb.append("HS3:");
-            sb.append(myPictureURL);
-            msg = sb.toString().getBytes();
-            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg, mRoomId, sender);
+            String msg = "HS3:" + myPictureURL;
+            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, sender);
         }
         // 상대방의 프로필 사진 URL을 받았을 때(Handshake 3)
         else if(bufString.startsWith("HS3:")) {
@@ -324,6 +373,13 @@ public class MultiActivity extends Activity
             // 게임을 시작한다.
             startGame();
         }
+        // 나에게 턴이 넘어올 때
+        else if(bufString.startsWith("PASSTURN")) {
+            // 턴을 설정하고 횟수를 초기화한다.
+            isMyTurn = true;
+            remainingTurn = TURNCNT;
+            Toast.makeText(this,"It is My turn", Toast.LENGTH_SHORT).show();
+        }
         else {
             Toast.makeText(this,"Message received: " + (char) buf[0] + "/" + (int) buf[1], Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
@@ -341,8 +397,9 @@ public class MultiActivity extends Activity
         rtmConfigBuilder.setMessageReceivedListener(this);
         rtmConfigBuilder.setRoomStatusUpdateListener(this);
         rtmConfigBuilder.setAutoMatchCriteria(autoMatchCriteria);
-        switchToScreen(R.id.screen_waiting_room);
         keepScreenOn();
+
+        // 게임시 필요한 변수들을 초기화한다.
         resetGameVars();
 
         // 리얼타임 멀티플레이 방을 생성한다.
@@ -359,6 +416,10 @@ public class MultiActivity extends Activity
         mMyId = null;
         peerPictureURL = null;
         map_info = null;
+        isMyTurn = false;
+
+        // 말의 위치 초기화
+        initMarkersPosition();
 
         // 상대 플레어의 사진을 기본 사진으로 초기화
         peerPicture.setImageResource(R.drawable.photo);
@@ -370,21 +431,26 @@ public class MultiActivity extends Activity
         waitingRoomStatus.setText("waiting for player...");
     }
 
+    // 말들의 위치를 초기화한다.
+    void initMarkersPosition() {
+        for(int i = 0; i < gridItems.length; i++)
+            gridItems[i] = 0;
+
+        gridItems[LEFT_START_POSITION] = LEFT_MARKER;
+        gridItems[RIGHT_START_POSITION] = RIGHT_MARKER;
+        iAdapter.notifyDataSetChanged();
+    }
+
     // 방이 만들어졌을 때(create() 호출시) 호출된다.
     @Override
     public void onRoomCreated(int statusCode, Room room) {
         Log.d(TAG, "onRoomCreated called (" + room.getCreatorId() + "/" + room.getRoomId() + ")");
 
+        mPDialog.dismiss();
+
         // 방이 생성되면 나의 Id와 방 ID를 바로 초기화 한다.
         mMyId = room.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient));
         mRoomId = room.getRoomId();
-
-        // 방 생성 대기 중 백키가 눌렸으면 방을 떠난다.
-        if(isBackKeyPressedOnWait) {
-            leaveRoom();
-            isBackKeyPressedOnWait = false;
-            return;
-        }
 
         // 에러 발생시 처리
         if (statusCode != GamesStatusCodes.STATUS_OK) {
@@ -436,15 +502,14 @@ public class MultiActivity extends Activity
         });
 
 
-        // 리스트의 첫번 째 참가자가 서버에서 맵을 다운받는다.
+        // 리스트의 첫번 째 참가자가 선이 되고 서버에서 맵을 다운받아 상대방에게 전달한다.(맵 동기화)
+        // 선이 된 참가자는 왼쪽 말을 자신의 말로 갖는다.
         if (mParticipants.get(0).getParticipantId().equals(mMyId)) {
-
+            isMyTurn = true;    // 턴을 가져온다.
+            myMarker = LEFT_MARKER;
+            peerMarker = RIGHT_MARKER;
             sendMapInfo();
-
         }
-
-        // 게임 플레이 화면으로 전환한다.
-        // switchToScreen(R.id.screen_game);
 
         // 나와 상대방이 매칭된 화면을 출력한다.
         switchToScreen(R.id.screen_waiting_room);
@@ -461,7 +526,6 @@ public class MultiActivity extends Activity
         if (statusCode != GamesStatusCodes.STATUS_OK) {
             Log.e(TAG, "*** Error: onJoinedRoom, status " + statusCode);
             showGameError();
-            return;
         }
     }
 
@@ -474,19 +538,14 @@ public class MultiActivity extends Activity
         switchToMainScreen();
     }
 
-
-
     // 맵을 다운받고 상대방에게 전송한다.
     void sendMapInfo() {
         // 맵 다운로드
         map_info = downloadMultiMap();
         Log.i(TAG, "downloaded map info : " + map_info);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("HS1:");
-        sb.append(map_info);
-
-        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, mapSentCallback, sb.toString().getBytes(), mRoomId, mPeerId);
+        String msg = "HS1:" + map_info;
+        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, mapSentCallback, msg.getBytes(), mRoomId, mPeerId);
     }
 
     // 상대방에게 맵 정보를 전송한다.
@@ -508,19 +567,6 @@ public class MultiActivity extends Activity
                 Log.d(TAG, "map info is sent");
         }
     };
-
-    // 다른 플레이어가 방에 들어오고 연결되는 과정을 track할 수 있도록 방 대기 화면을 보여준다.
-    // onRoomConnected 와 onJoinedRoom 에서 호출됨
-    void showWaitingRoom(Room room) {
-        // minimum number of players required for our game
-        // For simplicity, we require everyone to join the game before we start it
-        // (this is signaled by Integer.MAX_VALUE).
-        final int MIN_PLAYERS = Integer.MAX_VALUE;
-        Intent i = Games.RealTimeMultiplayer.getWaitingRoomIntent(mGoogleApiClient, room, MIN_PLAYERS);
-
-        // show waiting room UI
-        startActivityForResult(i, RC_WAITING_ROOM);
-    }
 
     // 취소(cancelled)된 게임에 대한 에러 메시지를 보여주고 메인 화면으로 돌아간다.
     void showGameError() {
@@ -681,14 +727,8 @@ public class MultiActivity extends Activity
 
         if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_waiting_room) {
             // 대기방에서 백키를 누르면 방을 나간다.
-            isBackKeyPressedOnWait = true;
             leaveRoom();
             return true;
-        }
-
-        // 웨이팅 화면에서 백키 금지
-        if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_wait) {
-            return false;
         }
 
         return super.onKeyDown(keyCode, e);
@@ -787,5 +827,103 @@ public class MultiActivity extends Activity
         }
 
         return map;
+    }
+
+    // 이미지의 URL을 이용하여 view에 출력한다.
+    private void setProfilePicture(final ImageView view, final String url) {
+        new AsyncTask<Void, Void, Void>() {
+
+            URL u = null;
+            Bitmap bmp = null;
+
+            @Override
+            protected Void doInBackground(Void... params) {
+
+                try {
+                    u = new URL(url);
+                    bmp = BitmapFactory.decodeStream(u.openConnection().getInputStream());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                view.setImageBitmap(bmp);
+                mPDialog.dismiss();
+            }
+        }.execute();
+    }
+
+    // 그리드뷰에 이미지를 출력해주는 어댑터
+    public class ImageAdapter extends BaseAdapter {
+
+        private Context mContext;
+        private LayoutInflater mInflater;
+
+        public ImageAdapter(Context c) {
+            mContext = c;
+            mInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        }
+
+        public int getCount() {
+            return gridItems.length;
+        }
+
+        public Object getItem(int position) {
+            return null;
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            RelativeLayout v = (RelativeLayout)convertView;
+
+            if(v == null) {
+                v = (RelativeLayout)mInflater.inflate(R.layout.activity_multi_gridview_item, null);
+            }
+
+            // 위치에 따른 배경색 처리
+            if(position % 2 == 0)
+                v.setBackgroundColor(Color.DKGRAY);
+            else
+                v.setBackgroundColor(Color.WHITE);
+
+
+            // 시작 위치와 종료 위치 표시
+            TextView startGoal = (TextView)v.findViewById(R.id.start_goal);
+            if(position == LEFT_START_POSITION || position == RIGHT_START_POSITION) {
+                startGoal.setText("START");
+                startGoal.setVisibility(View.VISIBLE);
+            } else if(position == LEFT_GOAL_POSITION || position == RIGHT_GOAL_POSITION) {
+                startGoal.setText("GOAL");
+                startGoal.setVisibility(View.VISIBLE);
+            } else
+                startGoal.setVisibility(View.INVISIBLE);
+
+            // 말 표시
+            ImageView marker = (ImageView)v.findViewById(R.id.marker);
+            if(gridItems[position] == LEFT_MARKER) {
+                marker.setImageDrawable(new ColorDrawable(Color.BLUE));
+                marker.setVisibility(View.VISIBLE);
+            }
+            else if(gridItems[position] == RIGHT_MARKER) {
+                marker.setImageDrawable(new ColorDrawable(Color.RED));
+                marker.setVisibility(View.VISIBLE);
+            }
+            else
+                marker.setVisibility(View.INVISIBLE);
+
+            return v;
+        }
     }
 }

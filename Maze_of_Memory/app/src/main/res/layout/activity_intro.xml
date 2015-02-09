@@ -4,10 +4,12 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="#ffffff">
+    android:background="#ffffff"
+    android:padding="40dp">
     <ImageView
-        android:layout_width="250dp"
-        android:layout_height="100dp"
-        android:background="@drawable/intro_logo"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/intro_logo_3" />
 
 </LinearLayout>

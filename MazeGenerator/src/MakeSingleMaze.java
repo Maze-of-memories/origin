@@ -72,7 +72,7 @@ public class MakeSingleMaze {
 			}
 		}
 		
-		// 생성된 미로의 set을 파일에 쓴다.
+		/*// 생성된 미로의 set을 파일에 쓴다.
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(fileName);
@@ -108,7 +108,7 @@ public class MakeSingleMaze {
 		System.out.println(fileName + "파일이 생성되었습니다!");
 		long end = System.currentTimeMillis();
 
-		System.out.println( "\n경과 시간 : " + ( end - start )/1000.0 );
+		System.out.println( "\n경과 시간 : " + ( end - start )/1000.0 );*/
 
 	}
 
