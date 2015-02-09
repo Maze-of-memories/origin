@@ -272,8 +272,13 @@ public class MultiActivity extends Activity
         // 변경사항을 어댑터에게 알린다.
         iAdapter.notifyDataSetChanged();
 
+        // 이동한 위치 정보를 상대방에게 보낸다.
+        String msg = "PEERMOVE:" + pos;
+        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
+
+
         // 턴 수를 하나 감소시키고 턴이 끝났으면 상대방에게 턴을 넘긴다.
-        if( --remainingTurn == 0 )
+        if( --remainingTurn <= 0 )
             passTurn();
     }
 
@@ -380,6 +385,12 @@ public class MultiActivity extends Activity
             remainingTurn = TURNCNT;
             Toast.makeText(this,"It is My turn", Toast.LENGTH_SHORT).show();
         }
+        // 상대방의 말이 이동했을 때
+        else if(bufString.startsWith("PEERMOVE:")) {
+            int peerPosition = Integer.parseInt(bufString.substring("PEERMOVE:".length()));
+            movePeerMarkerPosition(peerPosition);
+            Log.i(TAG, "peer moved to position " + peerPosition);
+        }
         else {
             Toast.makeText(this,"Message received: " + (char) buf[0] + "/" + (int) buf[1], Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
@@ -417,6 +428,7 @@ public class MultiActivity extends Activity
         peerPictureURL = null;
         map_info = null;
         isMyTurn = false;
+        remainingTurn = TURNCNT;
 
         // 말의 위치 초기화
         initMarkersPosition();
