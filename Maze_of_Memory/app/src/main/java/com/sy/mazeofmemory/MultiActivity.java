@@ -7,9 +7,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -125,8 +126,8 @@ public class MultiActivity extends Activity
 
     // 턴 관련 변수
     private final static int TURNCNT = 3;
-    private boolean isMyTurn = false;   /* 턴 여부 */
-    private int remainingTurn = TURNCNT;      /* 남은 턴 수 */
+    private boolean isMyTurn = false;           /* 턴 여부 */
+    private int remainingTurn = TURNCNT;        /* 남은 턴 수 */
 
     // 말
     int myMarker;
@@ -146,6 +147,10 @@ public class MultiActivity extends Activity
     ImageAdapter iAdapter;
 
     private Integer[] gridItems;
+
+    // 타이머 텍스트뷰
+    TextView txtTimer;
+    int remainingTime = 15;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -208,7 +213,10 @@ public class MultiActivity extends Activity
             }
         });
 
-        //imageUrl DB 저장 고려
+        // 타이머 텍스트뷰 초기화
+        txtTimer = (TextView)findViewById(R.id.timer);
+
+
         if (myPictureURL != null) {
             myPictureURL = myPictureURL.substring(0, myPictureURL.length() - 6);
 
@@ -241,7 +249,7 @@ public class MultiActivity extends Activity
                 if(!isMyTurn) return;
 
                 Log.d(TAG,"pass turn button clicked");
-                passTurn();
+                remainingTime = -1;
                 break;
         }
     }
@@ -264,10 +272,10 @@ public class MultiActivity extends Activity
     void moveMyMarkerPosition(int pos) {
         // 자신의 말을 이동시킨다.
         for(int i = 0; i < gridItems.length; i++) {
-            if(gridItems[i] == myMarker)
-                gridItems[i] = 0;
+            if(gridItems[i] == myMarker || gridItems[i] == 3)
+                gridItems[i] -= myMarker;
         }
-        gridItems[pos] = myMarker;
+        gridItems[pos] += myMarker;
 
         // 변경사항을 어댑터에게 알린다.
         iAdapter.notifyDataSetChanged();
@@ -285,10 +293,10 @@ public class MultiActivity extends Activity
     void movePeerMarkerPosition(int pos) {
         // 상대방의 말을 이동시킨다.
         for(int i = 0; i < gridItems.length; i++) {
-            if(gridItems[i] == peerMarker )
-                gridItems[i] = 0;
+            if(gridItems[i] == peerMarker || gridItems[i] == 3 )
+                gridItems[i] -= peerMarker;
         }
-        gridItems[pos] = peerMarker;
+        gridItems[pos] += peerMarker;
 
         // 변경사항을 어댑터에게 알린다.
         iAdapter.notifyDataSetChanged();
@@ -383,6 +391,9 @@ public class MultiActivity extends Activity
             // 턴을 설정하고 횟수를 초기화한다.
             isMyTurn = true;
             remainingTurn = TURNCNT;
+
+            // 타이머를 작동시킨다.
+            startTimer();
             Toast.makeText(this,"It is My turn", Toast.LENGTH_SHORT).show();
         }
         // 상대방의 말이 이동했을 때
@@ -527,8 +538,12 @@ public class MultiActivity extends Activity
         switchToScreen(R.id.screen_waiting_room);
     }
 
+    // 게임 시작 메소드
     private void startGame() {
+
+        // 게임 화면으로 전환하고 타이머를 동작시킨다.
         switchToScreen(R.id.screen_game);
+        startTimer();
     }
 
     // join()메소드에 의해 호출되는 콜백
@@ -923,19 +938,68 @@ public class MultiActivity extends Activity
                 startGoal.setVisibility(View.INVISIBLE);
 
             // 말 표시
-            ImageView marker = (ImageView)v.findViewById(R.id.marker);
+            ImageView leftMarker = (ImageView)v.findViewById(R.id.left_marker);
+            ImageView rightMarker = (ImageView)v.findViewById(R.id.right_marker);
+
             if(gridItems[position] == LEFT_MARKER) {
-                marker.setImageDrawable(new ColorDrawable(Color.BLUE));
-                marker.setVisibility(View.VISIBLE);
+                leftMarker.setVisibility(View.VISIBLE);
+                rightMarker.setVisibility(View.GONE);
             }
             else if(gridItems[position] == RIGHT_MARKER) {
-                marker.setImageDrawable(new ColorDrawable(Color.RED));
-                marker.setVisibility(View.VISIBLE);
+                leftMarker.setVisibility(View.GONE);
+                rightMarker.setVisibility(View.VISIBLE);
             }
-            else
-                marker.setVisibility(View.INVISIBLE);
+            else if(gridItems[position] == 3) {
+                leftMarker.setVisibility(View.VISIBLE);
+                rightMarker.setVisibility(View.VISIBLE);
+            }
+            else {
+                leftMarker.setVisibility(View.GONE);
+                rightMarker.setVisibility(View.GONE);
+            }
 
             return v;
         }
+    }
+
+    // 타이머를 시작한다.
+    private void startTimer() {
+        remainingTime = 15;
+
+        new AsyncTask<Void, Integer, Void>() {
+
+            // 1초 간격으로 시간을 갱신하여 UI 쓰레드로 전달한다.
+            @Override
+            protected Void doInBackground(Void... params) {
+                while(remainingTime > -1) {
+                    publishProgress(new Integer[]{remainingTime--});
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                return null;
+            }
+
+            // UI를 업데이트 한다.
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                super.onProgressUpdate(values);
+
+                txtTimer.setText(values[0].toString());
+            }
+
+            // 시간이 경과하면 턴을 넘긴다
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                if(isMyTurn)
+                    passTurn();
+            }
+        }.execute();
     }
 }
