@@ -1,31 +1,30 @@
 package com.sy.mazeofmemory;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 
@@ -39,10 +38,12 @@ public class SingleGameActivity extends Activity {
             R.drawable.left_game_profile, 0, 0, 0, 0
     };
     private ImageAdapter imageAdapter;
-    private int touch_cnt = 0;
-
+    private int move_cnt = 0;
+    private int fail_cnt = 0;
+    private int perfect_cnt = 0;
     private int chess_startPosition = 20;
     private int pre_chess_Position = chess_startPosition;
+    private int stage_num;
 
     private ArrayList<String> map_info = new ArrayList<String>();
 
@@ -61,22 +62,51 @@ public class SingleGameActivity extends Activity {
     private int map_info_startPosition = 72;
     private int map_info_Postion = map_info_startPosition;
 
+    private static final String dbName = "single.db";
+    private static final String tableName = "SINGLE_MAP_5";
+    public static final int dbVersion = 1;
+    private SQLiteOpenHelper opener;
+    private SQLiteDatabase db;
+    private int position;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_game);
 
-        Intent intent = getIntent();
-        map_info.add(intent.getExtras().getString("map_info"));
-
-        game_init();
+        init();
 
         GridView gridView = (GridView) findViewById(R.id.game_move);
         gridView.setAdapter(imageAdapter = new ImageAdapter(this));
         gridView.setOnItemClickListener(gridviewOnItemClickListener);
 
+        if (!isDBExists()) {
+            copyDB();
+        }
+
+        opener = new MySQLiteOpenHelper(SingleGameActivity.this, dbName, null, dbVersion);
+        db = opener.getReadableDatabase();
+        select();
+        db.close();
+
+        game_init();
 
     }
+
+    public void init() {
+
+        Intent intent = getIntent();
+        stage_num = intent.getExtras().getInt("stage_num");
+        position = intent.getExtras().getInt("position");
+
+        TextView textView = (TextView) findViewById(R.id.stage_num);
+        textView.setText("Stage" + stage_num);
+
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //게임조작
 
     public void game_init() {
 
@@ -91,15 +121,11 @@ public class SingleGameActivity extends Activity {
         pre_chess_Position = chess_startPosition;
         map_info_Postion = map_info_startPosition;
 
-        //Log.i("map_info",map_info.get(0));
-
-        if(touch_cnt >= 1){
-            Toast.makeText(this, "틀렸습니다. 시작 위치로 돌아갑니다.", Toast.LENGTH_SHORT).show();
-        }
     }
 
     public void move(int position) {
-        //25배열
+
+        move_cnt++;
         chess[pre_chess_Position] = 0;
         chess[position] = R.drawable.left_game_profile;
         pre_chess_Position = position;
@@ -111,37 +137,32 @@ public class SingleGameActivity extends Activity {
         //아래 클릭
         if (position == pre_chess_Position + 5 && map[map_info_Postion + 9].equals("o")) {
             move(position);
-            //81배열
             map_info_Postion = map_info_Postion + 18;
-            touchEvent();
         }
         //위 클릭
         else if (position == pre_chess_Position - 5 && map[map_info_Postion - 9].equals("o")) {
             move(position);
-            //81배열
             map_info_Postion = map_info_Postion - 18;
-            touchEvent();
         }
         //왼쪽 클릭
         else if (position == pre_chess_Position - 1 && map[map_info_Postion - 1].equals("o")) {
             move(position);
-            //81배열
             map_info_Postion = map_info_Postion - 2;
-            touchEvent();
         }
         //오른쪽 클릭
         else if (position == pre_chess_Position + 1 && map[map_info_Postion + 1].equals("o")) {
             move(position);
-            //81배열
             map_info_Postion = map_info_Postion + 2;
-            touchEvent();
         } else if ((position == pre_chess_Position + 5 && map[map_info_Postion + 9].equals("x"))
                 || (position == pre_chess_Position - 5 && map[map_info_Postion - 9].equals("x"))
                 || (position == pre_chess_Position - 1 && map[map_info_Postion - 1].equals("x"))
                 || (position == pre_chess_Position + 1 && map[map_info_Postion + 1].equals("x"))) {
 
-            touchEvent();
+            move_cnt = 0;
+            fail_cnt++;
+            Toast.makeText(this, "틀렸습니다. 시작 위치로 돌아갑니다.", Toast.LENGTH_SHORT).show();
             game_init();
+
         }
     }
 
@@ -150,27 +171,32 @@ public class SingleGameActivity extends Activity {
 
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
             game_Move(position);
+
+            Log.i("touch_cnt", "" + move_cnt);
+            Log.i("fail_cnt", "" + fail_cnt);
+
+            setText();
+
+            if (pre_chess_Position == 4) {
+                Toast.makeText(SingleGameActivity.this, "Game Clear!!!", Toast.LENGTH_SHORT).show();
+
+                findViewById(R.id.R_single_clear).setVisibility(View.VISIBLE);
+
+            }
+
+            imageAdapter.notifyDataSetChanged();
         }
     };
 
-    public void touchEvent() {
+    public void setText() {
+        TextView textView = (TextView) findViewById(R.id.move_cnt);
+        textView.setText("Move : " + move_cnt);
 
-        long downTime = SystemClock.uptimeMillis();
-        long eventTime = SystemClock.uptimeMillis() + 100;
-        float x = 0.0f;
-        float y = 0.0f;
+        textView = (TextView) findViewById(R.id.fail_cnt);
+        textView.setText("Fail : " + fail_cnt + " / 8");
 
-        int metaState = 0;
-
-        MotionEvent motionEvent = MotionEvent.obtain(
-                downTime,
-                eventTime,
-                MotionEvent.ACTION_DOWN,
-                x,
-                y,
-                metaState
-        );
-        onTouchEvent(motionEvent);
+        textView = (TextView) findViewById(R.id.perfect_cnt);
+        textView.setText("Perfect : " + perfect_cnt);
     }
 
     public class ImageAdapter extends BaseAdapter {
@@ -213,35 +239,77 @@ public class SingleGameActivity extends Activity {
         }
     }
 
-    public boolean onTouchEvent(MotionEvent event) {
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    //DB
 
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+    public void select() {
 
-            touch_cnt++;
-            Log.i("touch_cnt", "" + touch_cnt);
+        Cursor cursr = db.query(tableName, null, null, null, null, null, null);
 
-            if(pre_chess_Position == 4){
-                Toast.makeText(this, "Game Clear!!!", Toast.LENGTH_SHORT).show();
-                //finish();
-                alertDialog();
+        cursr.moveToPosition(position);
+
+        map_info.add(cursr.getString(cursr.getColumnIndex("MAP_INFO")));
+        perfect_cnt = cursr.getInt(cursr.getColumnIndex("DISTANCE"));
+
+        Log.i("map_info", map_info.get(0).toString());
+        Log.i("perfect_cnt", "" + perfect_cnt);
+
+        setText();
+
+    }
+
+    public void copyDB() {
+        AssetManager assetMgr = getApplication().getAssets();
+        File directory = new File("/data/data/com.sy.mazeofmemory/databases");
+        File addressDB = new File("/data/data/com.sy.mazeofmemory/databases/" + dbName);
+
+        FileOutputStream fos = null;
+        BufferedOutputStream bos = null;
+
+        try {
+            InputStream is = assetMgr.open(dbName);
+            BufferedInputStream bis = new BufferedInputStream(is);
+
+            // make the directory first
+            if (!directory.exists())
+                directory.mkdir();
+
+            // if file exists, remove and regenerate
+            if (addressDB.exists()) {
+                addressDB.delete();
+                addressDB.createNewFile();
             }
 
-            TextView textview = (TextView) findViewById(R.id.cnt);
-            textview.setText(""+touch_cnt);
+            fos = new FileOutputStream(addressDB);
+            bos = new BufferedOutputStream(fos);
 
-            imageAdapter.notifyDataSetChanged();
+            int read = -1;
+            byte[] buffer = new byte[1024];
+            while ((read = bis.read(buffer, 0, 1024)) != -1) {
+                bos.write(buffer, 0, read);
+            }
+            bos.flush();
 
+            bos.close();
+            fos.close();
+            bis.close();
+            is.close();
+
+        } catch (IOException e) {
+            Log.e("SingleDBManager : ", e.getMessage());
         }
-
-        return super.onTouchEvent(event);
     }
 
-    private void alertDialog(){
-        AlertDialog.Builder ab = new AlertDialog.Builder(SingleGameActivity.this);
-        ab.setMessage(Html.fromHtml("<strong><font color=\"#ff0000\"> " + "Html 표현여부 "
-                + "</font></strong><br>HTML 이 제대로 표현되는지 본다."));
-        ab.setPositiveButton("ok", null);
-        ab.show();
+    public boolean isDBExists() {
+        File addressDB = new File("/data/data/com.sy.mazeofmemory/databases/" + dbName);
 
+        if (addressDB.exists()) {
+            Log.i("SingleDBManager : ", "DB exists.");
+            return true;
+        } else {
+            Log.i("SingleDBManager : ", "DB not exists.");
+            return false;
+        }
     }
+
 }

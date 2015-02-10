@@ -1,16 +1,13 @@
 package com.sy.mazeofmemory;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
 
 
 public class SingleActivity extends FragmentActivity {
@@ -26,15 +23,6 @@ public class SingleActivity extends FragmentActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(new adapter(getSupportFragmentManager()));
 
-        // 랭킹보기 버튼
-        Button btnShowRank = (Button) findViewById(R.id.btnShowRank);
-        btnShowRank.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SingleActivity.this, RankingActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private class adapter extends FragmentPagerAdapter {
@@ -69,4 +57,7 @@ public class SingleActivity extends FragmentActivity {
             return MAX_PAGE;
         }
     }
+
+
+
 }

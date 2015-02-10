@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:background="#ffffff">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="#ffffff"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -48,6 +50,7 @@
                         android:background="@drawable/single_star_cnt" />
 
                     <TextView
+                        android:id="@+id/stage_num"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
@@ -78,32 +81,112 @@
                         android:numColumns="5" />
 
                 </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/R_move"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/R_single_map"
+                    android:layout_gravity="center">
+
+                    <TextView
+                        android:id="@+id/move_cnt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Move : 0"
+                        android:textSize="25dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:text="Perfect : 10"
+                        android:id="@+id/perfect_cnt"
+                        android:textSize="25dp"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/R_fail"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/R_move">
+
+                    <TextView
+                        android:id="@+id/fail_cnt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fail : 0 / 8"
+                        android:textSize="25dp" />
+
+                </RelativeLayout>
+
             </RelativeLayout>
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="right">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:background="@drawable/single_star"
-                android:id="@+id/star"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/cnt"
-                android:text="0"
-                android:textSize="25dp"
-                android:layout_toRightOf="@+id/star"
-                android:layout_centerInParent="true"/>
-
-        </RelativeLayout>
-
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/R_single_clear"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="invisible">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:alpha="0.3"
+            android:background="#fff6ffbd"
+            android:gravity="center"
+            android:orientation="horizontal"></LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/stage_clear_logo"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bo" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/exit"
+                    android:layout_width="80dp"
+                    android:layout_height="40dp"
+                    android:text="Exit" />
+
+                <Button
+                    android:id="@+id/retry"
+                    android:layout_width="80dp"
+                    android:layout_height="40dp"
+                    android:layout_toRightOf="@+id/exit"
+                    android:text="Retry" />
+
+                <Button
+                    android:id="@+id/next"
+                    android:layout_width="80dp"
+                    android:layout_height="40dp"
+                    android:layout_toRightOf="@+id/retry"
+                    android:text="Next" />
+            </RelativeLayout>
+
+        </LinearLayout>
+    </RelativeLayout>
 
 </FrameLayout>
