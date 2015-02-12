@@ -14,8 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -104,7 +107,6 @@ public class SingleGameActivity extends Activity {
 
     }
 
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //게임조작
 
@@ -170,18 +172,12 @@ public class SingleGameActivity extends Activity {
             = new GridView.OnItemClickListener() {
 
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+
             game_Move(position);
-
-            Log.i("touch_cnt", "" + move_cnt);
-            Log.i("fail_cnt", "" + fail_cnt);
-
             setText();
 
             if (pre_chess_Position == 4) {
-                Toast.makeText(SingleGameActivity.this, "Game Clear!!!", Toast.LENGTH_SHORT).show();
-
-                findViewById(R.id.R_single_clear).setVisibility(View.VISIBLE);
-
+                game_clear();
             }
 
             imageAdapter.notifyDataSetChanged();
@@ -237,6 +233,84 @@ public class SingleGameActivity extends Activity {
 
             return imageView;
         }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    //게임 클리어
+    public void game_clear() {
+
+        Toast.makeText(SingleGameActivity.this, "Game Clear!!!", Toast.LENGTH_SHORT).show();
+
+        findViewById(R.id.R_single_clear).setVisibility(View.VISIBLE);
+
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.stage_clear_star);
+        linearLayout.removeAllViews();
+
+        if (fail_cnt < 3) {
+            for (int i = 0; i < 3; i++) {
+                ImageView view = new ImageView(this);
+                view.setImageResource(android.R.drawable.btn_star_big_on);
+                linearLayout.addView(view);
+            }
+        } else if (fail_cnt < 6) {
+            ImageView view_off = new ImageView(this);
+            view_off.setImageResource(android.R.drawable.btn_star_big_off);
+            linearLayout.addView(view_off);
+            for (int i = 0; i < 2; i++) {
+                ImageView view = new ImageView(this);
+                view.setImageResource(android.R.drawable.btn_star_big_on);
+                linearLayout.addView(view);
+            }
+        } else if(fail_cnt < 9){
+            for (int i = 0; i < 2; i++) {
+                ImageView view_off = new ImageView(this);
+                view_off.setImageResource(android.R.drawable.btn_star_big_off);
+                linearLayout.addView(view_off);
+            }
+            ImageView view = new ImageView(this);
+            view.setImageResource(android.R.drawable.btn_star_big_on);
+            linearLayout.addView(view);
+        }else{
+            for (int i = 0; i < 3; i++) {
+                ImageView view_off = new ImageView(this);
+                view_off.setImageResource(android.R.drawable.btn_star_big_off);
+                linearLayout.addView(view_off);
+            }
+        }
+
+        Button btn;
+
+        btn = (Button) findViewById(R.id.exit);
+        btn.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(SingleGameActivity.this, SingleActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
+        btn = (Button) findViewById(R.id.retry);
+        btn.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+
+                findViewById(R.id.R_single_clear).setVisibility(View.GONE);
+                fail_cnt = 0;
+                setText();
+                game_init();
+                imageAdapter.notifyDataSetChanged();
+
+            }
+        });
+        btn = (Button) findViewById(R.id.next);
+        btn.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(SingleGameActivity.this, SingleGameActivity.class);
+                intent.putExtra("stage_num", stage_num + 1);
+                intent.putExtra("position", position + 1);
+                finish();
+                startActivity(intent);
+            }
+        });
+
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////

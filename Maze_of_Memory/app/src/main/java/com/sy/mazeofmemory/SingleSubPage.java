@@ -12,7 +12,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import java.util.ArrayList;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 public class SingleSubPage extends android.support.v4.app.Fragment {
 
@@ -22,6 +23,7 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
 
     private Context context;
     private int pageCnt;
+
 
     public SingleSubPage(Context context, int position) {
         this.context = context;
@@ -50,18 +52,6 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
         return linearLayout;
     }
 
-    static View v;
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (v != null) {
-            ViewGroup parent = (ViewGroup) v.getParent();
-            if (parent != null) {
-                parent.removeView(v);
-            }
-        }
-    }
-
     public GridView.OnItemClickListener gridviewOnItemClickListener
             = new GridView.OnItemClickListener() {
 
@@ -73,10 +63,10 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
                 intent = new Intent(context, SingleTutorialActivity.class);
             } else {
                 intent = new Intent(context, SingleGameActivity.class);
-                if(pageCnt == 0) {
+                if (pageCnt == 0) {
                     intent.putExtra("stage_num", position);
-                }else {
-                    intent.putExtra("stage_num", position+1);
+                } else {
+                    intent.putExtra("stage_num", position + 1);
                 }
             }
             intent.putExtra("position", position);
@@ -113,6 +103,9 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
             } else {
                 imageView = (ImageView) convertView;
             }
+
+            imageView.setAdjustViewBounds(true);
+            imageView.setPadding(10, 10, 10, 10);
 
             imageView.setImageResource(btn[position]);
 

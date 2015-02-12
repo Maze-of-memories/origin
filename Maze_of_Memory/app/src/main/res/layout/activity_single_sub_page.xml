@@ -15,6 +15,6 @@
             android:layout_height="fill_parent"
             android:id="@+id/single_game_btn"
             android:numColumns="4"
-            android:gravity="center" />
+            android:gravity="center"/>
     </LinearLayout>
 </LinearLayout>

@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="#ff242424"
-    android:padding="5dp"
-    android:gravity="center">
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:background="#ff242424">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -26,43 +22,15 @@
         android:layout_centerHorizontal="true"
         android:textColor="#FFFFFF" />
 
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center"
-        android:layout_centerInParent="true">
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:id="@+id/left_marker"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:adjustViewBounds="true"
-            android:visibility="visible"
-            android:cropToPadding="false"
-            android:padding="5dp"
-            android:src="@drawable/photo"
-            android:layout_weight="1"
-            android:background="#ff008dff"
-            android:layout_gravity="center" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:id="@+id/right_marker"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:adjustViewBounds="true"
-            android:visibility="visible"
-            android:cropToPadding="false"
-            android:padding="5dp"
-            android:src="@drawable/photo"
-            android:layout_weight="1"
-            android:background="#ffff4136"
-            android:layout_gravity="center" />
-    </LinearLayout>
-
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/marker"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:focusableInTouchMode="true"
+        android:layout_margin="20dp"
+        android:visibility="visible"
+        android:src="#ff005fff" />
 </RelativeLayout>
