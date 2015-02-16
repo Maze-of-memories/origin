@@ -4,17 +4,22 @@
     <string name="app_name">Maze of Memory</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_help">도움말</string>
+    <string name="title_activity_menu">Menu</string>
     <string name="FACEBOOK_APP_ID">211474092356561</string>
-    <string name="app_id">172581716041</string>
-    <string name="achievement_tutorial_master">CgkIyYCw9YIFEAIQAQ</string>
     <string name="game_problem">An error occurred while starting the game. Please try again.</string>
     <string name="please_wait">Please wait...</string>
-
 
     <!-- 서버 주소 관련 -->
     <string name="server">http://53.vs.woobi.co.kr/MOM/</string>
     <string name="multi_map_load">MultiMapLoad.php</string>
+
+    <!-- 리더보드 -->
+    <string name="app_id">172581716041</string>
+    <string name="achievement_tutorial_master">CgkIyYCw9YIFEAIQAQ</string>
+    <string name="achievement_multi_tutorial_master">CgkIyYCw9YIFEAIQAw</string>
+    <string name="achievement_single_stage_clear">CgkIyYCw9YIFEAIQBg</string>
+    <string name="leaderboard_single_ranking">CgkIyYCw9YIFEAIQBA</string>
+    <string name="leaderboard_multi_ranking">CgkIyYCw9YIFEAIQBQ</string>
 
 </resources>
 

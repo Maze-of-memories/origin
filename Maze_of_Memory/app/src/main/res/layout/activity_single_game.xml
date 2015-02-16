@@ -22,23 +22,9 @@
                 android:layout_height="wrap_content">
 
                 <RelativeLayout
-                    android:id="@+id/R_single_nickname"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true">
-
-                    <TextView
-                        android:id="@+id/single_nickname"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="nickname" />
-                </RelativeLayout>
-
-                <RelativeLayout
                     android:id="@+id/stage_info"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/R_single_nickname">
+                    android:layout_height="wrap_content">
 
                     <ImageView
                         android:id="@+id/single_star_cnt"
@@ -141,7 +127,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:alpha="1"
             android:gravity="center"
             android:orientation="vertical">
 
