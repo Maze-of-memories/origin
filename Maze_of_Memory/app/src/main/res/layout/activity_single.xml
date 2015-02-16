@@ -48,8 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             ads:adSize="BANNER"
-            ads:adUnitId="ca-app-pub-2141789302410438/6692503507"
-            android:padding="0dp" />
+            ads:adUnitId="ca-app-pub-2141789302410438/6692503507" />
 
     </RelativeLayout>
 

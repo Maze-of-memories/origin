@@ -18,7 +18,6 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,6 +70,7 @@ public class SingleGameActivity extends Activity {
     private SQLiteOpenHelper opener;
     private SQLiteDatabase db;
     private int position;
+    boolean game_clear = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,14 +173,16 @@ public class SingleGameActivity extends Activity {
 
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
-            game_Move(position);
-            setText();
+            if (!game_clear) {
+                game_Move(position);
+                setText();
 
-            if (pre_chess_Position == 4) {
-                game_clear();
+                if (pre_chess_Position == 4) {
+                    game_clear();
+                }
+
+                imageAdapter.notifyDataSetChanged();
             }
-
-            imageAdapter.notifyDataSetChanged();
         }
     };
 
@@ -238,6 +240,7 @@ public class SingleGameActivity extends Activity {
     ////////////////////////////////////////////////////////////////////////////////////////////
     //게임 클리어
     public void game_clear() {
+        game_clear = true;
 
         Toast.makeText(SingleGameActivity.this, "Game Clear!!!", Toast.LENGTH_SHORT).show();
 
@@ -261,7 +264,7 @@ public class SingleGameActivity extends Activity {
                 view.setImageResource(android.R.drawable.btn_star_big_on);
                 linearLayout.addView(view);
             }
-        } else if(fail_cnt < 9){
+        } else if (fail_cnt < 9) {
             for (int i = 0; i < 2; i++) {
                 ImageView view_off = new ImageView(this);
                 view_off.setImageResource(android.R.drawable.btn_star_big_off);
@@ -270,7 +273,7 @@ public class SingleGameActivity extends Activity {
             ImageView view = new ImageView(this);
             view.setImageResource(android.R.drawable.btn_star_big_on);
             linearLayout.addView(view);
-        }else{
+        } else {
             for (int i = 0; i < 3; i++) {
                 ImageView view_off = new ImageView(this);
                 view_off.setImageResource(android.R.drawable.btn_star_big_off);
@@ -292,8 +295,11 @@ public class SingleGameActivity extends Activity {
         btn.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
 
+                game_clear = false;
+
                 findViewById(R.id.R_single_clear).setVisibility(View.GONE);
                 fail_cnt = 0;
+                move_cnt = 0;
                 setText();
                 game_init();
                 imageAdapter.notifyDataSetChanged();

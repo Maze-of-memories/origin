@@ -42,9 +42,6 @@
             android:name=".MultiActivity"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".HelpActivity"
-            android:label="@string/title_activity_help"></activity>
-        <activity
             android:name=".SingleTutorialActivity"
             android:screenOrientation="portrait"></activity>
         <activity android:name=".RankingActivity"></activity>
@@ -55,8 +52,7 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:theme="@android:style/Theme.Translucent" />
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
     </application>
 
 </manifest>

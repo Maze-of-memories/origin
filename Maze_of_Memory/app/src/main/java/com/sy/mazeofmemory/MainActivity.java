@@ -1,6 +1,5 @@
 package com.sy.mazeofmemory;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
@@ -9,8 +8,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -19,6 +20,7 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.games.Games;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.google.example.games.basegameutils.BaseGameActivity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,7 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 
-public class MainActivity extends Activity implements View.OnClickListener, ConnectionCallbacks,
+public class MainActivity extends BaseGameActivity implements View.OnClickListener, ConnectionCallbacks,
         OnConnectionFailedListener {
 
     private static final int RC_SIGN_IN = 0;
@@ -44,8 +46,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
     private String personEmail;
 
     Button btn;
-
     ProgressDialog dialog;
+
+    boolean isPageOpen = false;
+    LinearLayout menuPage;
+    Animation translateLeftAnim;
+    Animation translateRightAnim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,9 +94,24 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
             }
         });
 
+        menuPage = (LinearLayout) findViewById(R.id.menuPage);
+        translateLeftAnim = AnimationUtils.loadAnimation(this, R.anim.apper_from_right);
+        translateRightAnim = AnimationUtils.loadAnimation(this, R.anim.disappear_to_right);
+
+        SlidingPageAnimationListener animationListener = new SlidingPageAnimationListener();
+        translateLeftAnim.setAnimationListener(animationListener);
+        translateRightAnim.setAnimationListener(animationListener);
+
         // 도움말 버튼 초기화 및 이벤트리스너 설정
-        Button btnHelp = (Button) findViewById(R.id.btnHelp);
-        btnHelp.setOnClickListener(this);
+        Button btnMenu = (Button) findViewById(R.id.btn_menu);
+        btnMenu.setOnClickListener(this);
+
+        Button btnLeaderboard = (Button) findViewById(R.id.leaderboard);
+        btnLeaderboard.setOnClickListener(this);
+
+        Button achievement = (Button) findViewById(R.id.achievement);
+        achievement.setOnClickListener(this);
+
 
         backPressCloseHandler = new BackPressCloseHandler(this);
 
@@ -98,11 +119,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
 
     protected void onStart() {
         super.onStart();
-
-        if (!mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.connect();
-        }
-
+        //자동로그인 취소
+        getGameHelper().setMaxAutoSignInAttempts(0);
+        mGoogleApiClient.connect();
     }
 
     protected void onStop() {
@@ -142,18 +161,46 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
         }
     }
 
+    @Override
+    public void onSignInFailed() {
+    }
+
+    @Override
+    public void onSignInSucceeded() {
+    }
+
+    private class SlidingPageAnimationListener implements Animation.AnimationListener {
+        public void onAnimationEnd(Animation animation) {
+            if (isPageOpen) {
+                menuPage.setVisibility(View.INVISIBLE);
+                isPageOpen = false;
+            } else {
+                isPageOpen = true;
+            }
+        }
+
+        public void onAnimationRepeat(Animation animation) {
+        }
+
+        public void onAnimationStart(Animation animation) {
+        }
+    }
+
     public void onClick(View view) {
 
         if (view.getId() == R.id.sign_in_button
                 && !mGoogleApiClient.isConnecting()) {
             mSignInClicked = true;
             resolveSignInError();
-        } else if (view.getId() == R.id.btnHelp) {
-            // 도움말 버튼 클릭시 도움말 화면을 출력한다.
-            startActivity(new Intent(this, HelpActivity.class));
-        }
+        } else if (view.getId() == R.id.btn_menu) {
 
-        if (view.getId() == R.id.sign_out_button) {
+            if (isPageOpen) {
+                menuPage.startAnimation(translateRightAnim);
+            } else {
+                menuPage.setVisibility(view.VISIBLE);
+                menuPage.startAnimation(translateLeftAnim);
+            }
+        } else if (view.getId() == R.id.sign_out_button) {
             if (mGoogleApiClient.isConnected()) {
                 Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
                 /* 토큰 권한 삭제
@@ -167,12 +214,21 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
                             }
                         });
                 */
+                Games.signOut(mGoogleApiClient);
                 mGoogleApiClient.disconnect();
-                mGoogleApiClient.connect();
 
                 findViewById(R.id.R_main).setVisibility(View.GONE);
                 findViewById(R.id.R_login).setVisibility(View.VISIBLE);
+                findViewById(R.id.menuPage).setVisibility(View.GONE);
+                isPageOpen = false;
             }
+        } else if (view.getId() == R.id.leaderboard) {
+
+            startActivityForResult(Games.Leaderboards.getAllLeaderboardsIntent(mGoogleApiClient), 5);
+
+        } else if (view.getId() == R.id.achievement) {
+
+            startActivityForResult(Games.Achievements.getAchievementsIntent(mGoogleApiClient), 5);
         }
     }
 
@@ -193,6 +249,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
 
     @Override
     public void onConnected(Bundle connectionHint) {
+
         mSignInClicked = false;
 
         //google 사용자 정보가져 오기
@@ -209,7 +266,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
         Log.i("personGooglePlusProfile", personGooglePlusProfile);
         Log.i("personEmail", personEmail);
 
-        personName = personName.replaceAll("\\p{Space}","_");
+        personName = personName.replaceAll("\\p{Space}", "_");
 
         Log.i("personName", personName);
 
@@ -258,8 +315,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Conn
                 //작업 후 보여질 화면
                 dialog.dismiss();
 
-                    findViewById(R.id.R_login).setVisibility(View.GONE);
-                    findViewById(R.id.R_main).setVisibility(View.VISIBLE);
+                findViewById(R.id.R_login).setVisibility(View.GONE);
+                findViewById(R.id.R_main).setVisibility(View.VISIBLE);
 
             }
         }.execute();

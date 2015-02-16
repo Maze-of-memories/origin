@@ -12,21 +12,6 @@
         android:visibility="invisible">
 
         <RelativeLayout
-            android:id="@+id/relativeLayout"
-            android:layout_width="fill_parent"
-            android:layout_height="40dp"
-            android:background="#fff6ffbd">
-
-
-            <Button
-                android:id="@+id/sign_out_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="logout" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="#ffffff">
@@ -115,12 +100,12 @@
                             android:text="배경음" />
 
                         <Button
-                            android:id="@+id/btnHelp"
+                            android:id="@+id/btn_menu"
                             android:layout_width="wrap_content"
                             android:layout_height="50dp"
                             android:layout_marginLeft="20dp"
                             android:layout_toRightOf="@+id/button7"
-                            android:text="도움말" />
+                            android:text="Menu" />
 
                     </RelativeLayout>
                 </RelativeLayout>
@@ -141,15 +126,15 @@
         android:id="@+id/R_login"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="horizontal"
         android:background="#ffffff"
+        android:orientation="horizontal"
         android:visibility="invisible">
 
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:gravity="center">
 
             <ImageView
                 android:layout_width="250dp"
@@ -161,9 +146,10 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:gravity="center"
-            android:layout_marginBottom="20dp">
-x
+            android:layout_marginBottom="20dp"
+            android:gravity="center">
+            x
+
             <ImageButton
                 android:id="@+id/sign_in_button"
                 android:layout_width="wrap_content"
@@ -173,5 +159,51 @@ x
         </RelativeLayout>
 
     </RelativeLayout>
+
+
+    <LinearLayout
+        android:id="@+id/menuPage"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_gravity="right"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff6ffbd"
+            android:padding="30dp">
+
+            <Button
+                android:id="@+id/leaderboard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="leaderboard" />
+
+            <Button
+                android:id="@+id/achievement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/leaderboard"
+                android:text="achievement" />
+
+            <Button
+                android:id="@+id/invite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/achievement"
+                android:text="invite" />
+
+            <Button
+                android:id="@+id/sign_out_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/invite"
+                android:text="logout" />
+
+        </RelativeLayout>
+    </LinearLayout>
+
 
 </FrameLayout>
