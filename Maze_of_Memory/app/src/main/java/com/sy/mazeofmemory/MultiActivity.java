@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -125,25 +126,41 @@ public class MultiActivity extends Activity
 
     // 턴 관련 변수
     private final static int TURNCNT = 3;
-    private boolean isMyTurn = false;   /* 턴 여부 */
-    private int remainingTurn = TURNCNT;      /* 남은 턴 수 */
+    private boolean isMyTurn = false;       /* 턴 여부 */
+    private int remainingTurn = TURNCNT;    /* 남은 턴 수 */
+
+    // 타이머
+    CountDownTimer timer;
+    TextView tvTimer;
 
     // 말
     int myMarker;
     int peerMarker;
 
-    // 각 플레이어의 시작 위치와 종료 위치
+    // 화면 상(그리드뷰) 각 플레이어의 시작 위치와 종료 위치
     private static final int LEFT_START_POSITION = 20;
     private static final int RIGHT_START_POSITION = 24;
     private static final int LEFT_GOAL_POSITION = 4;
     private static final int RIGHT_GOAL_POSITION = 0;
+    
+    // 화면 상 플레이어의 위치
+    private int myMarkerStartPosition;
+    private int myMarkerPosition;
+
+    // 실제 맵에서 각 플레어의 시작위치
+    private static final int MAP_LEFT_START_POSITION = 72;
+    private static final int MAP_RIGHT_START_POSITION = 80;
+    
+    // 실제 맵에서 플레이어의 현재 위치
+    private int myRealPosition;
+    private int myRealStartPosition;
 
     // 맵 정보
-    String map_info;
+    String map;
 
     // 맵을 표현하는 그리드뷰
-    GridView gridMap;
-    ImageAdapter iAdapter;
+    GridView mapView;
+    ImageAdapter mapViewAdapter;
 
     private Integer[] gridItems;
 
@@ -196,17 +213,41 @@ public class MultiActivity extends Activity
             gridItems[i] = new Integer(0);
 
         // 미로 그리드뷰 초기화
-        gridMap = (GridView)findViewById(R.id.gridView);
-        iAdapter = new ImageAdapter(this);
-        gridMap.setAdapter(iAdapter);
-        gridMap.setOnItemClickListener(this);
-        gridMap.setOnTouchListener(new View.OnTouchListener(){
+        mapView = (GridView)findViewById(R.id.gridView);
+        mapViewAdapter = new ImageAdapter(this);
+        mapView.setAdapter(mapViewAdapter);
+        mapView.setOnItemClickListener(this);
+        mapView.setOnTouchListener(new View.OnTouchListener(){
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 return event.getAction() == MotionEvent.ACTION_MOVE;
             }
         });
+
+        // 카운트다운 타이머 초기화
+        timer = new CountDownTimer(15000, 1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                tvTimer.setText("" + millisUntilFinished / 1000);
+            }
+
+            @Override
+            public void onFinish() {
+
+                tvTimer.setText("0");
+
+                // 카운터가 종료되었을 때 자신의 턴이라면 턴을 상대방에게 넘겨준다.
+                //  -- 자신의 턴이 아닌경우, 상대쪽에서 턴을 보내오기 때문에
+                //  -- 특별한 동작이 필요하지 않다.
+                if(isMyTurn)
+                    passTurn();
+            }
+        };
+
+        // 타이머 텍스트뷰
+        tvTimer = (TextView)findViewById(R.id.timer);
 
         //imageUrl DB 저장 고려
         if (myPictureURL != null) {
@@ -251,26 +292,63 @@ public class MultiActivity extends Activity
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         // 내 턴이 아니면 말을 움직이지 않고 바로 빠져나온다.
         if(!isMyTurn) {
-            Toast.makeText(this, "It is not your turn", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "It is not your turn", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 벽 검사 루틴 들어가야함.
+        //
+        checkAndMove(position);
+    }
 
-        // 벽이 없으면 자신의 말을 이동시킨다.
-        moveMyMarkerPosition(position);
+    // 클릭한 방향의 벽을 검사한뒤 말을 이동시킨다.
+    //  -- 클릭한 방향으로 벽이 없으면 해당 position으로 말을 이동시킨다.
+    //  -- 클릭한 방향으로 벽이 있으면 시작위치로 말을 이동시킨다.
+    public void checkAndMove(int position) {
+
+        // 아래 타일로 이동
+        if (position == myMarkerPosition + 5 && map.charAt(myRealPosition + 9) == 'o') {
+            moveMyMarkerPosition(position);     // 화면의 말의 위치 이동
+            myRealPosition += 18;               // 실제 맵 이동
+        }
+        // 위 타일로 이동
+        else if (position == myMarkerPosition - 5 && map.charAt(myRealPosition - 9) == 'o') {
+            moveMyMarkerPosition(position);     // 화면의 말의 위치 이동
+            myRealPosition -= 18;               // 실제 맵 이동
+        }
+        // 왼쪽 타일로 이동
+        else if (position == myMarkerPosition - 1 && map.charAt(myRealPosition - 1) == 'o') {
+            moveMyMarkerPosition(position);     // 화면의 말의 위치 이동
+            myRealPosition -= 2;                // 실제 맵 이동
+        }
+        // 오른쪽 타일로 이동
+        else if (position == myMarkerPosition + 1 && map.charAt(myRealPosition + 1) == 'o') {
+            moveMyMarkerPosition(position);     // 화면의 말의 위치 이동
+            myRealPosition += 2;                // 실제 맵 이동
+        // 벽으로 막혔을 경우
+        } else if ((position == myMarkerPosition + 5 && map.charAt(myRealPosition + 9) == 'x')
+                || (position == myMarkerPosition - 5 && map.charAt(myRealPosition - 9) == 'x')
+                || (position == myMarkerPosition - 1 && map.charAt(myRealPosition - 1) == 'x')
+                || (position == myMarkerPosition + 1 && map.charAt(myRealPosition + 1) == 'x')) {
+
+            moveMyMarkerPosition(myMarkerStartPosition);
+            myRealPosition = myRealStartPosition;
+
+            // 상대방에게 턴을 넘긴다.
+            passTurn();
+        }
     }
 
     void moveMyMarkerPosition(int pos) {
         // 자신의 말을 이동시킨다.
         for(int i = 0; i < gridItems.length; i++) {
-            if(gridItems[i] == myMarker)
-                gridItems[i] = 0;
+            if(gridItems[i] == myMarker || gridItems[i] == 3)
+                gridItems[i] -= myMarker;
         }
-        gridItems[pos] = myMarker;
+        gridItems[pos] += myMarker;
+        myMarkerPosition = pos;
 
         // 변경사항을 어댑터에게 알린다.
-        iAdapter.notifyDataSetChanged();
+        mapViewAdapter.notifyDataSetChanged();
 
         // 이동한 위치 정보를 상대방에게 보낸다.
         String msg = "PEERMOVE:" + pos;
@@ -285,24 +363,32 @@ public class MultiActivity extends Activity
     void movePeerMarkerPosition(int pos) {
         // 상대방의 말을 이동시킨다.
         for(int i = 0; i < gridItems.length; i++) {
-            if(gridItems[i] == peerMarker )
-                gridItems[i] = 0;
+            if(gridItems[i] == peerMarker || gridItems[i] == 3 )
+                gridItems[i] -= peerMarker;
         }
-        gridItems[pos] = peerMarker;
+        gridItems[pos] += peerMarker;
 
         // 변경사항을 어댑터에게 알린다.
-        iAdapter.notifyDataSetChanged();
+        mapViewAdapter.notifyDataSetChanged();
     }
 
     // 상대방에게 턴을 넘기는 메소드
     void passTurn() {
-        // 전송할 메시지를 설정한다.
-        String msg = "PASSTURN";
+        // 타이머를 취소시킨다.
+        timer.cancel();
 
-        // 실제 메시지를 보내는 static method
-        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
+        // 타이머 텍스트뷰의 배경 색을 변경한다.
+        tvTimer.setBackgroundColor(Color.GRAY);
+
+        // 타이머를 동작시킨다.
+        timer.start();
 
         isMyTurn = false;
+
+        // 전송할 메시지를 설정한다.
+        String msg = "PASSTURN";
+        // 실제 메시지를 보내는 static method
+        Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
     }
 
     // 실시간 메시지를 받았을 때 호출되는 메소드
@@ -317,11 +403,17 @@ public class MultiActivity extends Activity
 
         // 맵 정보를 받았을 때(Handshake 1)
         if(bufString.startsWith("HS1:")) {
-            map_info = bufString.substring("HS1:".length());
-            Log.d(TAG, "Map info received: " + map_info);
+            map = bufString.substring("HS1:".length());
+            Log.d(TAG, "Map info received: " + map);
 
             // 상대방이 왼쪽 말을 가졌으므로 오른쪽 말을 갖는다.
             myMarker = RIGHT_MARKER;
+            myMarkerStartPosition = RIGHT_START_POSITION;
+            myMarkerPosition = RIGHT_START_POSITION;
+            myRealStartPosition = MAP_RIGHT_START_POSITION;
+            myRealPosition = MAP_RIGHT_START_POSITION;
+            Log.i(TAG, "my real position : " + myRealPosition);
+
             peerMarker = LEFT_MARKER;
 
             Toast.makeText(this, "Player connected", Toast.LENGTH_SHORT).show();
@@ -377,13 +469,23 @@ public class MultiActivity extends Activity
 
             // 게임을 시작한다.
             startGame();
+
+            // 상대방에게 턴을 넘긴다.
+            passTurn();
         }
         // 나에게 턴이 넘어올 때
         else if(bufString.startsWith("PASSTURN")) {
             // 턴을 설정하고 횟수를 초기화한다.
             isMyTurn = true;
             remainingTurn = TURNCNT;
-            Toast.makeText(this,"It is My turn", Toast.LENGTH_SHORT).show();
+
+            // 타이머를 동작시킨다.
+            timer.start();
+
+            // 타이머 텍스트뷰의 배경 색을 변경한다.
+            tvTimer.setBackgroundColor(Color.GREEN);
+
+            // Toast.makeText(this,"It is My turn", Toast.LENGTH_SHORT).show();
         }
         // 상대방의 말이 이동했을 때
         else if(bufString.startsWith("PEERMOVE:")) {
@@ -426,9 +528,10 @@ public class MultiActivity extends Activity
         mRoomId = null;
         mMyId = null;
         peerPictureURL = null;
-        map_info = null;
+        map = null;
         isMyTurn = false;
         remainingTurn = TURNCNT;
+        timer.cancel();     /* 타이머 중지 */
 
         // 말의 위치 초기화
         initMarkersPosition();
@@ -450,7 +553,7 @@ public class MultiActivity extends Activity
 
         gridItems[LEFT_START_POSITION] = LEFT_MARKER;
         gridItems[RIGHT_START_POSITION] = RIGHT_MARKER;
-        iAdapter.notifyDataSetChanged();
+        mapViewAdapter.notifyDataSetChanged();
     }
 
     // 방이 만들어졌을 때(create() 호출시) 호출된다.
@@ -513,14 +616,20 @@ public class MultiActivity extends Activity
             }
         });
 
-
-        // 리스트의 첫번 째 참가자가 선이 되고 서버에서 맵을 다운받아 상대방에게 전달한다.(맵 동기화)
+        // 리스트의 첫번 째 참가자가 맵을 다운받아 상대방에게 전달한다.(맵 동기화)
         // 선이 된 참가자는 왼쪽 말을 자신의 말로 갖는다.
+        //  -- 각 말의 위치별로 실제 맵에서의 위치를 초기화 한다.
         if (mParticipants.get(0).getParticipantId().equals(mMyId)) {
-            isMyTurn = true;    // 턴을 가져온다.
-            myMarker = LEFT_MARKER;
+            myMarker = LEFT_MARKER;                             // 내가 조작하게될 말
+            myMarkerStartPosition = LEFT_START_POSITION;        // 내 말의 시작 위치
+            myMarkerPosition = LEFT_START_POSITION;             // 내 말의 현재 위치
+            myRealStartPosition = MAP_LEFT_START_POSITION;      // 나의 실제 시작 위치
+            myRealPosition = MAP_LEFT_START_POSITION;           // 나의 실제 현재 위치
+            Log.i(TAG, "my real position : " + myRealPosition);
+
             peerMarker = RIGHT_MARKER;
-            sendMapInfo();
+
+            sendmap();
         }
 
         // 나와 상대방이 매칭된 화면을 출력한다.
@@ -551,12 +660,12 @@ public class MultiActivity extends Activity
     }
 
     // 맵을 다운받고 상대방에게 전송한다.
-    void sendMapInfo() {
+    void sendmap() {
         // 맵 다운로드
-        map_info = downloadMultiMap();
-        Log.i(TAG, "downloaded map info : " + map_info);
+        map = downloadMultiMap();
+        Log.i(TAG, "downloaded map info : " + map);
 
-        String msg = "HS1:" + map_info;
+        String msg = "HS1:" + map;
         Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, mapSentCallback, msg.getBytes(), mRoomId, mPeerId);
     }
 
@@ -573,7 +682,7 @@ public class MultiActivity extends Activity
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                sendMapInfo();
+                sendmap();
             }
             else
                 Log.d(TAG, "map info is sent");
@@ -755,6 +864,9 @@ public class MultiActivity extends Activity
             Games.RealTimeMultiplayer.leave(mGoogleApiClient, this, mRoomId);
             mRoomId = null;
             //switchToScreen(R.id.screen_wait);
+
+            // 타이머 중지
+            timer.cancel();
         } else {
             switchToMainScreen();
         }
@@ -930,6 +1042,10 @@ public class MultiActivity extends Activity
             }
             else if(gridItems[position] == RIGHT_MARKER) {
                 marker.setImageDrawable(new ColorDrawable(Color.RED));
+                marker.setVisibility(View.VISIBLE);
+            }
+            else if(gridItems[position] == 3) {
+                marker.setImageDrawable(new ColorDrawable(Color.YELLOW));
                 marker.setVisibility(View.VISIBLE);
             }
             else

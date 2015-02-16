@@ -291,7 +291,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:background="#ff57bb00"
+            android:background="#44000000"
             android:padding="5dp">
 
             <LinearLayout
@@ -321,11 +321,13 @@
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="time"
-                android:id="@+id/textView8"
+                android:id="@+id/timer"
                 android:layout_weight="1"
-                android:gravity="center" />
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textSize="@dimen/abc_text_size_large_material" />
 
             <LinearLayout
                 android:orientation="vertical"

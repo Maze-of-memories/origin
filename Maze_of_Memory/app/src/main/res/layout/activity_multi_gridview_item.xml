@@ -29,7 +29,7 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:adjustViewBounds="true"
-        android:focusableInTouchMode="true"
+        android:focusableInTouchMode="false"
         android:layout_margin="20dp"
         android:visibility="visible"
         android:src="#ff005fff" />
