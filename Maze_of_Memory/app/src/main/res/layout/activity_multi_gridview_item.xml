@@ -30,7 +30,8 @@
         android:layout_centerHorizontal="true"
         android:adjustViewBounds="true"
         android:focusableInTouchMode="false"
-        android:layout_margin="20dp"
+        android:layout_margin="15dp"
         android:visibility="visible"
-        android:src="#ff005fff" />
+        android:src="@drawable/left_marker"
+        android:scaleType="centerInside" />
 </RelativeLayout>

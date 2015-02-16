@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
@@ -284,33 +285,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:padding="15dp">
+        android:padding="15dp"
+        android:background="#ffbfbbbb">
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="#44000000"
-            android:padding="5dp">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/timer"
+                android:layout_toStartOf="@+id/timer">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="my nickname"
-                    android:id="@+id/textView9" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="class"
-                    android:id="@+id/textView10" />
+                    android:id="@+id/playing_mynick"
+                    android:editable="false"
+                    android:textIsSelectable="false"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -320,33 +318,32 @@
             </LinearLayout>
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:text="time"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:text="15"
                 android:id="@+id/timer"
-                android:layout_weight="1"
                 android:gravity="center"
                 android:textStyle="bold"
-                android:textSize="@dimen/abc_text_size_large_material" />
+                android:textSize="@dimen/abc_text_size_large_material"
+                android:layout_alignParentEnd="false"
+                android:layout_centerInParent="true" />
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="right">
+                android:gravity="right"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/timer"
+                android:layout_toEndOf="@+id/timer">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="peer nickname"
-                    android:id="@+id/textView12" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="class"
-                    android:id="@+id/textView11" />
+                    android:id="@+id/playing_peernick"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -354,7 +351,7 @@
                     android:text="score"
                     android:id="@+id/textView14" />
             </LinearLayout>
-        </LinearLayout>
+        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -393,8 +390,7 @@
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical|right"
-            android:background="#ff005fff">
+            android:gravity="center_vertical|right">
 
             <Button
                 android:layout_width="wrap_content"

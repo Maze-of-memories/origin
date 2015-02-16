@@ -43,6 +43,7 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -145,6 +146,7 @@ public class MultiActivity extends Activity
     
     // 화면 상 플레이어의 위치
     private int myMarkerStartPosition;
+    private int myMarkerGoalPosition;
     private int myMarkerPosition;
 
     // 실제 맵에서 각 플레어의 시작위치
@@ -354,9 +356,17 @@ public class MultiActivity extends Activity
         String msg = "PEERMOVE:" + pos;
         Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
 
+        // 목적지에 도착했을 때
+        if(pos == myMarkerGoalPosition) {
+            Toast.makeText(this, "이김", Toast.LENGTH_SHORT).show();
 
+            // 내가 이겼음을 상대방에게 알린다.
+            msg = "PEERWIN";
+            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
+            endGame();
+        }
         // 턴 수를 하나 감소시키고 턴이 끝났으면 상대방에게 턴을 넘긴다.
-        if( --remainingTurn <= 0 )
+        else if( --remainingTurn <= 0 )
             passTurn();
     }
 
@@ -409,6 +419,7 @@ public class MultiActivity extends Activity
             // 상대방이 왼쪽 말을 가졌으므로 오른쪽 말을 갖는다.
             myMarker = RIGHT_MARKER;
             myMarkerStartPosition = RIGHT_START_POSITION;
+            myMarkerGoalPosition = RIGHT_GOAL_POSITION;
             myMarkerPosition = RIGHT_START_POSITION;
             myRealStartPosition = MAP_RIGHT_START_POSITION;
             myRealPosition = MAP_RIGHT_START_POSITION;
@@ -492,6 +503,11 @@ public class MultiActivity extends Activity
             int peerPosition = Integer.parseInt(bufString.substring("PEERMOVE:".length()));
             movePeerMarkerPosition(peerPosition);
             Log.i(TAG, "peer moved to position " + peerPosition);
+        }
+        // 상대방이 이겼을 때
+        else if(bufString.startsWith("PEERWIN")) {
+            Toast.makeText(this, "졌음", Toast.LENGTH_SHORT).show();
+            endGame();
         }
         else {
             Toast.makeText(this,"Message received: " + (char) buf[0] + "/" + (int) buf[1], Toast.LENGTH_SHORT).show();
@@ -622,6 +638,7 @@ public class MultiActivity extends Activity
         if (mParticipants.get(0).getParticipantId().equals(mMyId)) {
             myMarker = LEFT_MARKER;                             // 내가 조작하게될 말
             myMarkerStartPosition = LEFT_START_POSITION;        // 내 말의 시작 위치
+            myMarkerGoalPosition = LEFT_GOAL_POSITION;          // 내 말의 도착 위치
             myMarkerPosition = LEFT_START_POSITION;             // 내 말의 현재 위치
             myRealStartPosition = MAP_LEFT_START_POSITION;      // 나의 실제 시작 위치
             myRealPosition = MAP_LEFT_START_POSITION;           // 나의 실제 현재 위치
@@ -637,7 +654,25 @@ public class MultiActivity extends Activity
     }
 
     private void startGame() {
+        // 게임 플레이화면 닉네임 출력
+        TextView playingMyNick = (TextView)findViewById(R.id.playing_mynick);
+        playingMyNick.setText(strMyNick);
+        TextView playingPeerNick = (TextView)findViewById(R.id.playing_peernick);
+        playingPeerNick.setText(strPeerNick);
+
         switchToScreen(R.id.screen_game);
+    }
+
+    // 게임 종료 메소드
+    private void endGame() {
+        // 타이머를 취소시킨다.
+        timer.cancel();
+
+        // 타이머 텍스트뷰의 배경 색을 변경한다.
+        tvTimer.setBackgroundColor(Color.GRAY);
+        tvTimer.setText("0");
+
+        isMyTurn = false;
     }
 
     // join()메소드에 의해 호출되는 콜백
@@ -770,7 +805,6 @@ public class MultiActivity extends Activity
     // 방과의 연결이 끊길 때 호출된다. (메인 화면으로 돌아감)
     @Override
     public void onDisconnectedFromRoom(Room room) {
-        Toast.makeText(this, "Disconnected from room(server)", Toast.LENGTH_SHORT).show();
         Log.i(TAG, "onDisconnectedFromRoom(room) called.");
         mRoomId = null;
         showGameError();
@@ -1018,17 +1052,14 @@ public class MultiActivity extends Activity
 
             // 위치에 따른 배경색 처리
             if(position % 2 == 0)
-                v.setBackgroundColor(Color.DKGRAY);
+                v.setBackgroundColor(getResources().getColor(R.color.lolipop_darkgreen));
             else
-                v.setBackgroundColor(Color.WHITE);
+                v.setBackgroundColor(getResources().getColor(R.color.lolipop_green));
 
 
-            // 시작 위치와 종료 위치 표시
+            // 종료 위치 표시
             TextView startGoal = (TextView)v.findViewById(R.id.start_goal);
-            if(position == LEFT_START_POSITION || position == RIGHT_START_POSITION) {
-                startGoal.setText("START");
-                startGoal.setVisibility(View.VISIBLE);
-            } else if(position == LEFT_GOAL_POSITION || position == RIGHT_GOAL_POSITION) {
+            if(position == LEFT_GOAL_POSITION || position == RIGHT_GOAL_POSITION) {
                 startGoal.setText("GOAL");
                 startGoal.setVisibility(View.VISIBLE);
             } else
@@ -1037,15 +1068,17 @@ public class MultiActivity extends Activity
             // 말 표시
             ImageView marker = (ImageView)v.findViewById(R.id.marker);
             if(gridItems[position] == LEFT_MARKER) {
-                marker.setImageDrawable(new ColorDrawable(Color.BLUE));
+                //marker.setImageDrawable(new ColorDrawable(Color.BLUE));
+                marker.setImageResource(R.drawable.left_marker);
                 marker.setVisibility(View.VISIBLE);
             }
             else if(gridItems[position] == RIGHT_MARKER) {
-                marker.setImageDrawable(new ColorDrawable(Color.RED));
+                //marker.setImageDrawable(new ColorDrawable(Color.RED));
+                marker.setImageResource(R.drawable.right_marker);
                 marker.setVisibility(View.VISIBLE);
             }
             else if(gridItems[position] == 3) {
-                marker.setImageDrawable(new ColorDrawable(Color.YELLOW));
+                //marker.setImageDrawable(new ColorDrawable(Color.YELLOW));
                 marker.setVisibility(View.VISIBLE);
             }
             else
