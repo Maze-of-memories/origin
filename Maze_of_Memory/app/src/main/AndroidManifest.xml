@@ -53,6 +53,12 @@
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+        <service android:name=".Sound">
+            <intent-filter>
+                <action android:name="backgroundSound"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

@@ -40,8 +40,6 @@ public class SingleActivity extends FragmentActivity {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //광고
-
-
     @Override
     public void onPause() {
         if (mAdView != null) {
