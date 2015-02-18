@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -18,8 +17,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -42,7 +45,6 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.example.games.basegameutils.BaseGameUtils;
-
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -318,20 +320,25 @@ public class MultiActivity extends Activity
             myRealPosition -= 18;               // 실제 맵 이동
         }
         // 왼쪽 타일로 이동
-        else if (position == myMarkerPosition - 1 && map.charAt(myRealPosition - 1) == 'o') {
+        else if (position == myMarkerPosition - 1 && map.charAt(myRealPosition - 1) == 'o'
+                && myMarkerPosition % 5 != 0 ) {
             moveMyMarkerPosition(position);     // 화면의 말의 위치 이동
             myRealPosition -= 2;                // 실제 맵 이동
         }
         // 오른쪽 타일로 이동
-        else if (position == myMarkerPosition + 1 && map.charAt(myRealPosition + 1) == 'o') {
+        else if (position == myMarkerPosition + 1 && map.charAt(myRealPosition + 1) == 'o'
+                && myMarkerPosition % 5 != 4) {
             moveMyMarkerPosition(position);     // 화면의 말의 위치 이동
             myRealPosition += 2;                // 실제 맵 이동
         // 벽으로 막혔을 경우
         } else if ((position == myMarkerPosition + 5 && map.charAt(myRealPosition + 9) == 'x')
                 || (position == myMarkerPosition - 5 && map.charAt(myRealPosition - 9) == 'x')
-                || (position == myMarkerPosition - 1 && map.charAt(myRealPosition - 1) == 'x')
-                || (position == myMarkerPosition + 1 && map.charAt(myRealPosition + 1) == 'x')) {
+                || (position == myMarkerPosition - 1 && map.charAt(myRealPosition - 1) == 'x'
+                        && myMarkerPosition % 5 != 0)
+                || (position == myMarkerPosition + 1 && map.charAt(myRealPosition + 1) == 'x'
+                        && myMarkerPosition % 5 != 4)) {
 
+            // 말을 시작위치로 이동시킨다.
             moveMyMarkerPosition(myMarkerStartPosition);
             myRealPosition = myRealStartPosition;
 
@@ -394,6 +401,9 @@ public class MultiActivity extends Activity
         timer.start();
 
         isMyTurn = false;
+
+        // 턴이 넘어갔으므로 블링크 애니메이션을 중지하기 위해 그리드뷰 어댑터를 갱신해준다.
+        mapViewAdapter.notifyDataSetChanged();
 
         // 전송할 메시지를 설정한다.
         String msg = "PASSTURN";
@@ -495,6 +505,8 @@ public class MultiActivity extends Activity
 
             // 타이머 텍스트뷰의 배경 색을 변경한다.
             tvTimer.setBackgroundColor(Color.GREEN);
+
+            mapViewAdapter.notifyDataSetChanged();
 
             // Toast.makeText(this,"It is My turn", Toast.LENGTH_SHORT).show();
         }
@@ -659,6 +671,9 @@ public class MultiActivity extends Activity
         playingMyNick.setText(strMyNick);
         TextView playingPeerNick = (TextView)findViewById(R.id.playing_peernick);
         playingPeerNick.setText(strPeerNick);
+
+        // 그리드뷰 갱신
+        mapViewAdapter.notifyDataSetChanged();
 
         switchToScreen(R.id.screen_game);
     }
@@ -1071,18 +1086,43 @@ public class MultiActivity extends Activity
                 //marker.setImageDrawable(new ColorDrawable(Color.BLUE));
                 marker.setImageResource(R.drawable.left_marker);
                 marker.setVisibility(View.VISIBLE);
+                marker.clearAnimation();
+
+                // 애니메이션 테스트
+                if(LEFT_MARKER == myMarker && isMyTurn) {
+                    Animation blinkAni = AnimationUtils.loadAnimation(MultiActivity.this, R.anim.blink);
+                    marker.startAnimation(blinkAni);
+                }
             }
             else if(gridItems[position] == RIGHT_MARKER) {
                 //marker.setImageDrawable(new ColorDrawable(Color.RED));
                 marker.setImageResource(R.drawable.right_marker);
                 marker.setVisibility(View.VISIBLE);
+                marker.clearAnimation();
+
+                // 애니메이션 테스트
+                if(RIGHT_MARKER == myMarker && isMyTurn) {
+                    Animation blinkAni = AnimationUtils.loadAnimation(MultiActivity.this, R.anim.blink);
+                    marker.startAnimation(blinkAni);
+                }
             }
+            // 두 말이 겹쳐져있을 때
             else if(gridItems[position] == 3) {
                 //marker.setImageDrawable(new ColorDrawable(Color.YELLOW));
+                marker.setImageResource(R.drawable.overlap_marker);
                 marker.setVisibility(View.VISIBLE);
+                marker.clearAnimation();
+
+                // 애니메이션 테스트
+                if(isMyTurn) {
+                    Animation blinkAni = AnimationUtils.loadAnimation(MultiActivity.this, R.anim.blink);
+                    marker.startAnimation(blinkAni);
+                }
             }
-            else
+            else {
                 marker.setVisibility(View.INVISIBLE);
+                marker.clearAnimation();
+            }
 
             return v;
         }
