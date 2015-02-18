@@ -7,11 +7,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,6 +54,8 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     LinearLayout menuPage;
     Animation translateLeftAnim;
     Animation translateRightAnim;
+
+    Sound sound = new Sound();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +102,14 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         translateLeftAnim = AnimationUtils.loadAnimation(this, R.anim.apper_from_right);
         translateRightAnim = AnimationUtils.loadAnimation(this, R.anim.disappear_to_right);
 
+        RelativeLayout R_menuPage = (RelativeLayout) findViewById(R.id.R_menuPage);
+        R_menuPage.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
+
         SlidingPageAnimationListener animationListener = new SlidingPageAnimationListener();
         translateLeftAnim.setAnimationListener(animationListener);
         translateRightAnim.setAnimationListener(animationListener);
@@ -112,8 +124,13 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         Button achievement = (Button) findViewById(R.id.achievement);
         achievement.setOnClickListener(this);
 
+        //배경음 클릭
+        Button background_sound = (Button) findViewById(R.id.background_sound);
+        background_sound.setOnClickListener(this);
 
+        //back키 막기
         backPressCloseHandler = new BackPressCloseHandler(this);
+
 
     }
 
@@ -122,6 +139,12 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         //자동로그인 취소
         getGameHelper().setMaxAutoSignInAttempts(0);
         mGoogleApiClient.connect();
+
+        //사운드 메모리
+        //sound.initBackgroundSound(this);
+        sound.initBtnSound(this);
+        //sound.playBackgroundSound();
+        startService(new Intent("backgroundSound"));
     }
 
     protected void onStop() {
@@ -129,6 +152,13 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+        //사운드 종료
+        //sound.stopBackgroundSound();
+    }
+
+    protected void onDestroy(){
+        super.onDestroy();
+        stopService(new Intent("backgroundSound"));
     }
 
     public void onConnectionFailed(ConnectionResult result) {
@@ -152,9 +182,7 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
             if (responseCode != RESULT_OK) {
                 mSignInClicked = false;
             }
-
             mIntentInProgress = false;
-
             if (!mGoogleApiClient.isConnecting()) {
                 mGoogleApiClient.connect();
             }
@@ -192,14 +220,6 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
                 && !mGoogleApiClient.isConnecting()) {
             mSignInClicked = true;
             resolveSignInError();
-        } else if (view.getId() == R.id.btn_menu) {
-
-            if (isPageOpen) {
-                menuPage.startAnimation(translateRightAnim);
-            } else {
-                menuPage.setVisibility(view.VISIBLE);
-                menuPage.startAnimation(translateLeftAnim);
-            }
         } else if (view.getId() == R.id.sign_out_button) {
             if (mGoogleApiClient.isConnected()) {
                 Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
@@ -222,24 +242,32 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
                 findViewById(R.id.menuPage).setVisibility(View.GONE);
                 isPageOpen = false;
             }
+        } else if (view.getId() == R.id.btn_menu) {
+
+            sound.playBtnSound();
+
+            if (isPageOpen) {
+                menuPage.startAnimation(translateRightAnim);
+            } else {
+                menuPage.setVisibility(view.VISIBLE);
+                menuPage.startAnimation(translateLeftAnim);
+            }
+        } else if (view.getId() == R.id.background_sound) {
+            //진행 중인지 아닌지 알아야함
+            stopService(new Intent("backgroundSound"));
         } else if (view.getId() == R.id.leaderboard) {
-
             startActivityForResult(Games.Leaderboards.getAllLeaderboardsIntent(mGoogleApiClient), 5);
-
         } else if (view.getId() == R.id.achievement) {
-
             startActivityForResult(Games.Achievements.getAchievementsIntent(mGoogleApiClient), 5);
         }
     }
 
     private void resolveSignInError() {
-
         if (mConnectionResult.hasResolution()) {
             try {
                 mIntentInProgress = true;
                 startIntentSenderForResult(mConnectionResult.getResolution().getIntentSender(),
                         RC_SIGN_IN, null, 0, 0, 0);
-
             } catch (SendIntentException e) {
                 mIntentInProgress = false;
                 mGoogleApiClient.connect();
@@ -271,7 +299,6 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         Log.i("personName", personName);
 
         accountCreate();
-
     }
 
     public void accountCreate() {
@@ -317,10 +344,8 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
 
                 findViewById(R.id.R_login).setVisibility(View.GONE);
                 findViewById(R.id.R_main).setVisibility(View.VISIBLE);
-
             }
         }.execute();
-
     }
 
     public void onConnectionSuspended(int cause) {

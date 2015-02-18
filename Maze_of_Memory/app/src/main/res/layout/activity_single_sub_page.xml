@@ -4,17 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
     <LinearLayout
+        android:id="@+id/R_sub_btn"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="#ff1cfffa"
-        android:orientation="horizontal"
-        android:id="@+id/R_sub_btn">
+        android:orientation="horizontal">
 
         <GridView
+            android:id="@+id/single_game_btn"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/single_game_btn"
+            android:gravity="center"
             android:numColumns="4"
-            android:gravity="center"/>
+            android:soundEffectsEnabled="false"/>
     </LinearLayout>
 </LinearLayout>
