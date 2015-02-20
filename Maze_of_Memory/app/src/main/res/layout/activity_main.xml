@@ -47,13 +47,14 @@
                     <RelativeLayout
                         android:layout_width="250dp"
                         android:layout_height="wrap_content"
-                        android:background="#ffb9a2ff"
                         android:gravity="center">
+                        <!--android:background="#ffb9a2ff"-->
 
                         <Button
                             android:id="@+id/single"
                             android:layout_width="fill_parent"
                             android:layout_height="80dp"
+                            android:background="@drawable/btn_play_change"
                             android:soundEffectsEnabled="false"
                             android:text="Single" />
 
@@ -85,15 +86,15 @@
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="#ff1cfffa">
+                        android:layout_height="wrap_content">
+                        <!--android:background="#ff1cfffa"-->
 
-                        <Button
+                        <ImageButton
                             android:id="@+id/btn_sound"
-                            android:layout_width="wrap_content"
-                            android:layout_height="50dp"
-                            android:soundEffectsEnabled="false"
-                            android:text="버튼음" />
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:background="@drawable/btn_sound_change"
+                            android:soundEffectsEnabled="false" />
 
                         <Button
                             android:id="@+id/background_sound"

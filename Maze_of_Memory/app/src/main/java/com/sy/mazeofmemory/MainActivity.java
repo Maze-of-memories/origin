@@ -128,9 +128,13 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         Button background_sound = (Button) findViewById(R.id.background_sound);
         background_sound.setOnClickListener(this);
 
+        //버튼음 클릭
+        /*
+        final Button btn_sound = (Button) findViewById(R.id.btn_sound);
+        btn_sound.setOnClickListener(this);
+        */
         //back키 막기
         backPressCloseHandler = new BackPressCloseHandler(this);
-
 
     }
 
@@ -156,7 +160,7 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         //sound.stopBackgroundSound();
     }
 
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent("backgroundSound"));
     }
@@ -242,19 +246,19 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
                 findViewById(R.id.menuPage).setVisibility(View.GONE);
                 isPageOpen = false;
             }
+        } else if (view.getId() == R.id.btn_sound) {
+
+        } else if (view.getId() == R.id.background_sound) {
+            //진행 중인지 아닌지 알아야함
+            stopService(new Intent("backgroundSound"));
         } else if (view.getId() == R.id.btn_menu) {
-
             sound.playBtnSound();
-
             if (isPageOpen) {
                 menuPage.startAnimation(translateRightAnim);
             } else {
                 menuPage.setVisibility(view.VISIBLE);
                 menuPage.startAnimation(translateLeftAnim);
             }
-        } else if (view.getId() == R.id.background_sound) {
-            //진행 중인지 아닌지 알아야함
-            stopService(new Intent("backgroundSound"));
         } else if (view.getId() == R.id.leaderboard) {
             startActivityForResult(Games.Leaderboards.getAllLeaderboardsIntent(mGoogleApiClient), 5);
         } else if (view.getId() == R.id.achievement) {
