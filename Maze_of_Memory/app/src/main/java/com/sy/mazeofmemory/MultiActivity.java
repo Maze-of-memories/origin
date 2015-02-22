@@ -1,8 +1,10 @@
 package com.sy.mazeofmemory;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -107,7 +109,7 @@ public class MultiActivity extends Activity
 
     // 클릭 가능한 모든 뷰의 리스트
     final static int[] CLICKABLES = {
-            R.id.button_play, R.id.button_pass_turn
+            R.id.button_play, R.id.button_pass_turn, R.id.button_give_up
     };
 
     // 화면 리스트
@@ -287,6 +289,11 @@ public class MultiActivity extends Activity
 
                 Log.d(TAG,"pass turn button clicked");
                 passTurn();
+                break;
+
+            // 게임 포기 버튼 클릭
+            case R.id.button_give_up:
+                showGiveUpDialog();
                 break;
         }
     }
@@ -890,9 +897,11 @@ public class MultiActivity extends Activity
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent e) {
         if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_game) {
-            // 게임 플레이 중 백키를 누르면 방을 나간다.
-            leaveRoom();
-            return true;
+            // 게임 플레이 중 백키를 누르면 게임 포기 다어얼로그를 띄운다.
+            // leaveRoom();
+            showGiveUpDialog();
+
+            return false;
         }
 
         if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_waiting_room) {
@@ -1031,6 +1040,22 @@ public class MultiActivity extends Activity
                 mPDialog.dismiss();
             }
         }.execute();
+    }
+
+    // 게임 포기 다이얼로그를 띄우는 메소드
+    private void showGiveUpDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Give up")
+                .setMessage("Are you sure you want to give up the game and leave the room?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        leaveRoom();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .create().show();
+
     }
 
     // 그리드뷰에 이미지를 출력해주는 어댑터
