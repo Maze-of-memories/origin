@@ -27,34 +27,6 @@ public class Sound extends Service {
     }
 
     //배경음
-    public void initBackgroundSound(Context context){
-        mediaPlayer = MediaPlayer.create(context, R.raw.sms_iphone_sms);
-        mediaPlayer.setLooping(true);
-    }
-
-    public void playBackgroundSound() {
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                mediaPlayer.setOnPreparedListener(
-                        new MediaPlayer.OnPreparedListener() {
-                            @Override
-                            public void onPrepared(MediaPlayer mp) {
-                                mediaPlayer.start();
-                            }
-                        }
-                );
-                return null;
-            }
-        }.execute();
-    }
-
-    public void stopBackgroundSound() {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-        }
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -71,14 +43,7 @@ public class Sound extends Service {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                mediaPlayer.setOnPreparedListener(
-                        new MediaPlayer.OnPreparedListener() {
-                            @Override
-                            public void onPrepared(MediaPlayer mp) {
-                                mediaPlayer.start();
-                            }
-                        }
-                );
+                mediaPlayer.start();
                 return null;
             }
         }.execute();
@@ -89,5 +54,4 @@ public class Sound extends Service {
         mediaPlayer.stop();
         mediaPlayer.release();
     }
-
 }
