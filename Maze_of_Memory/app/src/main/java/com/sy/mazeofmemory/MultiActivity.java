@@ -1099,14 +1099,19 @@ public class MultiActivity extends Activity
 
             // 위치에 따른 배경색 처리
             if(position % 2 == 0)
-                v.setBackgroundColor(getResources().getColor(R.color.lolipop_darkgreen));
+                v.setBackgroundColor(Color.GRAY);
             else
-                v.setBackgroundColor(getResources().getColor(R.color.lolipop_green));
+                v.setBackgroundColor(Color.LTGRAY);
 
 
             // 종료 위치 표시
             TextView startGoal = (TextView)v.findViewById(R.id.start_goal);
-            if(position == LEFT_GOAL_POSITION || position == RIGHT_GOAL_POSITION) {
+            if(position == LEFT_GOAL_POSITION ) {
+                v.setBackgroundColor(getResources().getColor(R.color.blue));
+                startGoal.setText("GOAL");
+                startGoal.setVisibility(View.VISIBLE);
+            } else if (position == RIGHT_GOAL_POSITION) {
+                v.setBackgroundColor(getResources().getColor(R.color.red));
                 startGoal.setText("GOAL");
                 startGoal.setVisibility(View.VISIBLE);
             } else
@@ -1155,6 +1160,35 @@ public class MultiActivity extends Activity
                 marker.setVisibility(View.INVISIBLE);
                 marker.clearAnimation();
             }
+
+            // 이동 가능한 방향 표시
+            ImageView directionMarker = (ImageView)v.findViewById(R.id.direction_marker);
+
+            if(isMyTurn) {
+                if(position == myMarkerPosition - 5) {
+                    // 위쪽 방향 표시
+                    directionMarker.setImageResource(R.drawable.arrow_up);
+                    directionMarker.setVisibility(View.VISIBLE);
+                }
+                else if(position == myMarkerPosition + 5) {
+                    // 아래쪽 방향 표시
+                    directionMarker.setImageResource(R.drawable.arrow_down);
+                    directionMarker.setVisibility(View.VISIBLE);
+                }
+                else if(position == myMarkerPosition - 1 && myMarkerPosition % 5 != 0) {
+                    // 왼쪽 방향 표시
+                    directionMarker.setImageResource(R.drawable.arrow_left);
+                    directionMarker.setVisibility(View.VISIBLE);
+                }
+                else if(position == myMarkerPosition + 1 && myMarkerPosition % 5 != 4) {
+                    // 오른쪽 방향 표시
+                    directionMarker.setImageResource(R.drawable.arrow_right);
+                    directionMarker.setVisibility(View.VISIBLE);
+                }
+                else
+                    directionMarker.setVisibility(View.INVISIBLE);
+            } else
+                directionMarker.setVisibility(View.INVISIBLE);
 
             return v;
         }

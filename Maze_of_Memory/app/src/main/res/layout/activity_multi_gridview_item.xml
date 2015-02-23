@@ -34,4 +34,12 @@
         android:visibility="visible"
         android:src="@drawable/left_marker"
         android:scaleType="centerInside" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/direction_marker"
+        android:src="@drawable/arrow_up"
+        android:layout_margin="15dp"
+        android:adjustViewBounds="true" />
 </RelativeLayout>
