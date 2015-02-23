@@ -387,18 +387,35 @@
 
         </RelativeLayout>
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical|right">
+            android:layout_height="wrap_content">
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="PASS TURN"
-                android:id = "@+id/button_pass_turn" />
-        </LinearLayout>
+                android:text="Give up"
+                android:id="@+id/button_give_up"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="#ffff4444"
+                android:textColor="#FFFFFF"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pass turn"
+                android:id="@+id/button_pass_turn"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="#ff99cc00"
+                android:textColor="#FFFFFF"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 
