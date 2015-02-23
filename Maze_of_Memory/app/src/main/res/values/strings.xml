@@ -8,6 +8,10 @@
     <string name="FACEBOOK_APP_ID">211474092356561</string>
     <string name="game_problem">An error occurred while starting the game. Please try again.</string>
     <string name="please_wait">Please wait...</string>
+    <string name="GIVEUP_DIALOG_TITLE">Give up</string>
+    <string name="GIVEUP_DIALOG_MSG">Are you sure you want to give up the game and leave the room?</string>
+    <string name="YES">Yes</string>
+    <string name="NO">No</string>
 
     <!-- 서버 주소 관련 -->
     <string name="server">http://53.vs.woobi.co.kr/MOM/</string>

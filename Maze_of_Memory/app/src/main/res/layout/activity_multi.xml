@@ -286,72 +286,142 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:padding="15dp"
-        android:background="#ffbfbbbb">
+        android:background="#FFFFFF">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/timer"
-                android:layout_toStartOf="@+id/timer">
+                android:layout_weight="1">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="my nickname"
-                    android:id="@+id/playing_mynick"
-                    android:editable="false"
-                    android:textIsSelectable="false"
-                    android:textStyle="bold" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center_vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="score"
-                    android:id="@+id/textView13" />
+                    <ImageView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/playing_my_picture"
+                        android:src="@drawable/photo"
+                        android:adjustViewBounds="true"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:scaleType="fitCenter" />
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/my_profile_layout">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="my nick"
+                            android:id="@+id/playing_mynick"
+
+                            android:textStyle="bold"
+                            android:singleLine="true" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="score"
+                            android:id="@+id/textView13" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:id="@+id/my_progressBar"
+                    android:progress="0"
+                    android:max="1500"
+                    android:progressDrawable="@drawable/game_progress_bar_ltr"
+                    android:indeterminate="false"/>
             </LinearLayout>
 
             <TextView
-                android:layout_width="50dp"
+                android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:text="15"
-                android:id="@+id/timer"
+                android:text="VS"
                 android:gravity="center"
                 android:textStyle="bold"
                 android:textSize="@dimen/abc_text_size_large_material"
-                android:layout_alignParentEnd="false"
-                android:layout_centerInParent="true" />
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp" />
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="right"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/timer"
-                android:layout_toEndOf="@+id/timer">
+                android:layout_weight="1">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="peer nickname"
-                    android:id="@+id/playing_peernick"
-                    android:textStyle="bold" />
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="10dp"
+                    android:id="@+id/peer_progressBar"
+                    android:max="1500"
+                    android:progress="0"
+                    android:indeterminate="false"
+                    android:indeterminateOnly="false"
+                    android:mirrorForRtl="false"
+                    android:visibility="visible"
+                    android:progressDrawable="@drawable/game_progress_bar_rtl" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="score"
-                    android:id="@+id/textView14" />
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:id="@+id/peer_profile_layout"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="peer nick"
+                            android:id="@+id/playing_peernick"
+                            android:textStyle="bold"
+                            android:singleLine="true" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="score"
+                            android:id="@+id/textView14" />
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:id="@+id/playing_peer_picture"
+                        android:src="@drawable/photo"
+                        android:adjustViewBounds="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:scaleType="fitCenter" />
+                </LinearLayout>
             </LinearLayout>
-        </RelativeLayout>
+
+        </LinearLayout>
 
         <RelativeLayout
             android:layout_width="fill_parent"

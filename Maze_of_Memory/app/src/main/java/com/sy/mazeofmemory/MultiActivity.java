@@ -21,12 +21,11 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -136,7 +135,8 @@ public class MultiActivity extends Activity
 
     // 타이머
     CountDownTimer timer;
-    TextView tvTimer;
+    ProgressBar mMyProgressBar;
+    ProgressBar mPeerProgressBar;
 
     // 말
     int myMarker;
@@ -232,17 +232,23 @@ public class MultiActivity extends Activity
         });
 
         // 카운트다운 타이머 초기화
-        timer = new CountDownTimer(15000, 1000) {
+        timer = new CountDownTimer(15000, 10) {
 
             @Override
             public void onTick(long millisUntilFinished) {
-                tvTimer.setText("" + millisUntilFinished / 1000);
+                if(isMyTurn)
+                    mMyProgressBar.setProgress((int)millisUntilFinished / 10);
+                else
+                    mPeerProgressBar.setProgress((int)millisUntilFinished / 10);
             }
 
             @Override
             public void onFinish() {
 
-                tvTimer.setText("0");
+                if(isMyTurn)
+                    mMyProgressBar.setProgress(0);
+                else
+                    mPeerProgressBar.setProgress(0);
 
                 // 카운터가 종료되었을 때 자신의 턴이라면 턴을 상대방에게 넘겨준다.
                 //  -- 자신의 턴이 아닌경우, 상대쪽에서 턴을 보내오기 때문에
@@ -252,8 +258,9 @@ public class MultiActivity extends Activity
             }
         };
 
-        // 타이머 텍스트뷰
-        tvTimer = (TextView)findViewById(R.id.timer);
+        // 타이머 프로그레스 바
+        mMyProgressBar = (ProgressBar)findViewById(R.id.my_progressBar);
+        mPeerProgressBar = (ProgressBar)findViewById(R.id.peer_progressBar);
 
         //imageUrl DB 저장 고려
         if (myPictureURL != null) {
@@ -401,8 +408,7 @@ public class MultiActivity extends Activity
         // 타이머를 취소시킨다.
         timer.cancel();
 
-        // 타이머 텍스트뷰의 배경 색을 변경한다.
-        tvTimer.setBackgroundColor(Color.GRAY);
+        mMyProgressBar.setProgress(0);
 
         // 타이머를 동작시킨다.
         timer.start();
@@ -507,11 +513,10 @@ public class MultiActivity extends Activity
             isMyTurn = true;
             remainingTurn = TURNCNT;
 
+            mPeerProgressBar.setProgress(0);
+
             // 타이머를 동작시킨다.
             timer.start();
-
-            // 타이머 텍스트뷰의 배경 색을 변경한다.
-            tvTimer.setBackgroundColor(Color.GREEN);
 
             mapViewAdapter.notifyDataSetChanged();
 
@@ -679,6 +684,13 @@ public class MultiActivity extends Activity
         TextView playingPeerNick = (TextView)findViewById(R.id.playing_peernick);
         playingPeerNick.setText(strPeerNick);
 
+        // 게임 플레이화면의 프로필사진 출력
+        ImageView playingMyPicture = (ImageView)findViewById(R.id.playing_my_picture);
+        ImageView playingPeerPicture = (ImageView)findViewById(R.id.playing_peer_picture);
+
+        setProfilePicture(playingMyPicture, myPictureURL);
+        setProfilePicture(playingPeerPicture, peerPictureURL);
+
         // 그리드뷰 갱신
         mapViewAdapter.notifyDataSetChanged();
 
@@ -689,11 +701,6 @@ public class MultiActivity extends Activity
     private void endGame() {
         // 타이머를 취소시킨다.
         timer.cancel();
-
-        // 타이머 텍스트뷰의 배경 색을 변경한다.
-        tvTimer.setBackgroundColor(Color.GRAY);
-        tvTimer.setText("0");
-
         isMyTurn = false;
     }
 
@@ -1045,15 +1052,15 @@ public class MultiActivity extends Activity
     // 게임 포기 다이얼로그를 띄우는 메소드
     private void showGiveUpDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Give up")
-                .setMessage("Are you sure you want to give up the game and leave the room?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.GIVEUP_DIALOG_TITLE)
+                .setMessage(R.string.GIVEUP_DIALOG_MSG)
+                .setPositiveButton(R.string.YES, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         leaveRoom();
                     }
                 })
-                .setNegativeButton("No", null)
+                .setNegativeButton(R.string.NO, null)
                 .create().show();
 
     }
