@@ -89,30 +89,30 @@
                         android:layout_height="wrap_content">
                         <!--android:background="#ff1cfffa"-->
 
-                        <ImageButton
-                            android:id="@+id/btn_sound"
+                        <Button
+                            android:id="@+id/background_sound"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
-                            android:background="@drawable/btn_sound_change"
+                            android:background="@drawable/sound_bg_change"
                             android:soundEffectsEnabled="false" />
 
                         <Button
-                            android:id="@+id/background_sound"
-                            android:layout_width="wrap_content"
-                            android:layout_height="50dp"
+                            android:id="@+id/btn_sound"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:layout_marginLeft="20dp"
-                            android:layout_toRightOf="@+id/btn_sound"
-                            android:soundEffectsEnabled="false"
-                            android:text="배경음" />
+                            android:layout_toRightOf="@+id/background_sound"
+                            android:background="@drawable/sound_btn_change"
+                            android:soundEffectsEnabled="false" />
 
                         <Button
                             android:id="@+id/btn_menu"
-                            android:layout_width="wrap_content"
-                            android:layout_height="50dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:layout_marginLeft="20dp"
-                            android:layout_toRightOf="@+id/background_sound"
-                            android:soundEffectsEnabled="false"
-                            android:text="Menu" />
+                            android:layout_toRightOf="@+id/btn_sound"
+                            android:background="@drawable/menu"
+                            android:soundEffectsEnabled="false" />
 
                     </RelativeLayout>
                 </RelativeLayout>

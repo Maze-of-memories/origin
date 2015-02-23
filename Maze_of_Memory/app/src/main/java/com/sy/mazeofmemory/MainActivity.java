@@ -3,6 +3,7 @@ package com.sy.mazeofmemory;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -56,6 +57,11 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     Animation translateRightAnim;
 
     Sound sound = new Sound();
+    boolean btn_sound;
+    boolean bg_sound;
+
+    Button background_sound;
+    Button sound_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,16 +131,17 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         achievement.setOnClickListener(this);
 
         //배경음 클릭
-        Button background_sound = (Button) findViewById(R.id.background_sound);
+        background_sound = (Button) findViewById(R.id.background_sound);
         background_sound.setOnClickListener(this);
 
         //버튼음 클릭
-        /*
-        final Button btn_sound = (Button) findViewById(R.id.btn_sound);
-        btn_sound.setOnClickListener(this);
-        */
+        sound_btn = (Button) findViewById(R.id.btn_sound);
+        sound_btn.setOnClickListener(this);
+
         //back키 막기
         backPressCloseHandler = new BackPressCloseHandler(this);
+
+        getPreferences();
 
     }
 
@@ -144,11 +151,20 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         getGameHelper().setMaxAutoSignInAttempts(0);
         mGoogleApiClient.connect();
 
-        //사운드 메모리
-        //sound.initBackgroundSound(this);
         sound.initBtnSound(this);
-        //sound.playBackgroundSound();
-        startService(new Intent("backgroundSound"));
+        if (bg_sound)
+            startService(new Intent("backgroundSound"));
+
+        if (btn_sound) {
+            sound_btn.setBackgroundResource(R.drawable.sound_btn_default);
+        } else {
+            sound_btn.setBackgroundResource(R.drawable.sound_btn_click);
+        }
+        if (bg_sound) {
+            background_sound.setBackgroundResource(R.drawable.sound_bg_default);
+        } else {
+            background_sound.setBackgroundResource(R.drawable.sound_bg_click);
+        }
     }
 
     protected void onStop() {
@@ -156,13 +172,32 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
-        //사운드 종료
-        //sound.stopBackgroundSound();
     }
 
     protected void onDestroy() {
         super.onDestroy();
-        stopService(new Intent("backgroundSound"));
+        if (bg_sound)
+            stopService(new Intent("backgroundSound"));
+    }
+
+    private void getPreferences() {
+        SharedPreferences sound = getSharedPreferences("sound", MODE_PRIVATE);
+        this.btn_sound = sound.getBoolean("btn_sound", true);
+        this.bg_sound = sound.getBoolean("bg_sound", true);
+    }
+
+    private void saveBtnPreferences(boolean btn_sound) {
+        SharedPreferences sound = getSharedPreferences("sound", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sound.edit();
+        editor.putBoolean("btn_sound", btn_sound);
+        editor.commit();
+    }
+
+    private void saveBgPreferences(boolean bg_sound) {
+        SharedPreferences sound = getSharedPreferences("sound", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sound.edit();
+        editor.putBoolean("bg_sound", bg_sound);
+        editor.commit();
     }
 
     public void onConnectionFailed(ConnectionResult result) {
@@ -247,12 +282,29 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
                 isPageOpen = false;
             }
         } else if (view.getId() == R.id.btn_sound) {
-
+            if (btn_sound) {
+                btn_sound = false;
+                sound_btn.setBackgroundResource(R.drawable.sound_btn_click);
+            } else {
+                btn_sound = true;
+                sound_btn.setBackgroundResource(R.drawable.sound_btn_default);
+            }
+            saveBtnPreferences(btn_sound);
         } else if (view.getId() == R.id.background_sound) {
-            //진행 중인지 아닌지 알아야함
-            stopService(new Intent("backgroundSound"));
+            if (bg_sound) {
+                bg_sound = false;
+                stopService(new Intent("backgroundSound"));
+                background_sound.setBackgroundResource(R.drawable.sound_bg_click);
+            } else {
+                bg_sound = true;
+                startService(new Intent("backgroundSound"));
+                background_sound.setBackgroundResource(R.drawable.sound_bg_default);
+            }
+            saveBgPreferences(bg_sound);
         } else if (view.getId() == R.id.btn_menu) {
-            sound.playBtnSound();
+            if (btn_sound) {
+                sound.playBtnSound();
+            }
             if (isPageOpen) {
                 menuPage.startAnimation(translateRightAnim);
             } else {
@@ -366,6 +418,7 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         }
         return super.onKeyDown(keyCode, event);
     }
+
 
 }
 
