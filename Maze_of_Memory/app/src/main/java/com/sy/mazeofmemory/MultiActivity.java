@@ -128,6 +128,9 @@ public class MultiActivity extends Activity
     // 현재 게임에 참가한 나의 ID
     private String mMyId = null;
 
+    ImageView mPlayingMyPicture;
+    ImageView mPlayingPeerPicture;
+
     // 턴 관련 변수
     private final static int TURNCNT = 3;
     private boolean isMyTurn = false;       /* 턴 여부 */
@@ -405,15 +408,13 @@ public class MultiActivity extends Activity
 
     // 상대방에게 턴을 넘기는 메소드
     void passTurn() {
+        // 턴 종료
+        isMyTurn = false;
+
         // 타이머를 취소시킨다.
         timer.cancel();
-
         mMyProgressBar.setProgress(0);
-
-        // 타이머를 동작시킨다.
-        timer.start();
-
-        isMyTurn = false;
+        mPlayingMyPicture.setBackgroundColor(getResources().getColor(R.color.lightgray));
 
         // 턴이 넘어갔으므로 블링크 애니메이션을 중지하기 위해 그리드뷰 어댑터를 갱신해준다.
         mapViewAdapter.notifyDataSetChanged();
@@ -422,6 +423,10 @@ public class MultiActivity extends Activity
         String msg = "PASSTURN";
         // 실제 메시지를 보내는 static method
         Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
+
+        // 타이머를 동작시킨다.
+        timer.start();
+        mPlayingPeerPicture.setBackgroundColor(getResources().getColor(R.color.green));
     }
 
     // 실시간 메시지를 받았을 때 호출되는 메소드
@@ -507,6 +512,21 @@ public class MultiActivity extends Activity
             // 상대방에게 턴을 넘긴다.
             passTurn();
         }
+        // 상대방의 전적 정보를 받았을 때
+        else if(bufString.startsWith("PEER_RECORD:")) {
+            String peerRecord = bufString.substring("PEER_RECORD:".length());
+            String[] values = peerRecord.split("_");
+
+            // 상대방의 전적을 화면에 출력한다.
+            TextView peerWinCnt = (TextView)findViewById(R.id.peer_win_cnt);
+            peerWinCnt.setText(values[0]);
+
+            TextView peerLoseCnt = (TextView)findViewById(R.id.peer_lose_cnt);
+            peerLoseCnt.setText(values[1]);
+
+            TextView peerWinRate = (TextView)findViewById(R.id.peer_win_rate);
+            peerWinRate.setText(values[2] + "%");
+        }
         // 나에게 턴이 넘어올 때
         else if(bufString.startsWith("PASSTURN")) {
             // 턴을 설정하고 횟수를 초기화한다.
@@ -514,9 +534,11 @@ public class MultiActivity extends Activity
             remainingTurn = TURNCNT;
 
             mPeerProgressBar.setProgress(0);
+            mPlayingPeerPicture.setBackgroundColor(getResources().getColor(R.color.lightgray));
 
             // 타이머를 동작시킨다.
             timer.start();
+            mPlayingMyPicture.setBackgroundColor(getResources().getColor(R.color.green));
 
             mapViewAdapter.notifyDataSetChanged();
 
@@ -685,11 +707,14 @@ public class MultiActivity extends Activity
         playingPeerNick.setText(strPeerNick);
 
         // 게임 플레이화면의 프로필사진 출력
-        ImageView playingMyPicture = (ImageView)findViewById(R.id.playing_my_picture);
-        ImageView playingPeerPicture = (ImageView)findViewById(R.id.playing_peer_picture);
+        mPlayingMyPicture = (ImageView)findViewById(R.id.playing_my_picture);
+        mPlayingPeerPicture = (ImageView)findViewById(R.id.playing_peer_picture);
 
-        setProfilePicture(playingMyPicture, myPictureURL);
-        setProfilePicture(playingPeerPicture, peerPictureURL);
+        setProfilePicture(mPlayingMyPicture, myPictureURL);
+        setProfilePicture(mPlayingPeerPicture, peerPictureURL);
+
+        // 전적을 가져와 출력한다.
+        getMyRecord();
 
         // 그리드뷰 갱신
         mapViewAdapter.notifyDataSetChanged();
@@ -874,8 +899,9 @@ public class MultiActivity extends Activity
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "onConnected() called. Sign in successful!");
 
+        // 미들네임 가져오기
         Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
-        strMyNick = currentPerson.getDisplayName();
+        strMyNick = currentPerson.getName().getGivenName();
 
 
         // 메인 화면 닉네임 출력
@@ -1049,6 +1075,35 @@ public class MultiActivity extends Activity
         }.execute();
     }
 
+    // 서버로부터 전적을 가져와 출력하는 메소드
+    void getMyRecord() {
+        String url = getString(R.string.server) + getString(R.string.get_record);
+        String param = "gmail=" + Plus.AccountApi.getAccountName(mGoogleApiClient);
+
+        new HttpAsyncTask(url, param) {
+
+            @Override
+            protected void onPostExecute(String result) {
+
+                String[] values = result.split("_");
+                Log.i(TAG, "Record : " + values);
+
+                TextView myWinCnt = (TextView)findViewById(R.id.my_win_cnt);
+                myWinCnt.setText(values[0]);
+
+                TextView myLoseCnt = (TextView)findViewById(R.id.my_lose_cnt);
+                myLoseCnt.setText(values[1]);
+
+                TextView myWinRate = (TextView)findViewById(R.id.my_win_rate);
+                myWinRate.setText(values[2] + "%");
+
+                // 상대방에게도 나의 전적을 보내준다.
+                String msg = "PEER_RECORD:" + result;
+                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
+            }
+        }.execute();
+    }
+
     // 게임 포기 다이얼로그를 띄우는 메소드
     private void showGiveUpDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -1099,12 +1154,11 @@ public class MultiActivity extends Activity
 
             // 위치에 따른 배경색 처리
             if(position % 2 == 0)
-                v.setBackgroundColor(Color.GRAY);
+                v.setBackgroundColor(Color.parseColor("#724e4e"));
             else
-                v.setBackgroundColor(Color.LTGRAY);
+                v.setBackgroundColor(Color.parseColor("#EBE6E6"));
 
-
-            // 종료 위치 표시
+            // 종료 위치, 시작 위치 표시
             TextView startGoal = (TextView)v.findViewById(R.id.start_goal);
             if(position == LEFT_GOAL_POSITION ) {
                 v.setBackgroundColor(getResources().getColor(R.color.blue));
@@ -1113,6 +1167,14 @@ public class MultiActivity extends Activity
             } else if (position == RIGHT_GOAL_POSITION) {
                 v.setBackgroundColor(getResources().getColor(R.color.red));
                 startGoal.setText("GOAL");
+                startGoal.setVisibility(View.VISIBLE);
+            } else if(position == LEFT_START_POSITION) {
+                v.setBackgroundColor(getResources().getColor(R.color.blue));
+                startGoal.setText("START");
+                startGoal.setVisibility(View.VISIBLE);
+            } else if(position == RIGHT_START_POSITION) {
+                v.setBackgroundColor(getResources().getColor(R.color.red));
+                startGoal.setText("START");
                 startGoal.setVisibility(View.VISIBLE);
             } else
                 startGoal.setVisibility(View.INVISIBLE);

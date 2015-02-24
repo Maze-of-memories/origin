@@ -10,7 +10,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:src="@drawable/multi_game"
+        android:src="@drawable/multi_game_sq"
         android:visibility="invisible"
         android:adjustViewBounds="true" />
 

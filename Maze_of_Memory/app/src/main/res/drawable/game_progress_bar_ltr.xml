@@ -5,7 +5,7 @@
     <item android:id="@android:id/background">
         <shape>
             <solid
-                android:color="@color/primary_material_light" />
+                android:color="@color/lightgray" />
             <!--
             <gradient
                 android:startColor="#000001"

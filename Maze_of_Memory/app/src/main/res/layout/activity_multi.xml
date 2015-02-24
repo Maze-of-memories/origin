@@ -291,84 +291,19 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:id="@+id/playing_my_picture"
-                        android:src="@drawable/photo"
-                        android:adjustViewBounds="true"
-                        android:layout_marginRight="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:scaleType="fitCenter" />
-
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/my_profile_layout">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="my nick"
-                            android:id="@+id/playing_mynick"
-
-                            android:textStyle="bold"
-                            android:singleLine="true" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="score"
-                            android:id="@+id/textView13" />
-
-                    </LinearLayout>
-                </LinearLayout>
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:weightSum="5"
+                android:gravity="right">
 
                 <ProgressBar
                     style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    android:id="@+id/my_progressBar"
-                    android:progress="0"
-                    android:max="1500"
-                    android:progressDrawable="@drawable/game_progress_bar_ltr"
-                    android:indeterminate="false"/>
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:text="VS"
-                android:gravity="center"
-                android:textStyle="bold"
-                android:textSize="@dimen/abc_text_size_large_material"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp" />
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <ProgressBar
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="fill_parent"
+                    android:layout_width="0dp"
                     android:layout_height="10dp"
                     android:id="@+id/peer_progressBar"
                     android:max="1500"
@@ -377,48 +312,170 @@
                     android:indeterminateOnly="false"
                     android:mirrorForRtl="false"
                     android:visibility="visible"
-                    android:progressDrawable="@drawable/game_progress_bar_rtl" />
+                    android:progressDrawable="@drawable/game_progress_bar_rtl"
+                    android:layout_gravity="right"
+                    android:layout_weight="3" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="peer nick"
+                android:id="@+id/playing_peernick"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:layout_gravity="right" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_width="fill_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
-                    android:gravity="center_vertical">
-
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="right"
-                        android:id="@+id/peer_profile_layout"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="peer nick"
-                            android:id="@+id/playing_peernick"
-                            android:textStyle="bold"
-                            android:singleLine="true" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="score"
-                            android:id="@+id/textView14" />
-
-                    </LinearLayout>
+                    android:gravity="left">
 
                     <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        android:id="@+id/playing_my_picture"
+                        android:src="@drawable/photo"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter"
+                        android:layout_marginRight="5dp"
+                        android:padding="5dp"
+                        android:background="@color/lightgray" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:gravity="right"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:id="@+id/my_win_cnt" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:id="@+id/my_lose_cnt" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:id="@+id/my_win_rate" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:gravity="center"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WIN"
+                        android:id="@+id/textView"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LOSE"
+                        android:id="@+id/textView8"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WIN RATE"
+                        android:id="@+id/textView9"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:id="@+id/peer_win_cnt" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:id="@+id/peer_lose_cnt" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:id="@+id/peer_win_rate" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right">
+
+                    <ImageView
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
                         android:id="@+id/playing_peer_picture"
                         android:src="@drawable/photo"
                         android:adjustViewBounds="true"
-                        android:layout_marginTop="5dp"
+                        android:scaleType="fitCenter"
                         android:layout_marginLeft="5dp"
-                        android:scaleType="fitCenter" />
+                        android:padding="5dp"
+                        android:background="@color/lightgray" />
+
                 </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="my nick"
+                android:id="@+id/playing_mynick"
+                android:textStyle="bold"
+                android:singleLine="true" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:weightSum="5">
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="10dp"
+                    android:id="@+id/my_progressBar"
+                    android:progress="0"
+                    android:max="1500"
+                    android:progressDrawable="@drawable/game_progress_bar_ltr"
+                    android:indeterminate="false"
+                    android:layout_weight="3" />
             </LinearLayout>
 
         </LinearLayout>
@@ -427,10 +484,11 @@
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:id="@+id/game_board_layout">
+            android:id="@+id/game_board_layout"
+            android:gravity="center">
 
             <ImageView
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/map"
                 android:scaleType="fitCenter"
@@ -438,7 +496,8 @@
                 android:layout_gravity="center"
                 android:layout_centerInParent="true"
                 android:visibility="invisible"
-                android:src="@drawable/multi_game" />
+                android:src="@drawable/multi_game_sq"
+                android:layout_alignParentEnd="true" />
 
             <GridView
                 android:layout_width="0dp"
@@ -446,14 +505,16 @@
                 android:id="@+id/gridView"
                 android:layout_gravity="center"
                 android:numColumns="5"
-                android:layout_centerInParent="true"
                 android:drawSelectorOnTop="false"
                 android:visibility="visible"
                 android:layout_alignTop="@+id/map"
                 android:layout_alignLeft="@+id/map"
                 android:layout_alignBottom="@+id/map"
                 android:layout_alignRight="@+id/map"
-                android:nestedScrollingEnabled="false" />
+                android:nestedScrollingEnabled="false"
+                android:padding="10dp"
+                android:background="#9C8383"
+                android:layout_centerInParent="true" />
 
         </RelativeLayout>
 
@@ -466,7 +527,7 @@
                 android:layout_height="wrap_content"
                 android:text="Give up"
                 android:id="@+id/button_give_up"
-                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:background="@color/darkred"
                 android:textColor="#FFFFFF"
@@ -478,7 +539,7 @@
                 android:layout_height="wrap_content"
                 android:text="Pass turn"
                 android:id="@+id/button_pass_turn"
-                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:background="#ff99cc00"
                 android:textColor="#FFFFFF"
