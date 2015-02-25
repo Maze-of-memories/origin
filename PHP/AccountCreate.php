@@ -21,6 +21,9 @@ while($row = mysqli_fetch_array($result2, MYSQLI_ASSOC)){
 
 	if($row[cnt] == 0){
 		mysqli_query($conn, "INSERT INTO ACCOUNT(NICKNAME, G_MAIL) VALUES ('".$nickname."','".$email."')");
+
+		// 계정 생성시 전적 정보도 함께 생성
+		mysqli_query($conn, "INSERT INTO MULTI_PLAY_INFO(G_MAIL) VALUES ('$email')");
 		echo "success";
 	}else{
 		echo "fail";

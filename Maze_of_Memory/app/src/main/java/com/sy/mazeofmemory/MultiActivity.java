@@ -382,7 +382,8 @@ public class MultiActivity extends Activity
 
         // 목적지에 도착했을 때
         if(pos == myMarkerGoalPosition) {
-            Toast.makeText(this, "이김", Toast.LENGTH_SHORT).show();
+            // 내가 이겼으므로 전적에 1승을 추가한다.
+            updateMyRecord("WIN");
 
             // 내가 이겼음을 상대방에게 알린다.
             msg = "PEERWIN";
@@ -552,7 +553,9 @@ public class MultiActivity extends Activity
         }
         // 상대방이 이겼을 때
         else if(bufString.startsWith("PEERWIN")) {
-            Toast.makeText(this, "졌음", Toast.LENGTH_SHORT).show();
+            // 상대방이 이겼으므로 전적에 1패를 추가한다.
+            updateMyRecord("LOSE");
+
             endGame();
         }
         else {
@@ -1100,6 +1103,21 @@ public class MultiActivity extends Activity
                 // 상대방에게도 나의 전적을 보내준다.
                 String msg = "PEER_RECORD:" + result;
                 Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
+            }
+        }.execute();
+    }
+
+    // 승패에 따라 전적을 업데이트 하는 메소드
+    void updateMyRecord(String result) {
+        String url = getString(R.string.server) + getString(R.string.update_record);
+        String param = "gmail=" + Plus.AccountApi.getAccountName(mGoogleApiClient)
+                 + "&game_result=" + result;
+
+        new HttpAsyncTask(url, param) {
+
+            @Override
+            protected void onPostExecute(String result) {
+
             }
         }.execute();
     }

@@ -16,6 +16,7 @@
     <string name="server">http://53.vs.woobi.co.kr/MOM/</string>
     <string name="multi_map_load">MultiMapLoad.php</string>
     <string name="get_record">GetRecord.php</string>
+    <string name="update_record">UpdateRecord.php</string>
 
     <!-- 리더보드 -->
     <string name="app_id">172581716041</string>

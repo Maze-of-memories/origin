@@ -37,7 +37,7 @@ if(isset($_POST['gmail']))
 		// 전적 출력
 		echo $winCnt . "_";		// 승
 		echo $loseCnt . "_";		// 패
-		echo round($winRate, 1);	// 승률
+		echo round($winRate, 1);	// 승률, 소수점 첫째 자리에서 반올림
 	}
 }
 else
