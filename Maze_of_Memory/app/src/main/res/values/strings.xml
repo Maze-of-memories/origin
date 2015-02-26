@@ -11,6 +11,7 @@
     <string name="GIVEUP_DIALOG_MSG">Are you sure you want to give up the game and leave the room?</string>
     <string name="YES">Yes</string>
     <string name="NO">No</string>
+    <string name="PEER_LEFT_ROOM">The other party has left the room</string>
 
     <!-- 서버 주소 관련 -->
     <string name="server">http://53.vs.woobi.co.kr/MOM/</string>

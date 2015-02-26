@@ -173,6 +173,9 @@ public class MultiActivity extends Activity
 
     private Integer[] gridItems;
 
+    // 게임 상태
+    private boolean mIsGamePlaying;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -385,9 +388,14 @@ public class MultiActivity extends Activity
             // 내가 이겼으므로 전적에 1승을 추가한다.
             updateMyRecord("WIN");
 
+            // 승리 다이얼로그 출력
+            showGameEndDialog("You win!");
+
             // 내가 이겼음을 상대방에게 알린다.
             msg = "PEERWIN";
             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
+
+            // 게임을 종료시킨다.
             endGame();
         }
         // 턴 수를 하나 감소시키고 턴이 끝났으면 상대방에게 턴을 넘긴다.
@@ -556,6 +564,10 @@ public class MultiActivity extends Activity
             // 상대방이 이겼으므로 전적에 1패를 추가한다.
             updateMyRecord("LOSE");
 
+            // 패배 다이얼로그 출력
+            showGameEndDialog("You lose!");
+
+            // 게임 종료
             endGame();
         }
         else {
@@ -703,6 +715,8 @@ public class MultiActivity extends Activity
     }
 
     private void startGame() {
+        mIsGamePlaying = true;
+
         // 게임 플레이화면 닉네임 출력
         TextView playingMyNick = (TextView)findViewById(R.id.playing_mynick);
         playingMyNick.setText(strMyNick);
@@ -727,9 +741,17 @@ public class MultiActivity extends Activity
 
     // 게임 종료 메소드
     private void endGame() {
-        // 타이머를 취소시킨다.
+
+        mIsGamePlaying = false;
+
+        // 진행중이던 타이머를 중지시킨다.
         timer.cancel();
+        mPeerProgressBar.setProgress(0);
+        mPlayingPeerPicture.setBackgroundColor(getResources().getColor(R.color.lightgray));
+
+        // 게임 조작이 불가능하도록 턴을 종료시킨다.
         isMyTurn = false;
+        mapViewAdapter.notifyDataSetChanged();
     }
 
     // join()메소드에 의해 호출되는 콜백
@@ -745,7 +767,7 @@ public class MultiActivity extends Activity
     // 정상적으로 방을 나갔을 때 호출되는 메소드(leaveRoom() 호출을 통한)
     // 만약 연결이 끊겨서 나가지는 경우에는 onDisconnectedFromRoom() 메소드가 호출된다.
     @Override
-    public void onLeftRoom(int statusCode, String s) {
+    public void onLeftRoom(int statusCode, String roomId) {
         // 메인 화면으로 돌아간다.
         Log.d(TAG, "onLeftRoom, code " + statusCode);
         switchToMainScreen();
@@ -781,10 +803,10 @@ public class MultiActivity extends Activity
         }
     };
 
-    // 취소(cancelled)된 게임에 대한 에러 메시지를 보여주고 메인 화면으로 돌아간다.
+    // 취소(cancelled)된 게임에 대한 에러 메시지를 보여준다.
     void showGameError() {
         BaseGameUtils.makeSimpleDialog(this, getString(R.string.game_problem));
-        switchToMainScreen();
+        // switchToMainScreen();
     }
 
     // 멀티플레이 메인 화면을 보여준다.
@@ -840,7 +862,10 @@ public class MultiActivity extends Activity
     }
 
     @Override
-    public void onPeerLeft(Room room, List<String> strings) {updateRoom(room);}
+    public void onPeerLeft(Room room, List<String> strings) {
+        Log.i(TAG, "onPeerLeft() called.");
+        updateRoom(room);
+    }
 
     // 방에 연결되었을 때 호출된다.
     @Override
@@ -859,11 +884,11 @@ public class MultiActivity extends Activity
         Log.d(TAG, "<< CONNECTED TO ROOM >>");
     }
 
-    // 방과의 연결이 끊길 때 호출된다. (메인 화면으로 돌아감)
+    // 방과의 연결이 끊길 때 호출된다.
+    // 상대방이 방을 나갔을 때 호출되며 승리 화면을 보여준다.
     @Override
     public void onDisconnectedFromRoom(Room room) {
         Log.i(TAG, "onDisconnectedFromRoom(room) called.");
-        mRoomId = null;
         showGameError();
     }
 
@@ -877,7 +902,28 @@ public class MultiActivity extends Activity
     }
 
     @Override
-    public void onPeersDisconnected(Room room, List<String> strings) {updateRoom(room);}
+    public void onPeersDisconnected(Room room, List<String> strings) {
+        Log.i(TAG, "onPeersDisconnected() called.");
+        updateRoom(room);
+
+        // 게임 도중 상대방이 나갔을때만 승리처리를 해준다.
+        // 게임이 종료된 후 상대방이 나간것에 대해선 승리처리를 해주지 않는다.
+        if(mIsGamePlaying) {
+            // 내 전적에 1승 추가
+            updateMyRecord("WIN");
+
+            // 승리 다이얼로그 출력
+            showGameEndDialog("You win!");
+
+            // 게임 종료
+            endGame();
+        }
+
+        // 상대방이 나갔으므로 id를 null로 설정한다.
+        mPeerId = null;
+
+        Toast.makeText(this, getString(R.string.PEER_LEFT_ROOM), Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public void onP2PConnected(String s) {}
@@ -934,19 +980,20 @@ public class MultiActivity extends Activity
     public boolean onKeyDown(int keyCode, KeyEvent e) {
         if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_game) {
             // 게임 플레이 중 백키를 누르면 게임 포기 다어얼로그를 띄운다.
-            // leaveRoom();
-            showGiveUpDialog();
-
-            return false;
-        }
-
-        if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_waiting_room) {
+            if(mIsGamePlaying)
+                showGiveUpDialog();
+            // 게임이 종료된 후 백키를 누르면 메인화면으로 이동한다.
+            else
+                leaveRoom();
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_waiting_room) {
             // 대기방에서 백키를 누르면 방을 나간다.
             leaveRoom();
             return true;
+        } else {
+            finish();
+            return true;
         }
-
-        return super.onKeyDown(keyCode, e);
     }
 
     // 방을 나가는 메소드
@@ -1121,6 +1168,39 @@ public class MultiActivity extends Activity
             }
         }.execute();
     }
+    // 게임 종료 다이얼로그르 띄우는 메소드
+    private void showGameEndDialog(String result) {
+        LayoutInflater inflater = getLayoutInflater();
+        RelativeLayout layout = (RelativeLayout)inflater.inflate(R.layout.dialog_multiplay_end, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(layout);
+
+        final AlertDialog dialog = builder.create();
+
+        // 결과 출력
+        TextView txtGameResult = (TextView)layout.findViewById(R.id.txt_game_result);
+        txtGameResult.setText(result);
+
+        // exit 버튼 클릭
+        layout.findViewById(R.id.exit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                leaveRoom();
+                dialog.dismiss();
+            }
+        });
+
+        // answer버튼 클릭
+        layout.findViewById(R.id.answer).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
 
     // 게임 포기 다이얼로그를 띄우는 메소드
     private void showGiveUpDialog() {
@@ -1130,6 +1210,9 @@ public class MultiActivity extends Activity
                 .setPositiveButton(R.string.YES, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
+                        // 전적에 1패를 추가한다.
+                        updateMyRecord("LOSE");
                         leaveRoom();
                     }
                 })
