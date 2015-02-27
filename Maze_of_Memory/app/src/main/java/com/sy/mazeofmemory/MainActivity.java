@@ -6,7 +6,9 @@ import android.content.IntentSender.SendIntentException;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,9 +33,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-
-public class MainActivity extends BaseGameActivity implements View.OnClickListener, ConnectionCallbacks,
-        OnConnectionFailedListener {
+public class MainActivity extends BaseGameActivity implements View.OnClickListener, ConnectionCallbacks, OnConnectionFailedListener,
+        DrawerLayout.DrawerListener{
 
     private static final int RC_SIGN_IN = 0;
     private GoogleApiClient mGoogleApiClient;
@@ -53,8 +54,7 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
 
     boolean isPageOpen = false;
     LinearLayout menuPage;
-    Animation translateLeftAnim;
-    Animation translateRightAnim;
+    private DrawerLayout drawerLayout;
 
     Sound sound = new Sound();
     boolean btn_sound;
@@ -104,22 +104,6 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
             }
         });
 
-        menuPage = (LinearLayout) findViewById(R.id.menuPage);
-        translateLeftAnim = AnimationUtils.loadAnimation(this, R.anim.apper_from_right);
-        translateRightAnim = AnimationUtils.loadAnimation(this, R.anim.disappear_to_right);
-
-        RelativeLayout R_menuPage = (RelativeLayout) findViewById(R.id.R_menuPage);
-        R_menuPage.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
-
-        SlidingPageAnimationListener animationListener = new SlidingPageAnimationListener();
-        translateLeftAnim.setAnimationListener(animationListener);
-        translateRightAnim.setAnimationListener(animationListener);
-
         // 도움말 버튼 초기화 및 이벤트리스너 설정
         Button btnMenu = (Button) findViewById(R.id.btn_menu);
         btnMenu.setOnClickListener(this);
@@ -143,6 +127,24 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
 
         getPreferences();
 
+        /////////////////////////////////////////////////////////////////////////////
+        drawerLayout = (DrawerLayout) findViewById(R.id.R_drawer);
+        drawerLayout.setDrawerListener(this);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+        menuPage = (LinearLayout) findViewById(R.id.menuPage);
+        menuPage.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    //drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
+                }
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    drawerLayout.closeDrawer(menuPage);
+                }
+                return true;
+            }
+        });
     }
 
     protected void onStart() {
@@ -201,14 +203,12 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     }
 
     public void onConnectionFailed(ConnectionResult result) {
-
         dialog.dismiss();
         findViewById(R.id.R_login).setVisibility(View.VISIBLE);
         findViewById(R.id.R_main).setVisibility(View.GONE);
 
         if (!mIntentInProgress) {
             mConnectionResult = result;
-
             if (mSignInClicked) {
                 resolveSignInError();
             }
@@ -236,22 +236,31 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     public void onSignInSucceeded() {
     }
 
-    private class SlidingPageAnimationListener implements Animation.AnimationListener {
-        public void onAnimationEnd(Animation animation) {
-            if (isPageOpen) {
-                menuPage.setVisibility(View.INVISIBLE);
-                isPageOpen = false;
-            } else {
-                isPageOpen = true;
-            }
-        }
+    ///////////////////////////////////////////////////////////////
+    //드라워
+    @Override
+    public void onDrawerSlide(View drawerView, float slideOffset) {
+    }
 
-        public void onAnimationRepeat(Animation animation) {
-        }
+    @Override
+    public void onDrawerOpened(View drawerView) {
+    }
 
-        public void onAnimationStart(Animation animation) {
+    @Override
+    public void onDrawerClosed(View drawerView) {
+    }
+
+    @Override
+    public void onDrawerStateChanged(int newState) {
+        switch (newState) {
+            case DrawerLayout.STATE_SETTLING:
+                if (btn_sound) {
+                    sound.playBtnSound();
+                }
+                break;
         }
     }
+    ///////////////////////////////////////////////////////////////
 
     public void onClick(View view) {
 
@@ -276,10 +285,10 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
                 Games.signOut(mGoogleApiClient);
                 mGoogleApiClient.disconnect();
 
+                drawerLayout.closeDrawer(menuPage);
+                findViewById(R.id.menuPage).setVisibility(View.GONE);
                 findViewById(R.id.R_main).setVisibility(View.GONE);
                 findViewById(R.id.R_login).setVisibility(View.VISIBLE);
-                findViewById(R.id.menuPage).setVisibility(View.GONE);
-                isPageOpen = false;
             }
         } else if (view.getId() == R.id.btn_sound) {
             if (btn_sound) {
@@ -305,12 +314,7 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
             if (btn_sound) {
                 sound.playBtnSound();
             }
-            if (isPageOpen) {
-                menuPage.startAnimation(translateRightAnim);
-            } else {
-                menuPage.setVisibility(view.VISIBLE);
-                menuPage.startAnimation(translateLeftAnim);
-            }
+            drawerLayout.openDrawer(menuPage);
         } else if (view.getId() == R.id.leaderboard) {
             startActivityForResult(Games.Leaderboards.getAllLeaderboardsIntent(mGoogleApiClient), 5);
         } else if (view.getId() == R.id.achievement) {
@@ -418,7 +422,6 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         }
         return super.onKeyDown(keyCode, event);
     }
-
 
 }
 
