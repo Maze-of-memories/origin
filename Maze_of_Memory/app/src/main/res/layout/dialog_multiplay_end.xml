@@ -34,7 +34,11 @@
                 android:text="Exit"
                 android:id="@+id/exit"
                 android:layout_weight="1"
-                android:layout_marginRight="10dp" />
+                android:layout_marginRight="10dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:background="@drawable/button_red_round"
+                android:textColor="#FFFFFF" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -42,14 +46,22 @@
                 android:text="Rematch"
                 android:id="@+id/rematch"
                 android:layout_weight="1"
-                android:layout_marginRight="10dp" />
+                android:layout_marginRight="10dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:background="@drawable/button_orange_round"
+                android:textColor="#FFFFFF" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Answer"
                 android:id="@+id/answer"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:background="@drawable/button_blue_round"
+                android:textColor="#FFFFFF" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

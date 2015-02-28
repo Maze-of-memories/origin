@@ -108,7 +108,8 @@ public class MultiActivity extends Activity
 
     // 클릭 가능한 모든 뷰의 리스트
     final static int[] CLICKABLES = {
-            R.id.button_play, R.id.button_pass_turn, R.id.button_give_up
+            R.id.button_play, R.id.button_pass_turn, R.id.button_give_up,
+            R.id.button_exit
     };
 
     // 화면 리스트
@@ -134,7 +135,8 @@ public class MultiActivity extends Activity
     // 턴 관련 변수
     private final static int TURNCNT = 3;
     private boolean isMyTurn = false;       /* 턴 여부 */
-    private int remainingTurn = TURNCNT;    /* 남은 턴 수 */
+    private int remainingMoveCnt = 0;    /* 남은 턴 수 */
+    private TextView mTvRemainingMoveCnt;           /* 남은 턴 수를 출력할 텍스트뷰 */
 
     // 타이머
     CountDownTimer timer;
@@ -264,6 +266,9 @@ public class MultiActivity extends Activity
             }
         };
 
+        // 남은 이동횟수를 출력할 텍스트뷰
+        mTvRemainingMoveCnt = (TextView)findViewById(R.id.txt_turn_left);
+
         // 타이머 프로그레스 바
         mMyProgressBar = (ProgressBar)findViewById(R.id.my_progressBar);
         mPeerProgressBar = (ProgressBar)findViewById(R.id.peer_progressBar);
@@ -307,6 +312,11 @@ public class MultiActivity extends Activity
             // 게임 포기 버튼 클릭
             case R.id.button_give_up:
                 showGiveUpDialog();
+                break;
+
+            // exit 버튼 클릭
+            case R.id.button_exit:
+                leaveRoom();
                 break;
         }
     }
@@ -397,10 +407,14 @@ public class MultiActivity extends Activity
 
             // 게임을 종료시킨다.
             endGame();
+        } else {
+            // 턴 수를 하나 감소시키고 턴이 끝났으면 상대방에게 턴을 넘긴다.
+            mTvRemainingMoveCnt.setText(--remainingMoveCnt + "");
+
+            if( remainingMoveCnt <= 0 )
+                passTurn();
         }
-        // 턴 수를 하나 감소시키고 턴이 끝났으면 상대방에게 턴을 넘긴다.
-        else if( --remainingTurn <= 0 )
-            passTurn();
+
     }
 
     void movePeerMarkerPosition(int pos) {
@@ -420,10 +434,14 @@ public class MultiActivity extends Activity
         // 턴 종료
         isMyTurn = false;
 
+        remainingMoveCnt = 0;
+        mTvRemainingMoveCnt.setText(remainingMoveCnt + "");
+
         // 타이머를 취소시킨다.
         timer.cancel();
         mMyProgressBar.setProgress(0);
         mPlayingMyPicture.setBackgroundColor(getResources().getColor(R.color.lightgray));
+        findViewById(R.id.button_pass_turn).setEnabled(false);
 
         // 턴이 넘어갔으므로 블링크 애니메이션을 중지하기 위해 그리드뷰 어댑터를 갱신해준다.
         mapViewAdapter.notifyDataSetChanged();
@@ -540,10 +558,12 @@ public class MultiActivity extends Activity
         else if(bufString.startsWith("PASSTURN")) {
             // 턴을 설정하고 횟수를 초기화한다.
             isMyTurn = true;
-            remainingTurn = TURNCNT;
+            remainingMoveCnt = TURNCNT;
+            mTvRemainingMoveCnt.setText(TURNCNT + "");
 
             mPeerProgressBar.setProgress(0);
             mPlayingPeerPicture.setBackgroundColor(getResources().getColor(R.color.lightgray));
+            findViewById(R.id.button_pass_turn).setEnabled(true);
 
             // 타이머를 동작시킨다.
             timer.start();
@@ -607,7 +627,7 @@ public class MultiActivity extends Activity
         peerPictureURL = null;
         map = null;
         isMyTurn = false;
-        remainingTurn = TURNCNT;
+        remainingMoveCnt = 0;
         timer.cancel();     /* 타이머 중지 */
 
         // 말의 위치 초기화
@@ -735,6 +755,10 @@ public class MultiActivity extends Activity
 
         // 그리드뷰 갱신
         mapViewAdapter.notifyDataSetChanged();
+
+        // 게임 플레이 중 필요한 버튼들을 출력한다.
+        findViewById(R.id.playing_button_set).setVisibility(View.VISIBLE);
+        findViewById(R.id.end_button_set).setVisibility(View.GONE);
 
         switchToScreen(R.id.screen_game);
     }
@@ -1191,10 +1215,23 @@ public class MultiActivity extends Activity
             }
         });
 
+        // rematch 버튼 클릭
+        layout.findViewById(R.id.rematch).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mPeerId == null)
+                    Toast.makeText(getApplicationContext(), getString(R.string.PEER_LEFT_ROOM), Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // answer버튼 클릭
         layout.findViewById(R.id.answer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                // 게임 종료 후 필요한 버튼들을 출력한다.
+                findViewById(R.id.playing_button_set).setVisibility(View.GONE);
+                findViewById(R.id.end_button_set).setVisibility(View.VISIBLE);
                 dialog.dismiss();
             }
         });
@@ -1255,9 +1292,9 @@ public class MultiActivity extends Activity
 
             // 위치에 따른 배경색 처리
             if(position % 2 == 0)
-                v.setBackgroundColor(Color.parseColor("#724e4e"));
+                v.setBackgroundColor(getResources().getColor(R.color.map_tile_dark));
             else
-                v.setBackgroundColor(Color.parseColor("#EBE6E6"));
+                v.setBackgroundColor(getResources().getColor(R.color.map_tile_light));
 
             // 종료 위치, 시작 위치 표시
             TextView startGoal = (TextView)v.findViewById(R.id.start_goal);

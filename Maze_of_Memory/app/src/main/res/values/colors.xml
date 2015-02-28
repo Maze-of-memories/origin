@@ -14,6 +14,10 @@
     <item name="darkgray" type="color">#FF444444</item>
     <item name="lightgray" type="color">#FFd4d4d4</item>
 
+    <item name="map_border" type="color">#9C8383</item>
+    <item name="map_tile_dark" type="color">#724e4e</item>
+    <item name="map_tile_light" type="color">#EBE6E6</item>
+
 
     <item name="lolipop_green" type="color">#FF83d0c9</item>
     <item name="lolipop_darkgreen" type="color">#FF35a79c</item>
