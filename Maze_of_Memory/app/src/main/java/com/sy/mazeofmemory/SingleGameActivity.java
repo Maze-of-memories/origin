@@ -135,7 +135,6 @@ public class SingleGameActivity extends Activity {
     }
 
     public void game_Move(int position) {
-
         //아래 클릭
         if (position == pre_chess_Position + 5 && map[map_info_Postion + 9].equals("o")) {
             move(position);
@@ -147,24 +146,22 @@ public class SingleGameActivity extends Activity {
             map_info_Postion = map_info_Postion - 18;
         }
         //왼쪽 클릭
-        else if (position == pre_chess_Position - 1 && map[map_info_Postion - 1].equals("o")) {
+        else if (position == pre_chess_Position - 1 && map[map_info_Postion - 1].equals("o") && (position + 1) % 5 != 0) {
             move(position);
             map_info_Postion = map_info_Postion - 2;
         }
         //오른쪽 클릭
-        else if (position == pre_chess_Position + 1 && map[map_info_Postion + 1].equals("o")) {
+        else if (position == pre_chess_Position + 1 && map[map_info_Postion + 1].equals("o") && (position % 5) != 0) {
             move(position);
             map_info_Postion = map_info_Postion + 2;
         } else if ((position == pre_chess_Position + 5 && map[map_info_Postion + 9].equals("x"))
                 || (position == pre_chess_Position - 5 && map[map_info_Postion - 9].equals("x"))
-                || (position == pre_chess_Position - 1 && map[map_info_Postion - 1].equals("x"))
-                || (position == pre_chess_Position + 1 && map[map_info_Postion + 1].equals("x"))) {
-
+                || (position == pre_chess_Position - 1 && map[map_info_Postion - 1].equals("x") && (position + 1) % 5 != 0)
+                || (position == pre_chess_Position + 1 && map[map_info_Postion + 1].equals("x") && (position % 5) != 0)) {
             move_cnt = 0;
             fail_cnt++;
             Toast.makeText(this, "틀렸습니다. 시작 위치로 돌아갑니다.", Toast.LENGTH_SHORT).show();
             game_init();
-
         }
     }
 

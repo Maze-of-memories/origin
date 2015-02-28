@@ -3,213 +3,219 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-
-    <LinearLayout
-        android:id="@+id/R_main"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/R_drawer"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:visibility="invisible">
+        android:layout_height="fill_parent">
 
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/R_main"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="#ffffff">
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:visibility="invisible">
 
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+                android:background="#ffffff">
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:gravity="center">
+
+                    <RelativeLayout
+                        android:id="@+id/R_Logo"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:id="@+id/Logo"
+                            android:layout_width="130dp"
+                            android:layout_height="130dp"
+                            android:background="@drawable/main_logo" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/R_Play_btn"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/R_Logo"
+                        android:gravity="center">
+
+                        <RelativeLayout
+                            android:layout_width="250dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center">
+                            <!--android:background="#ffb9a2ff"-->
+
+                            <Button
+                                android:id="@+id/single"
+                                android:layout_width="fill_parent"
+                                android:layout_height="80dp"
+                                android:background="@drawable/btn_play_change"
+                                android:soundEffectsEnabled="false"
+                                android:text="Single" />
+
+                            <Button
+                                android:id="@+id/multi"
+                                android:layout_width="fill_parent"
+                                android:layout_height="80dp"
+                                android:layout_below="@+id/single"
+                                android:layout_marginTop="10dp"
+                                android:soundEffectsEnabled="false"
+                                android:text="Multi" />
+
+                            <Button
+                                android:id="@+id/button3"
+                                android:layout_width="fill_parent"
+                                android:layout_height="80dp"
+                                android:layout_below="@+id/multi"
+                                android:layout_marginTop="10dp"
+                                android:soundEffectsEnabled="false"
+                                android:text="Store" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/R_Play_btn"
+                        android:gravity="center">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                            <!--android:background="#ff1cfffa"-->
+
+                            <Button
+                                android:id="@+id/background_sound"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:background="@drawable/sound_bg_change"
+                                android:soundEffectsEnabled="false" />
+
+                            <Button
+                                android:id="@+id/btn_sound"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:layout_marginLeft="20dp"
+                                android:layout_toRightOf="@+id/background_sound"
+                                android:background="@drawable/sound_btn_change"
+                                android:soundEffectsEnabled="false" />
+
+                            <Button
+                                android:id="@+id/btn_menu"
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:layout_marginLeft="20dp"
+                                android:layout_toRightOf="@+id/btn_sound"
+                                android:background="@drawable/menu"
+                                android:soundEffectsEnabled="false" />
+
+                        </RelativeLayout>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="30dp"
+                    android:layout_alignParentBottom="true"
+                    android:background="#ffff17f5">
+
+                </RelativeLayout>
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/R_login"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="#ffffff"
+            android:orientation="horizontal"
+            android:visibility="invisible">
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:gravity="center">
 
-                <RelativeLayout
-                    android:id="@+id/R_Logo"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:id="@+id/Logo"
-                        android:layout_width="130dp"
-                        android:layout_height="130dp"
-                        android:background="@drawable/main_logo" />
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/R_Play_btn"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/R_Logo"
-                    android:gravity="center">
-
-                    <RelativeLayout
-                        android:layout_width="250dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center">
-                        <!--android:background="#ffb9a2ff"-->
-
-                        <Button
-                            android:id="@+id/single"
-                            android:layout_width="fill_parent"
-                            android:layout_height="80dp"
-                            android:background="@drawable/btn_play_change"
-                            android:soundEffectsEnabled="false"
-                            android:text="Single" />
-
-                        <Button
-                            android:id="@+id/multi"
-                            android:layout_width="fill_parent"
-                            android:layout_height="80dp"
-                            android:layout_below="@+id/single"
-                            android:layout_marginTop="10dp"
-                            android:soundEffectsEnabled="false"
-                            android:text="Multi" />
-
-                        <Button
-                            android:id="@+id/button3"
-                            android:layout_width="fill_parent"
-                            android:layout_height="80dp"
-                            android:layout_below="@+id/multi"
-                            android:layout_marginTop="10dp"
-                            android:soundEffectsEnabled="false"
-                            android:text="Store" />
-                    </RelativeLayout>
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/R_Play_btn"
-                    android:gravity="center">
-
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                        <!--android:background="#ff1cfffa"-->
-
-                        <Button
-                            android:id="@+id/background_sound"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:background="@drawable/sound_bg_change"
-                            android:soundEffectsEnabled="false" />
-
-                        <Button
-                            android:id="@+id/btn_sound"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_marginLeft="20dp"
-                            android:layout_toRightOf="@+id/background_sound"
-                            android:background="@drawable/sound_btn_change"
-                            android:soundEffectsEnabled="false" />
-
-                        <Button
-                            android:id="@+id/btn_menu"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_marginLeft="20dp"
-                            android:layout_toRightOf="@+id/btn_sound"
-                            android:background="@drawable/menu"
-                            android:soundEffectsEnabled="false" />
-
-                    </RelativeLayout>
-                </RelativeLayout>
+                <ImageView
+                    android:layout_width="250dp"
+                    android:layout_height="100dp"
+                    android:background="@drawable/intro_logo" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="fill_parent"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:background="#ffff17f5">
+                android:layout_marginBottom="20dp"
+                android:gravity="center">
+
+                <ImageButton
+                    android:id="@+id/sign_in_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/signin_white" />
 
             </RelativeLayout>
         </RelativeLayout>
 
-    </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/R_login"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:background="#ffffff"
-        android:orientation="horizontal"
-        android:visibility="invisible">
-
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/menuPage"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:gravity="center">
+            android:layout_height="fill_parent"
+            android:layout_gravity="right"
+            android:gravity="center_vertical|right"
+            android:visibility="visible">
+            <!--android:background="#64000000"-->
 
-            <ImageView
-                android:layout_width="250dp"
-                android:layout_height="100dp"
-                android:background="@drawable/intro_logo" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="20dp"
-            android:gravity="center">
-
-            <ImageButton
-                android:id="@+id/sign_in_button"
+            <RelativeLayout
+                android:id="@+id/R_menuPage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/signin_white" />
+                android:background="#fff6ffbd"
+                android:padding="30dp">
 
-        </RelativeLayout>
-    </RelativeLayout>
+                <Button
+                    android:id="@+id/leaderboard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="leaderboard" />
 
-    <LinearLayout
-        android:id="@+id/menuPage"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_gravity="right"
-        android:gravity="center"
-        android:visibility="gone">
+                <Button
+                    android:id="@+id/achievement"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/leaderboard"
+                    android:text="achievement" />
 
-        <RelativeLayout
-            android:id="@+id/R_menuPage"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="#fff6ffbd"
-            android:padding="30dp">
+                <Button
+                    android:id="@+id/invite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/achievement"
+                    android:text="invite" />
 
-            <Button
-                android:id="@+id/leaderboard"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="leaderboard" />
+                <Button
+                    android:id="@+id/sign_out_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/invite"
+                    android:text="logout" />
 
-            <Button
-                android:id="@+id/achievement"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/leaderboard"
-                android:text="achievement" />
+            </RelativeLayout>
+        </LinearLayout>
 
-            <Button
-                android:id="@+id/invite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/achievement"
-                android:text="invite" />
-
-            <Button
-                android:id="@+id/sign_out_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/invite"
-                android:text="logout" />
-
-        </RelativeLayout>
-
-    </LinearLayout>
+    </android.support.v4.widget.DrawerLayout>
 
 
 </FrameLayout>
