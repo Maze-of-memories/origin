@@ -36,6 +36,8 @@ import java.net.URL;
 public class MainActivity extends BaseGameActivity implements View.OnClickListener, ConnectionCallbacks, OnConnectionFailedListener,
         DrawerLayout.DrawerListener{
 
+    private static final String TAG = "MainActivity";
+
     private static final int RC_SIGN_IN = 0;
     private GoogleApiClient mGoogleApiClient;
     private boolean mIntentInProgress;
@@ -359,6 +361,9 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         Log.i("personName", personName);
 
         accountCreate();
+
+        // 서버에서 전적을 가져와 저장한다.
+        getMyRecordFromServer();
     }
 
     public void accountCreate() {
@@ -423,5 +428,30 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         return super.onKeyDown(keyCode, event);
     }
 
+    // 서버로부터 전적을 가져와 프리퍼런스에 저장하는 메소드
+    void getMyRecordFromServer() {
+        String url = getString(R.string.server) + getString(R.string.get_record);
+        String param = "gmail=" + Plus.AccountApi.getAccountName(mGoogleApiClient);
+
+        new HttpAsyncTask(url, param) {
+
+            @Override
+            protected void onPostExecute(String result) {
+
+                String[] values = result.split("_");
+                Log.i(TAG, "Record : " + values);
+
+                // 프리퍼런스에 저장한다.
+                SharedPreferences sp = getSharedPreferences("MULTI_RECORD", MODE_PRIVATE);
+                SharedPreferences.Editor spEditor = sp.edit();
+
+                spEditor.putString("WIN", values[0]);
+                spEditor.putString("LOSE", values[1]);
+                spEditor.putString("WIN_RATE", values[2]);
+
+                spEditor.commit();
+            }
+        }.execute();
+    }
 }
 

@@ -15,116 +15,154 @@
         android:gravity="center"
         android:padding="10dp">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:transitionGroup="false">
+            android:layout_marginBottom="30dp"
+            android:weightSum="5">
 
-
-            <ImageView
-                android:id="@+id/personphoto"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:scaleType="fitXY"
-                android:text="image"
-                android:src="@drawable/photo"
-                android:layout_centerHorizontal="true" />
-
-            <TextView
-                android:id="@+id/main_nickname"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/personphoto"
-                android:layout_centerHorizontal="true"
-                android:gravity="center"
-                android:text="Loading..."
-                android:textSize="25dp" />
-        </RelativeLayout>
+                android:layout_weight="2"
+                android:gravity="center_horizontal"
+                android:layout_marginRight="10dp">
 
-        <TableLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="50dp">
-
-            <TableRow
-                android:layout_marginTop="40dp"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/row0_column0"
+                <ImageView
+                    android:id="@+id/personphoto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#ffcd3fff"
-                    android:gravity="center"
-                    android:text="Win"
-                    android:textSize="20dp" />
+                    android:scaleType="fitXY"
+                    android:text="image"
+                    android:src="@drawable/photo"
+                    android:layout_centerHorizontal="true"
+                    android:background="@drawable/picture_background"
+                    android:adjustViewBounds="true" />
 
                 <TextView
-                    android:id="@+id/row0_column1"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/main_nickname"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#ffff7ada"
-                    android:gravity="center"
-                    android:text="Lose"
+                    android:layout_below="@+id/personphoto"
+                    android:layout_centerHorizontal="true"
+                    android:text="Loading..."
                     android:textSize="20dp"
+                    android:singleLine="true"
+                    android:gravity="center" />
+            </LinearLayout>
 
-                    />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="3">
 
-                <TextView
-                    android:id="@+id/row0_column2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="#ffff26a7"
-                    android:gravity="center"
-                    android:text="Winning rate"
-                    android:textSize="20dp"
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal">
 
-                    />
-            </TableRow>
+                    <TableRow
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:weightSum="2"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/multi_record_background"
+                        android:padding="5dp"
+                        android:layout_marginBottom="5dp">
 
-            <TableRow android:gravity="center">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Win"
+                            android:id="@+id/textView5"
+                            android:layout_weight="1"
+                            android:textSize="18dp"
+                            android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/row1_column0"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="#ffff26a7"
-                    android:gravity="center"
-                    android:text="0"
-                    android:textSize="20dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:id="@+id/main_win_cnt"
+                            android:layout_weight="1"
+                            android:textSize="18dp"
+                            android:gravity="right" />
+                    </TableRow>
 
-                <TextView
-                    android:id="@+id/row1_column1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="#ffcd3fff"
-                    android:gravity="center"
-                    android:text="0"
-                    android:textSize="20dp" />
+                    <TableRow
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/multi_record_background"
+                        android:padding="5dp"
+                        android:layout_marginBottom="5dp">
 
-                <TextView
-                    android:id="@+id/row1_column2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="#ffff7ada"
-                    android:gravity="center"
-                    android:text="00.0%"
-                    android:textSize="20dp" />
-            </TableRow>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Lose"
+                            android:id="@+id/textView10"
+                            android:layout_weight="1"
+                            android:textSize="18dp"
+                            android:textStyle="bold" />
 
-        </TableLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:id="@+id/main_lose_cnt"
+                            android:layout_weight="1"
+                            android:textSize="18dp"
+                            android:gravity="right" />
+                    </TableRow>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
+                    <TableRow
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/multi_record_background"
+                        android:padding="5dp"
+                        android:layout_marginBottom="5dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="W.R"
+                            android:id="@+id/textView12"
+                            android:layout_weight="1"
+                            android:textSize="18dp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00.0%"
+                            android:id="@+id/main_win_rate"
+                            android:layout_weight="1"
+                            android:textSize="18dp"
+                            android:gravity="right" />
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:weightSum="3"
             android:gravity="center">
 
             <Button
                 android:id="@+id/button_play"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="PLAY"
                 android:textSize="30dp"
@@ -133,9 +171,9 @@
                 android:minWidth="0dp"
                 android:minHeight="0dp"
                 android:paddingLeft="30dp"
-                android:paddingRight="30dp" />
-
-        </RelativeLayout>
+                android:paddingRight="30dp"
+                android:layout_weight="2" />
+        </LinearLayout>
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -153,11 +191,13 @@
             </RelativeLayout>
 
         </RelativeLayout>
+
     </LinearLayout>
 
     <!-- "PLEASE WAIT" 화면 -->
 
     <!-- "WAITING ROOM" 화면  : 테스트중 -->
+
     <LinearLayout android:id="@+id/screen_waiting_room"
         style="@style/LLScreen"
         android:orientation="vertical"
@@ -165,28 +205,35 @@
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp">
+            android:layout_marginBottom="30dp"
+            android:weightSum="7"
+            android:gravity="center">
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3">
 
                 <ImageView
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:id="@+id/my_picture"
-                    android:background="@drawable/photo"
-                    android:layout_gravity="center_horizontal" />
+                    android:background="@drawable/picture_background"
+                    android:src="@drawable/photo"
+                    android:adjustViewBounds="true" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="MyNick"
                     android:id="@+id/my_nick"
-                    android:layout_gravity="center_horizontal" />
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <TextView
@@ -195,26 +242,33 @@
                 android:text="VS"
                 android:id="@+id/textView7"
                 android:layout_gravity="center"
-                android:layout_margin="15dp" />
+                android:layout_margin="15dp"
+                android:textSize="20dp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3">
 
                 <ImageView
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:id="@+id/peer_picture"
-                    android:background="@drawable/photo"
-                    android:layout_gravity="center_horizontal" />
+                    android:background="@drawable/picture_background"
+                    android:src="@drawable/photo"
+                    android:adjustViewBounds="true" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="searching..."
                     android:id="@+id/peer_nick"
-                    android:layout_gravity="center_horizontal" />
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
 
@@ -326,8 +380,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
                     android:gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp">
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -346,7 +400,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="WIN RATE"
+                        android:text="W.R"
                         android:id="@+id/textView9"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -463,10 +517,18 @@
 
         </RelativeLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_rematch_state"
+            android:visibility="invisible"
+            android:gravity="left" />
+
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/playing_button_set">
+            android:id="@+id/playing_button_set"
+            android:visibility="visible">
 
             <Button
                 android:layout_width="wrap_content"
@@ -496,7 +558,8 @@
                     android:layout_height="wrap_content"
                     android:text="Turn"
                     android:id="@+id/textView2"
-                    android:layout_gravity="center_horizontal" />
+                    android:layout_gravity="center_horizontal"
+                    android:textSize="11dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -504,7 +567,8 @@
                     android:text="3"
                     android:id="@+id/txt_turn_left"
                     android:layout_gravity="center_horizontal"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textSize="11dp" />
             </LinearLayout>
 
             <Button
@@ -523,66 +587,61 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/end_button_set"
-            android:visibility="gone">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Exit"
-                android:id="@+id/button_exit"
-                android:layout_alignParentStart="true"
-                android:background="@drawable/button_red_round"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:textColor="#FFFFFF"
-                android:layout_toLeftOf="@+id/linearLayout2"
-                android:layout_toStartOf="@+id/linearLayout2" />
+            android:visibility="visible">
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:id="@+id/linearLayout2"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:visibility="invisible">
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
 
-                <TextView
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Rematch"
+                    android:id="@+id/button_rematch"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:textColor="#FFFFFF"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:background="@drawable/button_orange_round"
+                    android:layout_centerInParent="true"
+                    android:layout_weight="1" />
+
+                <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Turn"
-                    android:id="@+id/textView3"
-                    android:layout_gravity="center_horizontal" />
+                    android:text="New match"
+                    android:id="@+id/button_newmatch"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:background="@drawable/button_green_round"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <Button
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="3"
-                    android:id="@+id/textView4"
-                    android:layout_gravity="center_horizontal"
-                    android:textStyle="bold" />
+                    android:text="Exit"
+                    android:id="@+id/button_exit"
+                    android:background="@drawable/button_red_round"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:textColor="#FFFFFF"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="false"
+                    android:layout_centerInParent="true"
+                    android:layout_weight="1" />
             </LinearLayout>
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Rematch"
-                android:id="@+id/button_rematch"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:textColor="#FFFFFF"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
-                android:background="@drawable/button_orange_round"
-                android:layout_toRightOf="@+id/linearLayout2"
-                android:layout_toEndOf="@+id/linearLayout2" />
-        </RelativeLayout>
+        </LinearLayout>
 
     </LinearLayout>
 

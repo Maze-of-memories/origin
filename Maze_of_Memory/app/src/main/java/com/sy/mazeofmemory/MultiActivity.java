@@ -2,10 +2,12 @@ package com.sy.mazeofmemory;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -109,7 +111,7 @@ public class MultiActivity extends Activity
     // 클릭 가능한 모든 뷰의 리스트
     final static int[] CLICKABLES = {
             R.id.button_play, R.id.button_pass_turn, R.id.button_give_up,
-            R.id.button_exit
+            R.id.button_exit, R.id.button_rematch, R.id.button_newmatch
     };
 
     // 화면 리스트
@@ -178,6 +180,17 @@ public class MultiActivity extends Activity
     // 게임 상태
     private boolean mIsGamePlaying;
 
+    // 게임 종료 다이얼로그
+    AlertDialog mGameEndDialog;
+    RelativeLayout mGameEndDialogLayout;
+
+    // 나와 상대방의 리매치 대기 정보
+    boolean mIWantRematch = false;
+    boolean mPeerWantRematch = false;
+
+    // new match 버튼 클릭 정보
+    boolean isNewMatch = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -209,6 +222,9 @@ public class MultiActivity extends Activity
         // 메인화면 프로필 사진 및 닉네임
         mainProfilePicture = (ImageView) findViewById(R.id.personphoto);
         mainNickname = (TextView)findViewById(R.id.main_nickname);
+
+        // 메인화면 전적 출력
+        setMainScreenRecord();
 
         // 대기화면 프로필 사진
         myPicture = (ImageView)findViewById(R.id.my_picture);
@@ -273,6 +289,9 @@ public class MultiActivity extends Activity
         mMyProgressBar = (ProgressBar)findViewById(R.id.my_progressBar);
         mPeerProgressBar = (ProgressBar)findViewById(R.id.peer_progressBar);
 
+        // 게임 종료 다이얼로그 생성
+        makeGameEndDialog();
+
         //imageUrl DB 저장 고려
         if (myPictureURL != null) {
             myPictureURL = myPictureURL.substring(0, myPictureURL.length() - 6);
@@ -298,7 +317,7 @@ public class MultiActivity extends Activity
             case R.id.button_play:
                 Log.i(TAG, "button_play clicked");
                 mPDialog.show();
-                startMultiPlay();
+                createMultiPlayRoom();
                 break;
 
             // 턴 넘김(턴 종료) 버튼 클릭
@@ -318,6 +337,28 @@ public class MultiActivity extends Activity
             case R.id.button_exit:
                 leaveRoom();
                 break;
+
+            // rematch 버튼 클릭(게임 화면)
+            case R.id.button_rematch:
+                // 상대방에게 rematch 요청을 보낸다.
+                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, "REMATCH".getBytes(), mRoomId, mPeerId);
+
+                if (mPeerWantRematch) {
+                    // 상대방이 이미 rematch를 요청한 상태면 바로 매치를 시작한다.
+                    rematch();
+                } else {
+                    // 상대방이 아직 rematch 요청을 보내오지 않았다면 요청 전송 후 메시지를 출력한다.
+                    mIWantRematch = true;
+                    TextView state = (TextView)findViewById(R.id.txt_rematch_state);
+                    state.setText(getString(R.string.REMATCH_REQ_SENT));
+                    state.setVisibility(View.VISIBLE);
+                    v.setEnabled(false);
+                }
+                break;
+            // new match 버튼 클릭(게임 화면)
+            case R.id.button_newmatch:
+                newMatch();
+                break;
         }
     }
 
@@ -330,8 +371,8 @@ public class MultiActivity extends Activity
             return;
         }
 
-        //
-        checkAndMove(position);
+        // checkAndMove(position);
+        moveMyMarkerPosition(position);
     }
 
     // 클릭한 방향의 벽을 검사한뒤 말을 이동시킨다.
@@ -414,7 +455,6 @@ public class MultiActivity extends Activity
             if( remainingMoveCnt <= 0 )
                 passTurn();
         }
-
     }
 
     void movePeerMarkerPosition(int pos) {
@@ -517,11 +557,6 @@ public class MultiActivity extends Activity
             strPeerNick = bufString.substring("HS4:".length());
             peerNickname.setText(strPeerNick);
 
-            waitingRoomStatus.setText("Player is connected");
-
-            // 게임을 시작한다.
-            startGame();
-
             // 나의 닉네임 전송
             String msg = "HS5:" + strMyNick;
             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, sender);
@@ -531,17 +566,16 @@ public class MultiActivity extends Activity
             strPeerNick = bufString.substring("HS5:".length());
             peerNickname.setText(strPeerNick);
 
-            waitingRoomStatus.setText("Player is connected");
-
-            // 게임을 시작한다.
-            startGame();
-
-            // 상대방에게 턴을 넘긴다.
-            passTurn();
+            // 나의 전적 전송
+            SharedPreferences sp = getSharedPreferences("MULTI_RECORD", MODE_PRIVATE);
+            String msg = "HS6:" + sp.getString("WIN", "0") + "_"
+                    + sp.getString("LOSE", "0") + "_"
+                    + sp.getString("WIN_RATE", "00.0");
+            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, sender);
         }
-        // 상대방의 전적 정보를 받았을 때
-        else if(bufString.startsWith("PEER_RECORD:")) {
-            String peerRecord = bufString.substring("PEER_RECORD:".length());
+        // 상대방의 전적 정보를 받앟을 때(Handshake 6)
+        else if(bufString.startsWith("HS6:")) {
+            String peerRecord = bufString.substring("HS6:".length());
             String[] values = peerRecord.split("_");
 
             // 상대방의 전적을 화면에 출력한다.
@@ -553,6 +587,39 @@ public class MultiActivity extends Activity
 
             TextView peerWinRate = (TextView)findViewById(R.id.peer_win_rate);
             peerWinRate.setText(values[2] + "%");
+
+            // 나의 전적 전송
+            SharedPreferences sp = getSharedPreferences("MULTI_RECORD", MODE_PRIVATE);
+            String msg = "HS7:" + sp.getString("WIN", "0") + "_"
+                    + sp.getString("LOSE", "0") + "_"
+                    + sp.getString("WIN_RATE", "00.0");
+            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, sender);
+
+            // 게임을 시작한다.
+            startGame();
+        }
+        // 상대방의 전적 정보를 받았을 때(Handshake 7)
+        else if(bufString.startsWith("HS7:")) {
+            String peerRecord = bufString.substring("HS6:".length());
+            String[] values = peerRecord.split("_");
+
+            // 상대방의 전적을 화면에 출력한다.
+            TextView peerWinCnt = (TextView)findViewById(R.id.peer_win_cnt);
+            peerWinCnt.setText(values[0]);
+
+            TextView peerLoseCnt = (TextView)findViewById(R.id.peer_lose_cnt);
+            peerLoseCnt.setText(values[1]);
+
+            TextView peerWinRate = (TextView)findViewById(R.id.peer_win_rate);
+            peerWinRate.setText(values[2] + "%");
+
+            waitingRoomStatus.setText("Player is connected");
+
+            // 게임을 시작한다.
+            startGame();
+
+            // 상대방에게 턴을 넘긴다.
+            passTurn();
         }
         // 나에게 턴이 넘어올 때
         else if(bufString.startsWith("PASSTURN")) {
@@ -590,6 +657,32 @@ public class MultiActivity extends Activity
             // 게임 종료
             endGame();
         }
+        // 리매치 요청을 받았을 때
+        else if(bufString.startsWith("REMATCH")) {
+            mPeerWantRematch = true;
+
+            if(mIWantRematch) {
+                // 내가 이미 rematch를 요청한 상태라면 바로 매치를 시작한다.
+                mGameEndDialog.dismiss();
+                rematch();
+                // Toast.makeText(this, "REMATCH", Toast.LENGTH_SHORT).show();
+            } else {
+                // 내가 rematch를 요청한 상태가 아니면 상대에게 요청이 들어왔음을 텍스트로 출력한다.
+                TextView state = (TextView)mGameEndDialogLayout.findViewById(R.id.txt_rematch_state);
+                state.setText(strPeerNick + " " + getString(R.string.REMATCH_REQ_RECV));
+                state.setVisibility(View.VISIBLE);
+
+                // 게임 화면에서 상태 메시지 출력
+                state = (TextView)findViewById(R.id.txt_rematch_state);
+                state.setText(strPeerNick + " " + getString(R.string.REMATCH_REQ_RECV));
+            }
+        }
+        //
+        else if(bufString.startsWith("MAP:")) {
+            map = bufString.substring("MAP:".length());
+            Log.d(TAG, "Map info received: " + map);
+            passTurn();
+        }
         else {
             Toast.makeText(this,"Message received: " + (char) buf[0] + "/" + (int) buf[1], Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
@@ -598,7 +691,7 @@ public class MultiActivity extends Activity
     }
 
     // 자동 매칭 멀티 게임을 시작한다.
-    void startMultiPlay() {
+    void createMultiPlayRoom() {
         // 임의로 선택된 1명의 플레이어와 게임을 시작한다.
         final int MIN_OPPONENTS = 1, MAX_OPPONENTS = 1;
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
@@ -641,6 +734,20 @@ public class MultiActivity extends Activity
 
         // 대기방의 상태 메시지 초기화
         waitingRoomStatus.setText("waiting for player...");
+
+        /* rematch 관련 변수 초기화 */
+        // 다이얼로그의 rematch 버튼 및 텍스트 초기화
+        mGameEndDialogLayout.findViewById(R.id.rematch).setEnabled(true);
+        mGameEndDialogLayout.findViewById(R.id.txt_rematch_state).setVisibility(View.INVISIBLE);
+
+        // 게임화면의 rematch 버튼 및 텍스트 초기화
+        findViewById(R.id.button_rematch).setEnabled(true);
+        TextView state = (TextView)findViewById(R.id.txt_rematch_state);
+        state.setText("");
+        state.setVisibility(View.INVISIBLE);
+
+        mIWantRematch = false;
+        mPeerWantRematch = false;
     }
 
     // 말들의 위치를 초기화한다.
@@ -751,7 +858,15 @@ public class MultiActivity extends Activity
         setProfilePicture(mPlayingPeerPicture, peerPictureURL);
 
         // 전적을 가져와 출력한다.
-        getMyRecord();
+        SharedPreferences sp = getSharedPreferences("MULTI_RECORD", MODE_PRIVATE);
+        TextView myWinCnt = (TextView)findViewById(R.id.my_win_cnt);
+        myWinCnt.setText(sp.getString("WIN", "0"));
+
+        TextView myLoseCnt = (TextView)findViewById(R.id.my_lose_cnt);
+        myLoseCnt.setText(sp.getString("LOSE", "0"));
+
+        TextView myWinRate = (TextView)findViewById(R.id.my_win_rate);
+        myWinRate.setText(sp.getString("WIN_RATE", "00.0") + "%");
 
         // 그리드뷰 갱신
         mapViewAdapter.notifyDataSetChanged();
@@ -772,6 +887,9 @@ public class MultiActivity extends Activity
         timer.cancel();
         mPeerProgressBar.setProgress(0);
         mPlayingPeerPicture.setBackgroundColor(getResources().getColor(R.color.lightgray));
+
+        mMyProgressBar.setProgress(0);
+        mPlayingMyPicture.setBackgroundColor(getResources().getColor(R.color.lightgray));
 
         // 게임 조작이 불가능하도록 턴을 종료시킨다.
         isMyTurn = false;
@@ -794,7 +912,12 @@ public class MultiActivity extends Activity
     public void onLeftRoom(int statusCode, String roomId) {
         // 메인 화면으로 돌아간다.
         Log.d(TAG, "onLeftRoom, code " + statusCode);
-        switchToMainScreen();
+
+        // new match 버튼을 통한 방 나가기가 아닌 경우
+        if(!isNewMatch)
+            switchToMainScreen();
+
+        isNewMatch = false;
     }
 
     // 맵을 다운받고 상대방에게 전송한다.
@@ -835,6 +958,7 @@ public class MultiActivity extends Activity
 
     // 멀티플레이 메인 화면을 보여준다.
     void switchToMainScreen() {
+        setMainScreenRecord();
         switchToScreen(R.id.screen_main);
     }
 
@@ -930,6 +1054,18 @@ public class MultiActivity extends Activity
         Log.i(TAG, "onPeersDisconnected() called.");
         updateRoom(room);
 
+        // 게임 종료 다이얼로그의 rematch 버튼 비활성화
+        mGameEndDialogLayout.findViewById(R.id.rematch).setEnabled(false);
+        TextView state = (TextView)mGameEndDialogLayout.findViewById(R.id.txt_rematch_state);
+        state.setText(strPeerNick + " " + getString(R.string.PEER_LEFT_ROOM));
+        state.setVisibility(View.VISIBLE);
+
+        // 게임 화면의 rematch 버튼 비활성화
+        findViewById(R.id.button_rematch).setEnabled(false);
+        state = (TextView)findViewById(R.id.txt_rematch_state);
+        state.setText(strPeerNick + " " + getString(R.string.PEER_LEFT_ROOM));
+        // state.setVisibility(View.VISIBLE);
+
         // 게임 도중 상대방이 나갔을때만 승리처리를 해준다.
         // 게임이 종료된 후 상대방이 나간것에 대해선 승리처리를 해주지 않는다.
         if(mIsGamePlaying) {
@@ -945,8 +1081,6 @@ public class MultiActivity extends Activity
 
         // 상대방이 나갔으므로 id를 null로 설정한다.
         mPeerId = null;
-
-        Toast.makeText(this, getString(R.string.PEER_LEFT_ROOM), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -972,10 +1106,9 @@ public class MultiActivity extends Activity
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "onConnected() called. Sign in successful!");
 
-        // 미들네임 가져오기
+        // 이름 가져오기
         Person currentPerson = Plus.PeopleApi.getCurrentPerson(mGoogleApiClient);
         strMyNick = currentPerson.getName().getGivenName();
-
 
         // 메인 화면 닉네임 출력
         mainNickname.setText(strMyNick);
@@ -1015,8 +1148,7 @@ public class MultiActivity extends Activity
             leaveRoom();
             return true;
         } else {
-            finish();
-            return true;
+            return super.onKeyDown(keyCode, e);
         }
     }
 
@@ -1034,6 +1166,21 @@ public class MultiActivity extends Activity
             timer.cancel();
         } else {
             switchToMainScreen();
+        }
+    }
+
+    // 방을 나가는 메소드
+    void leaveRoomForNewMatch() {
+        Log.d(TAG, "leaveRoom() called.");
+        // mSecondsLeft = 0;
+        stopKeepingScreenOn();
+        if (mRoomId != null) {
+            Games.RealTimeMultiplayer.leave(mGoogleApiClient, this, mRoomId);
+            mRoomId = null;
+            //switchToScreen(R.id.screen_wait);
+
+            // 타이머 중지
+            timer.cancel();
         }
     }
 
@@ -1149,37 +1296,44 @@ public class MultiActivity extends Activity
         }.execute();
     }
 
-    // 서버로부터 전적을 가져와 출력하는 메소드
-    void getMyRecord() {
-        String url = getString(R.string.server) + getString(R.string.get_record);
-        String param = "gmail=" + Plus.AccountApi.getAccountName(mGoogleApiClient);
+    // 메인화면의 전적을 출력하는 메소드
+    void setMainScreenRecord() {
+        // 메인화면 전적 출력
+        SharedPreferences sp = getSharedPreferences("MULTI_RECORD", MODE_PRIVATE);
+        TextView mainWinCnt = (TextView)findViewById(R.id.main_win_cnt);
+        mainWinCnt.setText(sp.getString("WIN", "0"));
 
-        new HttpAsyncTask(url, param) {
+        TextView mainLoseCnt = (TextView)findViewById(R.id.main_lose_cnt);
+        mainLoseCnt.setText(sp.getString("LOSE", "0"));
 
-            @Override
-            protected void onPostExecute(String result) {
-
-                String[] values = result.split("_");
-                Log.i(TAG, "Record : " + values);
-
-                TextView myWinCnt = (TextView)findViewById(R.id.my_win_cnt);
-                myWinCnt.setText(values[0]);
-
-                TextView myLoseCnt = (TextView)findViewById(R.id.my_lose_cnt);
-                myLoseCnt.setText(values[1]);
-
-                TextView myWinRate = (TextView)findViewById(R.id.my_win_rate);
-                myWinRate.setText(values[2] + "%");
-
-                // 상대방에게도 나의 전적을 보내준다.
-                String msg = "PEER_RECORD:" + result;
-                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
-            }
-        }.execute();
+        TextView mainWinRate = (TextView)findViewById(R.id.main_win_rate);
+        mainWinRate.setText(sp.getString("WIN_RATE", "00.0") + "%");
     }
 
     // 승패에 따라 전적을 업데이트 하는 메소드
     void updateMyRecord(String result) {
+
+        // 로컬에 저장되어있는 전적을 업데이트 한다.
+        SharedPreferences sp = getSharedPreferences("MULTI_RECORD", MODE_PRIVATE);
+        SharedPreferences.Editor spEditor = sp.edit();
+
+        int winCnt = Integer.parseInt(sp.getString("WIN", "0"));
+        int loseCnt = Integer.parseInt(sp.getString("LOSE", "0"));
+        float winRate = Float.parseFloat(sp.getString("WIN_RATE", "00.0"));
+
+        if(result.equals("WIN"))
+            winCnt++;
+        else
+            loseCnt++;
+
+        winRate = ((float)winCnt / (float)(winCnt + loseCnt)) * 100;
+
+        spEditor.putString("WIN", winCnt + "");
+        spEditor.putString("LOSE", loseCnt + "");
+        spEditor.putString("WIN_RATE", String.format("%.1f", winRate));
+        spEditor.commit();
+
+        // 서버에 저장된 전적을 업데이트 한다.
         String url = getString(R.string.server) + getString(R.string.update_record);
         String param = "gmail=" + Plus.AccountApi.getAccountName(mGoogleApiClient)
                  + "&game_result=" + result;
@@ -1192,51 +1346,91 @@ public class MultiActivity extends Activity
             }
         }.execute();
     }
-    // 게임 종료 다이얼로그르 띄우는 메소드
-    private void showGameEndDialog(String result) {
-        LayoutInflater inflater = getLayoutInflater();
-        RelativeLayout layout = (RelativeLayout)inflater.inflate(R.layout.dialog_multiplay_end, null);
 
+    // 게임 종료 다이얼로그를 생성하는 메소드
+    private void makeGameEndDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(layout);
+        mGameEndDialogLayout = (RelativeLayout)getLayoutInflater().inflate(R.layout.dialog_multiplay_end, null);
+        builder.setView(mGameEndDialogLayout);
+        builder.setOnKeyListener(new Dialog.OnKeyListener() {
 
-        final AlertDialog dialog = builder.create();
-
-        // 결과 출력
-        TextView txtGameResult = (TextView)layout.findViewById(R.id.txt_game_result);
-        txtGameResult.setText(result);
-
-        // exit 버튼 클릭
-        layout.findViewById(R.id.exit).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                leaveRoom();
-                dialog.dismiss();
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    showAnswer();
+                    dialog.dismiss();
+                }
+                return false;
             }
         });
 
-        // rematch 버튼 클릭
-        layout.findViewById(R.id.rematch).setOnClickListener(new View.OnClickListener() {
+        // exit 버튼 클릭
+        mGameEndDialogLayout.findViewById(R.id.exit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mPeerId == null)
-                    Toast.makeText(getApplicationContext(), getString(R.string.PEER_LEFT_ROOM), Toast.LENGTH_SHORT).show();
+                leaveRoom();
+                mGameEndDialog.dismiss();
+            }
+        });
+
+        // rematch 버튼 클릭(다이얼로그)
+        mGameEndDialogLayout.findViewById(R.id.rematch).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 상대방에게 rematch 요청을 보낸다.
+                Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, "REMATCH".getBytes(), mRoomId, mPeerId);
+
+                if (mPeerWantRematch) {
+                    // 상대방이 이미 rematch를 요청한 상태면 바로 매치를 시작한다.
+                    mGameEndDialog.dismiss();
+                    rematch();
+                } else {
+                    // 상대방이 아직 rematch 요청을 보내오지 않았다면 요청 전송 후 메시지를 출력한다.
+                    mIWantRematch = true;
+                    TextView state = (TextView)mGameEndDialogLayout.findViewById(R.id.txt_rematch_state);
+                    state.setText(getString(R.string.REMATCH_REQ_SENT));
+                    state.setVisibility(View.VISIBLE);
+                    v.setEnabled(false);
+
+                    // 게임화면의 rematch 버튼도 비활성화
+                    state = (TextView)findViewById(R.id.txt_rematch_state);
+                    state.setText(getString(R.string.REMATCH_REQ_SENT));
+                    findViewById(R.id.button_rematch).setEnabled(false);
+                }
+            }
+        });
+
+        // new match 버튼 클릭
+        mGameEndDialogLayout.findViewById(R.id.newmatch).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                newMatch();
+
+                // 다이얼로그 종료
+                mGameEndDialog.dismiss();
             }
         });
 
         // answer버튼 클릭
-        layout.findViewById(R.id.answer).setOnClickListener(new View.OnClickListener() {
+        mGameEndDialogLayout.findViewById(R.id.answer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                // 게임 종료 후 필요한 버튼들을 출력한다.
-                findViewById(R.id.playing_button_set).setVisibility(View.GONE);
-                findViewById(R.id.end_button_set).setVisibility(View.VISIBLE);
-                dialog.dismiss();
+                showAnswer();
+                mGameEndDialog.dismiss();
             }
         });
 
-        dialog.show();
+        mGameEndDialog = builder.create();
+    }
+
+    // 개임 종료 다이얼로그 출력
+    void showGameEndDialog(String result) {
+        // 결과 출력
+        TextView txtGameResult = (TextView)mGameEndDialogLayout.findViewById(R.id.txt_game_result);
+        txtGameResult.setText(result);
+
+        mGameEndDialog.show();
     }
 
     // 게임 포기 다이얼로그를 띄우는 메소드
@@ -1255,7 +1449,85 @@ public class MultiActivity extends Activity
                 })
                 .setNegativeButton(R.string.NO, null)
                 .create().show();
+    }
+    // 벽을 보여주는 메소드
+    void showAnswer() {
+        // 게임 종료 후 필요한 버튼들 및 뷰를 출력한다.
+        findViewById(R.id.playing_button_set).setVisibility(View.GONE);
+        findViewById(R.id.end_button_set).setVisibility(View.VISIBLE);
+        findViewById(R.id.txt_rematch_state).setVisibility(View.VISIBLE);
+    }
 
+    // 상대방과 다시 매치를 시작한다.
+    void rematch() {
+        mIsGamePlaying = true;
+
+        // playing button set으로 버튼을 교체한다.
+        findViewById(R.id.end_button_set).setVisibility(View.GONE);
+        findViewById(R.id.playing_button_set).setVisibility(View.VISIBLE);
+
+        // 말의 위치를 초기화 시킨다.
+        initMarkersPosition();
+
+        if (mParticipants.get(0).getParticipantId().equals(mMyId)) {
+            myMarker = LEFT_MARKER;                             // 내가 조작하게될 말
+            myMarkerStartPosition = LEFT_START_POSITION;        // 내 말의 시작 위치
+            myMarkerGoalPosition = LEFT_GOAL_POSITION;          // 내 말의 도착 위치
+            myMarkerPosition = LEFT_START_POSITION;             // 내 말의 현재 위치
+            myRealStartPosition = MAP_LEFT_START_POSITION;      // 나의 실제 시작 위치
+            myRealPosition = MAP_LEFT_START_POSITION;           // 나의 실제 현재 위치
+            Log.i(TAG, "my real position : " + myRealPosition);
+
+            peerMarker = RIGHT_MARKER;
+
+            map = downloadMultiMap();
+            Log.i(TAG, "downloaded map info : " + map);
+
+            String msg = "MAP:" + map;
+            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
+        } else {
+            // 상대방이 왼쪽 말을 가졌으므로 오른쪽 말을 갖는다.
+            myMarker = RIGHT_MARKER;
+            myMarkerStartPosition = RIGHT_START_POSITION;
+            myMarkerGoalPosition = RIGHT_GOAL_POSITION;
+            myMarkerPosition = RIGHT_START_POSITION;
+            myRealStartPosition = MAP_RIGHT_START_POSITION;
+            myRealPosition = MAP_RIGHT_START_POSITION;
+            Log.i(TAG, "my real position : " + myRealPosition);
+
+            peerMarker = LEFT_MARKER;
+        }
+
+        // rematch 관련 변수 초기화
+        mIWantRematch = false;
+        mPeerWantRematch = false;
+
+        mGameEndDialogLayout.findViewById(R.id.rematch).setEnabled(true);
+        mGameEndDialogLayout.findViewById(R.id.txt_rematch_state).setVisibility(View.INVISIBLE);
+
+        // playing button set으로 버튼을 교체한다.
+        findViewById(R.id.end_button_set).setVisibility(View.GONE);
+        findViewById(R.id.playing_button_set).setVisibility(View.VISIBLE);
+        findViewById(R.id.button_rematch).setEnabled(true);
+        TextView state = (TextView)findViewById(R.id.txt_rematch_state);
+        state.setText("");
+        state.setVisibility(View.INVISIBLE);
+
+        mapViewAdapter.notifyDataSetChanged();
+
+        Log.i(TAG, "rematch() called");
+    }
+
+    // 새로운 상대와 새 게임을 시작한다.
+    void newMatch() {
+        isNewMatch = true;
+
+        // 방을 나간다
+        leaveRoomForNewMatch();
+
+        // 새로운 멀티 플레이 게임을 시작한다.
+        mPDialog.show();
+        createMultiPlayRoom();
     }
 
     // 그리드뷰에 이미지를 출력해주는 어댑터
