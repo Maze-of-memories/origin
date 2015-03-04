@@ -8,15 +8,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -34,7 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainActivity extends BaseGameActivity implements View.OnClickListener, ConnectionCallbacks, OnConnectionFailedListener,
-        DrawerLayout.DrawerListener{
+        DrawerLayout.DrawerListener {
 
     private static final String TAG = "MainActivity";
 
@@ -106,7 +102,7 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
             }
         });
 
-        // 도움말 버튼 초기화 및 이벤트리스너 설정
+        // menu 클릭
         Button btnMenu = (Button) findViewById(R.id.btn_menu);
         btnMenu.setOnClickListener(this);
 
@@ -130,18 +126,24 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         getPreferences();
 
         /////////////////////////////////////////////////////////////////////////////
+        //nenu 관련
         drawerLayout = (DrawerLayout) findViewById(R.id.R_drawer);
         drawerLayout.setDrawerListener(this);
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
+        drawerLayout.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                drawerLayout.closeDrawer(menuPage);
+                return false;
+            }
+        });
         menuPage = (LinearLayout) findViewById(R.id.menuPage);
         menuPage.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
-                    //drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
-                }
-                if(event.getAction() == MotionEvent.ACTION_UP) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     drawerLayout.closeDrawer(menuPage);
                 }
                 return true;
