@@ -42,4 +42,38 @@
         android:src="@drawable/arrow_up"
         android:layout_margin="15dp"
         android:adjustViewBounds="true" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:id="@+id/top_wall"
+        android:background="@color/orange" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:id="@+id/bottom_wall"
+        android:background="@color/orange"
+        android:layout_alignParentBottom="true" />
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:id="@+id/left_wall"
+        android:background="@color/orange"
+        android:layout_alignParentEnd="false"
+        android:visibility="visible"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/imageView"
+        android:layout_alignBottom="@+id/imageView" />
+
+    <View
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:id="@+id/right_wall"
+        android:background="@color/orange"
+        android:visibility="visible"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/imageView"
+        android:layout_alignBottom="@+id/imageView" />
 </RelativeLayout>

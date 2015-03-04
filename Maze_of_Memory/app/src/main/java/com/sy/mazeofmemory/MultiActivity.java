@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -74,6 +73,9 @@ public class MultiActivity extends Activity
 
     // Request code used to invoke sign in user interactions.
     private static final int RC_SIGN_IN = 9001;
+
+    // size of map
+    final static int MAP_SIZE = 5;
 
     // 말의 위치
     final int LEFT_MARKER = 1;
@@ -169,11 +171,11 @@ public class MultiActivity extends Activity
     private int myRealStartPosition;
 
     // 맵 정보
-    String map;
+    String map = "oxoooooooo+o+x+x+ooooxoxooox+o+o+o+xoxoxoxoooo+o+o+o+xooooooooox+x+o+x+ooooooxooo";
 
     // 맵을 표현하는 그리드뷰
     GridView mapView;
-    ImageAdapter mapViewAdapter;
+    MapViewAdpater mapViewAdapter;
 
     private Integer[] gridItems;
 
@@ -238,13 +240,13 @@ public class MultiActivity extends Activity
         waitingRoomStatus = (TextView)findViewById(R.id.waiting_room_status);
 
         // 말의 위치를 나타내는 배열 초기화
-        gridItems = new Integer[25];
-        for(int i = 0; i < 25; i++)
+        gridItems = new Integer[MAP_SIZE * MAP_SIZE];
+        for(int i = 0; i < MAP_SIZE * MAP_SIZE; i++)
             gridItems[i] = new Integer(0);
 
         // 미로 그리드뷰 초기화
         mapView = (GridView)findViewById(R.id.gridView);
-        mapViewAdapter = new ImageAdapter(this);
+        mapViewAdapter = new MapViewAdpater(this);
         mapView.setAdapter(mapViewAdapter);
         mapView.setOnItemClickListener(this);
         mapView.setOnTouchListener(new View.OnTouchListener(){
@@ -522,7 +524,7 @@ public class MultiActivity extends Activity
 
             peerMarker = LEFT_MARKER;
 
-            Toast.makeText(this, "Player connected", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(this, "Player connected", Toast.LENGTH_SHORT).show();
 
             // 맵 정보를 받으면 프로필 사진의 URL을 전송해준다.
             String msg = "HS2:" + myPictureURL;
@@ -722,18 +724,21 @@ public class MultiActivity extends Activity
         isMyTurn = false;
         remainingMoveCnt = 0;
         timer.cancel();     /* 타이머 중지 */
+        mIWantRematch = false;
+        mPeerWantRematch = false;
+    }
+
+    // 화면으로 보여지는 객체들을 초기화한다.
+    void resetScreenVars() {
+
+        // 대기화면의 메시지 초기화
+        waitingRoomStatus.setText("Waiting for player...");
+
+        // 벽 숨기기
+        mapViewAdapter.setWallVisibility(false);
 
         // 말의 위치 초기화
         initMarkersPosition();
-
-        // 상대 플레어의 사진을 기본 사진으로 초기화
-        peerPicture.setImageResource(R.drawable.photo);
-
-        // 상대 플레이어의 닉네임을 초기화
-        peerNickname.setText("searching...");
-
-        // 대기방의 상태 메시지 초기화
-        waitingRoomStatus.setText("waiting for player...");
 
         /* rematch 관련 변수 초기화 */
         // 다이얼로그의 rematch 버튼 및 텍스트 초기화
@@ -745,9 +750,6 @@ public class MultiActivity extends Activity
         TextView state = (TextView)findViewById(R.id.txt_rematch_state);
         state.setText("");
         state.setVisibility(View.INVISIBLE);
-
-        mIWantRematch = false;
-        mPeerWantRematch = false;
     }
 
     // 말들의 위치를 초기화한다.
@@ -783,6 +785,9 @@ public class MultiActivity extends Activity
 
         // 커스텀 대기방 화면을 보여준다.
         switchToScreen(R.id.screen_waiting_room);
+
+        // 화면을 초기화한다.
+        resetScreenVars();
     }
 
     // 방이 완전히 연결되었을 때(플레이어간 매칭이 성사되었을 때) 호출된다.
@@ -1352,17 +1357,17 @@ public class MultiActivity extends Activity
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         mGameEndDialogLayout = (RelativeLayout)getLayoutInflater().inflate(R.layout.dialog_multiplay_end, null);
         builder.setView(mGameEndDialogLayout);
-        builder.setOnKeyListener(new Dialog.OnKeyListener() {
+        /*builder.setOnKeyListener(new Dialog.OnKeyListener() {
 
             @Override
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                *//*if (keyCode == KeyEvent.KEYCODE_BACK) {
                     showAnswer();
                     dialog.dismiss();
-                }
+                }*//*
                 return false;
             }
-        });
+        });*/
 
         // exit 버튼 클릭
         mGameEndDialogLayout.findViewById(R.id.exit).setOnClickListener(new View.OnClickListener() {
@@ -1422,6 +1427,8 @@ public class MultiActivity extends Activity
         });
 
         mGameEndDialog = builder.create();
+        mGameEndDialog.setCancelable(false);
+        mGameEndDialog.setCanceledOnTouchOutside(false);
     }
 
     // 개임 종료 다이얼로그 출력
@@ -1456,6 +1463,9 @@ public class MultiActivity extends Activity
         findViewById(R.id.playing_button_set).setVisibility(View.GONE);
         findViewById(R.id.end_button_set).setVisibility(View.VISIBLE);
         findViewById(R.id.txt_rematch_state).setVisibility(View.VISIBLE);
+
+        mapViewAdapter.setWallVisibility(true);
+        mapViewAdapter.notifyDataSetChanged();
     }
 
     // 상대방과 다시 매치를 시작한다.
@@ -1513,6 +1523,8 @@ public class MultiActivity extends Activity
         state.setText("");
         state.setVisibility(View.INVISIBLE);
 
+        // 벽 숨기기
+        mapViewAdapter.setWallVisibility(false);
         mapViewAdapter.notifyDataSetChanged();
 
         Log.i(TAG, "rematch() called");
@@ -1531,12 +1543,15 @@ public class MultiActivity extends Activity
     }
 
     // 그리드뷰에 이미지를 출력해주는 어댑터
-    public class ImageAdapter extends BaseAdapter {
+    public class MapViewAdpater extends BaseAdapter {
 
         private Context mContext;
         private LayoutInflater mInflater;
+        private final int MAP_SIZE = 5;
+        private final int REAL_SIZE = MAP_SIZE * 2 - 1;
+        private boolean wallVisibility = false;
 
-        public ImageAdapter(Context c) {
+        public MapViewAdpater(Context c) {
             mContext = c;
             mInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -1554,6 +1569,18 @@ public class MultiActivity extends Activity
             return position;
         }
 
+        public int convertPosition(int pos) {
+            int q = pos / MAP_SIZE;
+            int r = pos % MAP_SIZE;
+
+            int realPosition = (q * REAL_SIZE * 2) + (r * 2);
+            return realPosition;
+        }
+
+        public void setWallVisibility(boolean visibility) {
+            wallVisibility = visibility;
+        }
+
         public View getView(int position, View convertView, ViewGroup parent) {
 
             RelativeLayout v = (RelativeLayout)convertView;
@@ -1561,6 +1588,11 @@ public class MultiActivity extends Activity
             if(v == null) {
                 v = (RelativeLayout)mInflater.inflate(R.layout.activity_multi_gridview_item, null);
             }
+
+            v.findViewById(R.id.top_wall).setVisibility(View.INVISIBLE);
+            v.findViewById(R.id.bottom_wall).setVisibility(View.INVISIBLE);
+            v.findViewById(R.id.left_wall).setVisibility(View.INVISIBLE);
+            v.findViewById(R.id.right_wall).setVisibility(View.INVISIBLE);
 
             // 위치에 따른 배경색 처리
             if(position % 2 == 0)
@@ -1661,6 +1693,32 @@ public class MultiActivity extends Activity
                     directionMarker.setVisibility(View.INVISIBLE);
             } else
                 directionMarker.setVisibility(View.INVISIBLE);
+
+            /* 벽 출력 */
+            if(wallVisibility) {
+                int rPos = convertPosition(position);
+                int wPos;
+
+                // 위쪽 벽 검사 및 출력
+                wPos = rPos - REAL_SIZE;
+                if (wPos >= 0 && map.charAt(wPos) == 'x')
+                    v.findViewById(R.id.top_wall).setVisibility(View.VISIBLE);
+
+                // 아래쪽 벽 검사 및 출력
+                wPos = rPos + REAL_SIZE;
+                if (wPos < REAL_SIZE * REAL_SIZE && map.charAt(wPos) == 'x')
+                    v.findViewById(R.id.bottom_wall).setVisibility(View.VISIBLE);
+
+                // 왼쪽 벽 검사 및 출력
+                wPos = rPos - 1;
+                if (wPos >= 0 && rPos % REAL_SIZE != 0 && map.charAt(wPos) == 'x')
+                    v.findViewById(R.id.left_wall).setVisibility(View.VISIBLE);
+
+                // 오른쪽 벽 검사 및 출력
+                wPos = rPos + 1;
+                if (wPos < REAL_SIZE * REAL_SIZE && rPos % REAL_SIZE != REAL_SIZE - 1 && map.charAt(wPos) == 'x')
+                    v.findViewById(R.id.right_wall).setVisibility(View.VISIBLE);
+            }
 
             return v;
         }

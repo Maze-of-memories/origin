@@ -272,9 +272,24 @@
             </LinearLayout>
         </LinearLayout>
 
-        <TextView style="@style/Blurb"
-            android:text="waiting for player..."
-            android:id="@+id/waiting_room_status" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <ProgressBar
+                android:id="@+id/progcircle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                />
+
+            <TextView style="@style/Blurb"
+                android:text="waiting for player..."
+                android:id="@+id/waiting_room_status" />
+        </LinearLayout>
+
     </LinearLayout>
 
     <!-- "GAME PLAY" 화면 -->
