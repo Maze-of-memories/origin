@@ -3,5 +3,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="small_button_radius">5dp</dimen>
+    <dimen name="imageview_radius">5dp</dimen>
     <dimen name="big_button_radius">10dp</dimen>
 </resources>

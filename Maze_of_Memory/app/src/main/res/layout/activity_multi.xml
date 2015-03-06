@@ -360,7 +360,7 @@
                         android:scaleType="fitCenter"
                         android:layout_marginRight="5dp"
                         android:padding="5dp"
-                        android:background="@color/lightgray" />
+                        android:background="@drawable/playing_picture_background" />
 
                 </LinearLayout>
 
@@ -460,7 +460,7 @@
                         android:scaleType="fitCenter"
                         android:layout_marginLeft="5dp"
                         android:padding="5dp"
-                        android:background="@color/lightgray" />
+                        android:background="@drawable/playing_picture_background" />
 
                 </LinearLayout>
 

@@ -25,7 +25,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/marker"
+        android:id="@+id/left_marker"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:adjustViewBounds="true"
@@ -33,6 +33,32 @@
         android:layout_margin="15dp"
         android:visibility="visible"
         android:src="@drawable/left_marker"
+        android:scaleType="centerInside" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/right_marker"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:focusableInTouchMode="false"
+        android:layout_margin="15dp"
+        android:visibility="visible"
+        android:src="@drawable/right_marker"
+        android:scaleType="centerInside" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/marker"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:adjustViewBounds="true"
+        android:focusableInTouchMode="false"
+        android:layout_margin="15dp"
+        android:visibility="visible"
+        android:src="@drawable/overlap_marker"
         android:scaleType="centerInside" />
 
     <ImageView
@@ -47,20 +73,20 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:id="@+id/top_wall"
-        android:background="@color/orange" />
+        android:background="@color/wall_color" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:id="@+id/bottom_wall"
-        android:background="@color/orange"
+        android:background="@color/wall_color"
         android:layout_alignParentBottom="true" />
 
     <View
         android:layout_width="2dp"
         android:layout_height="match_parent"
         android:id="@+id/left_wall"
-        android:background="@color/orange"
+        android:background="@color/wall_color"
         android:layout_alignParentEnd="false"
         android:visibility="visible"
         android:layout_alignParentLeft="true"
@@ -71,7 +97,7 @@
         android:layout_width="2dp"
         android:layout_height="match_parent"
         android:id="@+id/right_wall"
-        android:background="@color/orange"
+        android:background="@color/wall_color"
         android:visibility="visible"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/imageView"
