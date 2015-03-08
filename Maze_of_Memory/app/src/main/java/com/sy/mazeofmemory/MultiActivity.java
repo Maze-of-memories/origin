@@ -12,10 +12,10 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -77,9 +77,11 @@ public class MultiActivity extends Activity
     final static int MAP_SIZE = 5;
     final static int REAL_MAP_SIZE = MAP_SIZE * 2 - 1;
 
-    // 말의 위치
-    final int LEFT_MARKER = 1;
-    final int RIGHT_MARKER = 2;
+    // 각 플레이어의 시작 위치와 종료 위치
+    private static final int LEFT_START_POSITION = MAP_SIZE * (MAP_SIZE - 1);
+    private static final int RIGHT_START_POSITION = MAP_SIZE * MAP_SIZE - 1;
+    private static final int LEFT_GOAL_POSITION = MAP_SIZE - 1;
+    private static final int RIGHT_GOAL_POSITION = 0;
 
     // Google APIs와 상호작용하기 위해 사용되는 클라이언트
     private GoogleApiClient mGoogleApiClient;
@@ -147,16 +149,6 @@ public class MultiActivity extends Activity
     ProgressBar mMyProgressBar;
     ProgressBar mPeerProgressBar;
 
-    // 말
-    int myMarker;
-    int peerMarker;
-
-    // 화면 상(그리드뷰) 각 플레이어의 시작 위치와 종료 위치
-    private static final int LEFT_START_POSITION = 20;
-    private static final int RIGHT_START_POSITION = 24;
-    private static final int LEFT_GOAL_POSITION = 4;
-    private static final int RIGHT_GOAL_POSITION = 0;
-    
     // 화면 상 플레이어의 위치
     private int myMarkerStartPosition;
     private int myMarkerGoalPosition;
@@ -167,22 +159,12 @@ public class MultiActivity extends Activity
     private int peerPreviousPosition;
     private int peerMarkerStartPosition;
 
-    // 실제 맵에서 각 플레어의 시작위치
-    private static final int MAP_LEFT_START_POSITION = 72;
-    private static final int MAP_RIGHT_START_POSITION = 80;
-    
-    // 실제 맵에서 플레이어의 현재 위치
-    private int myRealPosition;
-    private int myRealStartPosition;
-
     // 맵 정보
     String map;
 
     // 맵을 표현하는 그리드뷰
     GridView mapView;
-    MapViewAdpater mapViewAdapter;
-
-    private Integer[] gridItems;
+    MapViewAdapter mapViewAdapter;
 
     // 게임 상태
     private boolean mIsGamePlaying;
@@ -228,55 +210,43 @@ public class MultiActivity extends Activity
 
         // 메인화면 프로필 사진 및 닉네임
         mainProfilePicture = (ImageView) findViewById(R.id.personphoto);
-        mainNickname = (TextView)findViewById(R.id.main_nickname);
+        mainNickname = (TextView) findViewById(R.id.main_nickname);
 
         // 메인화면 전적 출력
         setMainScreenRecord();
 
         // 대기화면 프로필 사진
-        myPicture = (ImageView)findViewById(R.id.my_picture);
-        peerPicture = (ImageView)findViewById(R.id.peer_picture);
+        myPicture = (ImageView) findViewById(R.id.my_picture);
+        peerPicture = (ImageView) findViewById(R.id.peer_picture);
 
         // 대기화면 닉네임
-        myNickname = (TextView)findViewById(R.id.my_nick);
-        peerNickname = (TextView)findViewById(R.id.peer_nick);
+        myNickname = (TextView) findViewById(R.id.my_nick);
+        peerNickname = (TextView) findViewById(R.id.peer_nick);
 
         // 대기화면 상태 메시지
-        waitingRoomStatus = (TextView)findViewById(R.id.waiting_room_status);
-
-        // 말의 위치를 나타내는 배열 초기화
-        gridItems = new Integer[MAP_SIZE * MAP_SIZE];
-        for(int i = 0; i < MAP_SIZE * MAP_SIZE; i++)
-            gridItems[i] = new Integer(0);
+        waitingRoomStatus = (TextView) findViewById(R.id.waiting_room_status);
 
         // 미로 그리드뷰 초기화
-        mapView = (GridView)findViewById(R.id.gridView);
-        mapViewAdapter = new MapViewAdpater(this);
+        mapView = (GridView) findViewById(R.id.gridView);
+        mapViewAdapter = new MapViewAdapter(this);
         mapView.setAdapter(mapViewAdapter);
         mapView.setOnItemClickListener(this);
-        mapView.setOnTouchListener(new View.OnTouchListener(){
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return event.getAction() == MotionEvent.ACTION_MOVE;
-            }
-        });
 
         // 카운트다운 타이머 초기화
         timer = new CountDownTimer(15000, 10) {
 
             @Override
             public void onTick(long millisUntilFinished) {
-                if(isMyTurn)
-                    mMyProgressBar.setProgress((int)millisUntilFinished / 10);
+                if (isMyTurn)
+                    mMyProgressBar.setProgress((int) millisUntilFinished / 10);
                 else
-                    mPeerProgressBar.setProgress((int)millisUntilFinished / 10);
+                    mPeerProgressBar.setProgress((int) millisUntilFinished / 10);
             }
 
             @Override
             public void onFinish() {
 
-                if(isMyTurn)
+                if (isMyTurn)
                     mMyProgressBar.setProgress(0);
                 else
                     mPeerProgressBar.setProgress(0);
@@ -284,17 +254,17 @@ public class MultiActivity extends Activity
                 // 카운터가 종료되었을 때 자신의 턴이라면 턴을 상대방에게 넘겨준다.
                 //  -- 자신의 턴이 아닌경우, 상대쪽에서 턴을 보내오기 때문에
                 //  -- 특별한 동작이 필요하지 않다.
-                if(isMyTurn)
+                if (isMyTurn)
                     passTurn();
             }
         };
 
         // 남은 이동횟수를 출력할 텍스트뷰
-        mTvRemainingMoveCnt = (TextView)findViewById(R.id.txt_turn_left);
+        mTvRemainingMoveCnt = (TextView) findViewById(R.id.txt_turn_left);
 
         // 타이머 프로그레스 바
-        mMyProgressBar = (ProgressBar)findViewById(R.id.my_progressBar);
-        mPeerProgressBar = (ProgressBar)findViewById(R.id.peer_progressBar);
+        mMyProgressBar = (ProgressBar) findViewById(R.id.my_progressBar);
+        mPeerProgressBar = (ProgressBar) findViewById(R.id.peer_progressBar);
 
         // 게임 종료 다이얼로그 생성
         makeGameEndDialog();
@@ -319,7 +289,7 @@ public class MultiActivity extends Activity
     // 버튼 클릭 이벤트 처리
     @Override
     public void onClick(View v) {
-        switch(v.getId()) {
+        switch (v.getId()) {
             // play 버튼 클릭
             case R.id.button_play:
                 Log.i(TAG, "button_play clicked");
@@ -328,10 +298,10 @@ public class MultiActivity extends Activity
                 break;
 
             // 턴 넘김(턴 종료) 버튼 클릭
-            case R.id.button_pass_turn  :
-                if(!isMyTurn) return;
+            case R.id.button_pass_turn:
+                if (!isMyTurn) return;
 
-                Log.d(TAG,"pass turn button clicked");
+                Log.d(TAG, "pass turn button clicked");
                 passTurn();
                 break;
 
@@ -356,7 +326,7 @@ public class MultiActivity extends Activity
                 } else {
                     // 상대방이 아직 rematch 요청을 보내오지 않았다면 요청 전송 후 메시지를 출력한다.
                     mIWantRematch = true;
-                    TextView state = (TextView)findViewById(R.id.txt_rematch_state);
+                    TextView state = (TextView) findViewById(R.id.txt_rematch_state);
                     state.setText(getString(R.string.REMATCH_REQ_SENT));
                     state.setVisibility(View.VISIBLE);
                     v.setEnabled(false);
@@ -373,20 +343,17 @@ public class MultiActivity extends Activity
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         // 내 턴이 아니면 말을 움직이지 않고 바로 빠져나온다.
-        if(!isMyTurn) {
+        if (!isMyTurn) {
             // Toast.makeText(this, "It is not your turn", Toast.LENGTH_SHORT).show();
             return;
         }
 
         // 위치 검증(상하좌우로만 이동가능)
-        if((position == myMarkerPosition + MAP_SIZE)
+        if ((position == myMarkerPosition + MAP_SIZE)
                 || (position == myMarkerPosition - MAP_SIZE)
                 || (position == myMarkerPosition - 1 && myMarkerPosition % MAP_SIZE != 0)
                 || (position == myMarkerPosition + 1 && myMarkerPosition % MAP_SIZE != MAP_SIZE - 1))
             moveMyMarkerPosition(position);
-
-        // checkAndMove(position);
-
     }
 
     // 이동하기 전과 후의 위치를 비교하여 벽으로 막혔는지 검사하는 메소드
@@ -397,7 +364,7 @@ public class MultiActivity extends Activity
         curPos = mapViewAdapter.convertPosition(curPos);
 
         // 이동한 방향으로 벽이 없으면 true를 리턴한다.
-        if((curPos == prePos + (REAL_MAP_SIZE * 2) && map.charAt(prePos + REAL_MAP_SIZE) == 'o')
+        if ((curPos == prePos + (REAL_MAP_SIZE * 2) && map.charAt(prePos + REAL_MAP_SIZE) == 'o')
                 || (curPos == prePos - (REAL_MAP_SIZE * 2) && map.charAt(prePos - REAL_MAP_SIZE) == 'o')
                 || (curPos == prePos + 2 && map.charAt(prePos + 1) == 'o')
                 || (curPos == prePos - 2 && map.charAt(prePos - 1) == 'o'))
@@ -405,49 +372,6 @@ public class MultiActivity extends Activity
         else
             return true;
 
-    }
-
-    // 클릭한 방향의 벽을 검사한뒤 말을 이동시킨다.
-    //  -- 클릭한 방향으로 벽이 없으면 해당 position으로 말을 이동시킨다.
-    //  -- 클릭한 방향으로 벽이 있으면 시작위치로 말을 이동시킨다.
-    public void checkAndMove(int position) {
-
-        // 아래 타일로 이동
-        if (position == myMarkerPosition + 5 && map.charAt(myRealPosition + 9) == 'o') {
-            moveMyMarkerPosition(position);     // 화면의 말의 위치 이동
-            myRealPosition += 18;               // 실제 맵 이동
-        }
-        // 위 타일로 이동
-        else if (position == myMarkerPosition - 5 && map.charAt(myRealPosition - 9) == 'o') {
-            moveMyMarkerPosition(position);     // 화면의 말의 위치 이동
-            myRealPosition -= 18;               // 실제 맵 이동
-        }
-        // 왼쪽 타일로 이동
-        else if (position == myMarkerPosition - 1 && map.charAt(myRealPosition - 1) == 'o'
-                && myMarkerPosition % 5 != 0 ) {
-            moveMyMarkerPosition(position);     // 화면의 말의 위치 이동
-            myRealPosition -= 2;                // 실제 맵 이동
-        }
-        // 오른쪽 타일로 이동
-        else if (position == myMarkerPosition + 1 && map.charAt(myRealPosition + 1) == 'o'
-                && myMarkerPosition % 5 != 4) {
-            moveMyMarkerPosition(position);     // 화면의 말의 위치 이동
-            myRealPosition += 2;                // 실제 맵 이동
-        // 벽으로 막혔을 경우
-        } else if ((position == myMarkerPosition + 5 && map.charAt(myRealPosition + 9) == 'x')
-                    || (position == myMarkerPosition - 5 && map.charAt(myRealPosition - 9) == 'x')
-                    || (position == myMarkerPosition - 1 && map.charAt(myRealPosition - 1) == 'x'
-                    && myMarkerPosition % 5 != 0)
-                    || (position == myMarkerPosition + 1 && map.charAt(myRealPosition + 1) == 'x'
-                    && myMarkerPosition % 5 != 4)) {
-
-                // 말을 시작위치로 이동시킨다.
-                moveMyMarkerPosition(myMarkerStartPosition);
-                myRealPosition = myRealStartPosition;
-
-                // 상대방에게 턴을 넘긴다.
-                passTurn();
-        }
     }
 
     void moveMyMarkerPosition(int pos) {
@@ -464,28 +388,6 @@ public class MultiActivity extends Activity
 
         // 턴 수를 하나 감소시킨다.
         mTvRemainingMoveCnt.setText(--remainingMoveCnt + "");
-
-        /*// 목적지에 도착했을 때
-        if(pos == myMarkerGoalPosition) {
-            // 내가 이겼으므로 전적에 1승을 추가한다.
-            updateMyRecord("WIN");
-
-            // 승리 다이얼로그 출력
-            showGameEndDialog("You win!");
-
-            // 내가 이겼음을 상대방에게 알린다.
-            msg = "PEERWIN";
-            Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
-
-            // 게임을 종료시킨다.
-            endGame();
-        } else {
-            // 턴 수를 하나 감소시키고 턴이 끝났으면 상대방에게 턴을 넘긴다.
-            mTvRemainingMoveCnt.setText(--remainingMoveCnt + "");
-
-            if( remainingMoveCnt <= 0 )
-                passTurn();
-        }*/
     }
 
     // 상대방의 말을 이동시킨다.
@@ -536,7 +438,7 @@ public class MultiActivity extends Activity
         Log.d(TAG, "---onRealTimeMessageReceived() called / " + bufString);
 
         // 맵 정보를 받았을 때(Handshake 1)
-        if(bufString.startsWith("HS1:")) {
+        if (bufString.startsWith("HS1:")) {
             map = bufString.substring("HS1:".length());
             Log.d(TAG, "Map info received: " + map);
 
@@ -547,7 +449,7 @@ public class MultiActivity extends Activity
             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, sender);
         }
         // 상대방의 프로필 사진 URL을 받았을 때(Handshake 2)
-        else if(bufString.startsWith("HS2:")) {
+        else if (bufString.startsWith("HS2:")) {
             peerPictureURL = bufString.substring("HS2:".length());
             Log.d(TAG, "peer picture url received : " + peerPictureURL);
 
@@ -559,7 +461,7 @@ public class MultiActivity extends Activity
             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, sender);
         }
         // 상대방의 프로필 사진 URL을 받았을 때(Handshake 3)
-        else if(bufString.startsWith("HS3:")) {
+        else if (bufString.startsWith("HS3:")) {
             peerPictureURL = bufString.substring("HS3:".length());
             Log.d(TAG, "peer picture url received : " + peerPictureURL);
 
@@ -571,7 +473,7 @@ public class MultiActivity extends Activity
             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, sender);
         }
         // 상대방의 닉네임을 받았을 때(Handshake 4)
-        else if(bufString.startsWith("HS4:")) {
+        else if (bufString.startsWith("HS4:")) {
             strPeerNick = bufString.substring("HS4:".length());
             peerNickname.setText(strPeerNick);
 
@@ -580,7 +482,7 @@ public class MultiActivity extends Activity
             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, sender);
         }
         // 상대방의 닉네임을 받았을 때(Handshake 5)
-        else if(bufString.startsWith("HS5:")) {
+        else if (bufString.startsWith("HS5:")) {
             strPeerNick = bufString.substring("HS5:".length());
             peerNickname.setText(strPeerNick);
 
@@ -592,18 +494,18 @@ public class MultiActivity extends Activity
             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, sender);
         }
         // 상대방의 전적 정보를 받앟을 때(Handshake 6)
-        else if(bufString.startsWith("HS6:")) {
+        else if (bufString.startsWith("HS6:")) {
             String peerRecord = bufString.substring("HS6:".length());
             String[] values = peerRecord.split("_");
 
             // 상대방의 전적을 화면에 출력한다.
-            TextView peerWinCnt = (TextView)findViewById(R.id.peer_win_cnt);
+            TextView peerWinCnt = (TextView) findViewById(R.id.peer_win_cnt);
             peerWinCnt.setText(values[0]);
 
-            TextView peerLoseCnt = (TextView)findViewById(R.id.peer_lose_cnt);
+            TextView peerLoseCnt = (TextView) findViewById(R.id.peer_lose_cnt);
             peerLoseCnt.setText(values[1]);
 
-            TextView peerWinRate = (TextView)findViewById(R.id.peer_win_rate);
+            TextView peerWinRate = (TextView) findViewById(R.id.peer_win_rate);
             peerWinRate.setText(values[2] + "%");
 
             // 나의 전적 전송
@@ -617,18 +519,18 @@ public class MultiActivity extends Activity
             startGame();
         }
         // 상대방의 전적 정보를 받았을 때(Handshake 7)
-        else if(bufString.startsWith("HS7:")) {
+        else if (bufString.startsWith("HS7:")) {
             String peerRecord = bufString.substring("HS6:".length());
             String[] values = peerRecord.split("_");
 
             // 상대방의 전적을 화면에 출력한다.
-            TextView peerWinCnt = (TextView)findViewById(R.id.peer_win_cnt);
+            TextView peerWinCnt = (TextView) findViewById(R.id.peer_win_cnt);
             peerWinCnt.setText(values[0]);
 
-            TextView peerLoseCnt = (TextView)findViewById(R.id.peer_lose_cnt);
+            TextView peerLoseCnt = (TextView) findViewById(R.id.peer_lose_cnt);
             peerLoseCnt.setText(values[1]);
 
-            TextView peerWinRate = (TextView)findViewById(R.id.peer_win_rate);
+            TextView peerWinRate = (TextView) findViewById(R.id.peer_win_rate);
             peerWinRate.setText(values[2] + "%");
 
             waitingRoomStatus.setText("Player is connected");
@@ -640,7 +542,7 @@ public class MultiActivity extends Activity
             passTurn();
         }
         // 나에게 턴이 넘어올 때
-        else if(bufString.startsWith("PASSTURN")) {
+        else if (bufString.startsWith("PASSTURN")) {
             // 턴을 설정하고 횟수를 초기화한다.
             isMyTurn = true;
             remainingMoveCnt = TURNCNT;
@@ -660,24 +562,24 @@ public class MultiActivity extends Activity
             // Toast.makeText(this,"It is My turn", Toast.LENGTH_SHORT).show();
         }
         // 상대방의 말이 이동했을 때
-        else if(bufString.startsWith("PEERMOVE_START:")) {
+        else if (bufString.startsWith("PEERMOVE_START:")) {
             int peerPosition = Integer.parseInt(bufString.substring("PEERMOVE_START:".length()));
             movePeerMarkerPosition(peerPosition);
             Log.i(TAG, "peer moved to position " + peerPosition);
         }
         // 상대방의 말이 이동에 실패했을 때
-        else if(bufString.startsWith("PEERMOVE_FAIL")) {
+        else if (bufString.startsWith("PEERMOVE_FAIL")) {
 
             peerPreviousPosition = peerMarkerPosition = peerMarkerStartPosition;
             mapViewAdapter.notifyDataSetChanged();
         }
         // 상대방의 말이 이동에 성공했을 때
-        else if(bufString.startsWith("PEERMOVE_SUCCESS")) {
+        else if (bufString.startsWith("PEERMOVE_SUCCESS")) {
             peerPreviousPosition = peerMarkerPosition;
             mapViewAdapter.notifyDataSetChanged();
         }
         // 상대방이 이겼을 때
-        else if(bufString.startsWith("PEERWIN")) {
+        else if (bufString.startsWith("PEERWIN")) {
             // 상대방이 이겼으므로 전적에 1패를 추가한다.
             updateMyRecord("LOSE");
 
@@ -688,33 +590,32 @@ public class MultiActivity extends Activity
             endGame();
         }
         // 리매치 요청을 받았을 때
-        else if(bufString.startsWith("REMATCH")) {
+        else if (bufString.startsWith("REMATCH")) {
             mPeerWantRematch = true;
 
-            if(mIWantRematch) {
+            if (mIWantRematch) {
                 // 내가 이미 rematch를 요청한 상태라면 바로 매치를 시작한다.
                 mGameEndDialog.dismiss();
                 rematch();
                 // Toast.makeText(this, "REMATCH", Toast.LENGTH_SHORT).show();
             } else {
                 // 내가 rematch를 요청한 상태가 아니면 상대에게 요청이 들어왔음을 텍스트로 출력한다.
-                TextView state = (TextView)mGameEndDialogLayout.findViewById(R.id.txt_rematch_state);
+                TextView state = (TextView) mGameEndDialogLayout.findViewById(R.id.txt_rematch_state);
                 state.setText(strPeerNick + " " + getString(R.string.REMATCH_REQ_RECV));
                 state.setVisibility(View.VISIBLE);
 
                 // 게임 화면에서 상태 메시지 출력
-                state = (TextView)findViewById(R.id.txt_rematch_state);
+                state = (TextView) findViewById(R.id.txt_rematch_state);
                 state.setText(strPeerNick + " " + getString(R.string.REMATCH_REQ_RECV));
             }
         }
         //
-        else if(bufString.startsWith("MAP:")) {
+        else if (bufString.startsWith("MAP:")) {
             map = bufString.substring("MAP:".length());
             Log.d(TAG, "Map info received: " + map);
             passTurn();
-        }
-        else {
-            Toast.makeText(this,"Message received: " + (char) buf[0] + "/" + (int) buf[1], Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Message received: " + (char) buf[0] + "/" + (int) buf[1], Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Message received: " + (char) buf[0] + "/" + (int) buf[1]);
         }
 
@@ -784,18 +685,13 @@ public class MultiActivity extends Activity
 
         // 게임화면의 rematch 버튼 및 텍스트 초기화
         findViewById(R.id.button_rematch).setEnabled(true);
-        TextView state = (TextView)findViewById(R.id.txt_rematch_state);
+        TextView state = (TextView) findViewById(R.id.txt_rematch_state);
         state.setText("");
         state.setVisibility(View.INVISIBLE);
     }
 
     // 말들의 위치를 초기화한다.
     void initMarkersPosition() {
-        /*for(int i = 0; i < gridItems.length; i++)
-            gridItems[i] = 0;
-
-        gridItems[LEFT_START_POSITION] = LEFT_MARKER;
-        gridItems[RIGHT_START_POSITION] = RIGHT_MARKER;*/
 
         myMarkerPosition = LEFT_START_POSITION;
         peerMarkerPosition = RIGHT_START_POSITION;
@@ -852,8 +748,8 @@ public class MultiActivity extends Activity
         Log.d(TAG, mMyId);
 
         // 상대방의 ID 구하기
-        for(Participant p : mParticipants) {
-            if(p.getParticipantId().equals(mMyId))
+        for (Participant p : mParticipants) {
+            if (p.getParticipantId().equals(mMyId))
                 continue;
 
             mPeerId = p.getParticipantId();
@@ -872,30 +768,20 @@ public class MultiActivity extends Activity
         // 선이 된 참가자는 왼쪽 말을 자신의 말로 갖는다.
         //  -- 각 말의 위치별로 실제 맵에서의 위치를 초기화 한다.
         if (mParticipants.get(0).getParticipantId().equals(mMyId)) {
-            myMarker = LEFT_MARKER;                             // 내가 조작하게될 말
             myMarkerStartPosition = LEFT_START_POSITION;        // 내 말의 시작 위치
             myMarkerGoalPosition = LEFT_GOAL_POSITION;          // 내 말의 도착 위치
             myMarkerPosition = LEFT_START_POSITION;             // 내 말의 현재 위치
-            myRealStartPosition = MAP_LEFT_START_POSITION;      // 나의 실제 시작 위치
-            myRealPosition = MAP_LEFT_START_POSITION;           // 나의 실제 현재 위치
-            Log.i(TAG, "my real position : " + myRealPosition);
 
-            peerMarker = RIGHT_MARKER;
             peerMarkerStartPosition = RIGHT_START_POSITION;
             peerMarkerPosition = RIGHT_START_POSITION;
 
             sendmap();
         } else {
             // 상대방이 왼쪽 말을 가졌으므로 오른쪽 말을 갖는다.
-            myMarker = RIGHT_MARKER;
             myMarkerStartPosition = RIGHT_START_POSITION;
             myMarkerGoalPosition = RIGHT_GOAL_POSITION;
             myMarkerPosition = RIGHT_START_POSITION;
-            myRealStartPosition = MAP_RIGHT_START_POSITION;
-            myRealPosition = MAP_RIGHT_START_POSITION;
-            Log.i(TAG, "my real position : " + myRealPosition);
 
-            peerMarker = LEFT_MARKER;
             peerMarkerStartPosition = LEFT_START_POSITION;
             peerMarkerPosition = LEFT_START_POSITION;
         }
@@ -912,27 +798,27 @@ public class MultiActivity extends Activity
         mIsGamePlaying = true;
 
         // 게임 플레이화면 닉네임 출력
-        TextView playingMyNick = (TextView)findViewById(R.id.playing_mynick);
+        TextView playingMyNick = (TextView) findViewById(R.id.playing_mynick);
         playingMyNick.setText(strMyNick);
-        TextView playingPeerNick = (TextView)findViewById(R.id.playing_peernick);
+        TextView playingPeerNick = (TextView) findViewById(R.id.playing_peernick);
         playingPeerNick.setText(strPeerNick);
 
         // 게임 플레이화면의 프로필사진 출력
-        mPlayingMyPicture = (ImageView)findViewById(R.id.playing_my_picture);
-        mPlayingPeerPicture = (ImageView)findViewById(R.id.playing_peer_picture);
+        mPlayingMyPicture = (ImageView) findViewById(R.id.playing_my_picture);
+        mPlayingPeerPicture = (ImageView) findViewById(R.id.playing_peer_picture);
 
         setProfilePicture(mPlayingMyPicture, myPictureURL);
         setProfilePicture(mPlayingPeerPicture, peerPictureURL);
 
         // 전적을 가져와 출력한다.
         SharedPreferences sp = getSharedPreferences("MULTI_RECORD", MODE_PRIVATE);
-        TextView myWinCnt = (TextView)findViewById(R.id.my_win_cnt);
+        TextView myWinCnt = (TextView) findViewById(R.id.my_win_cnt);
         myWinCnt.setText(sp.getString("WIN", "0"));
 
-        TextView myLoseCnt = (TextView)findViewById(R.id.my_lose_cnt);
+        TextView myLoseCnt = (TextView) findViewById(R.id.my_lose_cnt);
         myLoseCnt.setText(sp.getString("LOSE", "0"));
 
-        TextView myWinRate = (TextView)findViewById(R.id.my_win_rate);
+        TextView myWinRate = (TextView) findViewById(R.id.my_win_rate);
         myWinRate.setText(sp.getString("WIN_RATE", "00.0") + "%");
 
         // 그리드뷰 갱신
@@ -981,7 +867,7 @@ public class MultiActivity extends Activity
         Log.d(TAG, "onLeftRoom, code " + statusCode);
 
         // new match 버튼을 통한 방 나가기가 아닌 경우
-        if(!isNewMatch)
+        if (!isNewMatch)
             switchToMainScreen();
 
         isNewMatch = false;
@@ -1002,17 +888,14 @@ public class MultiActivity extends Activity
         @Override
         public void onRealTimeMessageSent(int statusCode, int tokenId, String recipientParticipantId) {
             Log.i(TAG, "onRealTimeMessageSent() : " + statusCode);
-            if(statusCode != GamesStatusCodes.STATUS_OK) {
-                // Toast.makeText(getApplicationContext(), "map info sent fail", Toast.LENGTH_SHORT).show();
-                // Games.RealTimeMultiplayer.leave(mGoogleApiClient, MultiActivity.this, mRoomId);
+            if (statusCode != GamesStatusCodes.STATUS_OK) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 sendmap();
-            }
-            else
+            } else
                 Log.d(TAG, "map info is sent");
         }
     };
@@ -1037,36 +920,30 @@ public class MultiActivity extends Activity
 
         // 현재 스크린 id 저장.
         mCurScreen = screenId;
-
-        /*// should we show the invitation popup?
-        boolean showInvPopup;
-        if (mIncomingInvitationId == null) {
-            // no invitation, so no popup
-            showInvPopup = false;
-        } else if (mMultiplayer) {
-            // if in multiplayer, only show invitation on main screen
-            showInvPopup = (mCurScreen == R.id.screen_main);
-        } else {
-            // single-player: show on main screen and gameplay screen
-            showInvPopup = (mCurScreen == R.id.screen_main || mCurScreen == R.id.screen_game);
-        }
-        findViewById(R.id.invitation_popup).setVisibility(showInvPopup ? View.VISIBLE : View.GONE);*/
     }
 
     /*
      * RoomStatusUpdate(방 상태 업데이트)관련 콜백 메소드
      */
     @Override
-    public void onRoomConnecting(Room room) {updateRoom(room);}
+    public void onRoomConnecting(Room room) {
+        updateRoom(room);
+    }
 
     @Override
-    public void onRoomAutoMatching(Room room) {updateRoom(room);}
+    public void onRoomAutoMatching(Room room) {
+        updateRoom(room);
+    }
 
     @Override
-    public void onPeerInvitedToRoom(Room room, List<String> strings) {updateRoom(room);}
+    public void onPeerInvitedToRoom(Room room, List<String> strings) {
+        updateRoom(room);
+    }
 
     @Override
-    public void onPeerDeclined(Room room, List<String> strings) {updateRoom(room);}
+    public void onPeerDeclined(Room room, List<String> strings) {
+        updateRoom(room);
+    }
 
     // 상대방이 방에 입장했을 때 호출되되는 메소드
     // 이 상태에서는 서로 메시지를 주고받을 수 없다.
@@ -1124,19 +1001,19 @@ public class MultiActivity extends Activity
 
         // 게임 종료 다이얼로그의 rematch 버튼 비활성화
         mGameEndDialogLayout.findViewById(R.id.rematch).setEnabled(false);
-        TextView state = (TextView)mGameEndDialogLayout.findViewById(R.id.txt_rematch_state);
+        TextView state = (TextView) mGameEndDialogLayout.findViewById(R.id.txt_rematch_state);
         state.setText(strPeerNick + " " + getString(R.string.PEER_LEFT_ROOM));
         state.setVisibility(View.VISIBLE);
 
         // 게임 화면의 rematch 버튼 비활성화
         findViewById(R.id.button_rematch).setEnabled(false);
-        state = (TextView)findViewById(R.id.txt_rematch_state);
+        state = (TextView) findViewById(R.id.txt_rematch_state);
         state.setText(strPeerNick + " " + getString(R.string.PEER_LEFT_ROOM));
         // state.setVisibility(View.VISIBLE);
 
         // 게임 도중 상대방이 나갔을때만 승리처리를 해준다.
         // 게임이 종료된 후 상대방이 나간것에 대해선 승리처리를 해주지 않는다.
-        if(mIsGamePlaying) {
+        if (mIsGamePlaying) {
             // 내 전적에 1승 추가
             updateMyRecord("WIN");
 
@@ -1152,10 +1029,12 @@ public class MultiActivity extends Activity
     }
 
     @Override
-    public void onP2PConnected(String s) {}
+    public void onP2PConnected(String s) {
+    }
 
     @Override
-    public void onP2PDisconnected(String s) {}
+    public void onP2PDisconnected(String s) {
+    }
 
     // 방의 상태를 업데이트 한다.
     void updateRoom(Room room) {
@@ -1205,9 +1084,9 @@ public class MultiActivity extends Activity
     public boolean onKeyDown(int keyCode, KeyEvent e) {
         if (keyCode == KeyEvent.KEYCODE_BACK && mCurScreen == R.id.screen_game) {
             // 게임 플레이 중 백키를 누르면 게임 포기 다어얼로그를 띄운다.
-            if(mIsGamePlaying)
+            if (mIsGamePlaying)
                 showGiveUpDialog();
-            // 게임이 종료된 후 백키를 누르면 메인화면으로 이동한다.
+                // 게임이 종료된 후 백키를 누르면 메인화면으로 이동한다.
             else
                 leaveRoom();
             return true;
@@ -1368,13 +1247,13 @@ public class MultiActivity extends Activity
     void setMainScreenRecord() {
         // 메인화면 전적 출력
         SharedPreferences sp = getSharedPreferences("MULTI_RECORD", MODE_PRIVATE);
-        TextView mainWinCnt = (TextView)findViewById(R.id.main_win_cnt);
+        TextView mainWinCnt = (TextView) findViewById(R.id.main_win_cnt);
         mainWinCnt.setText(sp.getString("WIN", "0"));
 
-        TextView mainLoseCnt = (TextView)findViewById(R.id.main_lose_cnt);
+        TextView mainLoseCnt = (TextView) findViewById(R.id.main_lose_cnt);
         mainLoseCnt.setText(sp.getString("LOSE", "0"));
 
-        TextView mainWinRate = (TextView)findViewById(R.id.main_win_rate);
+        TextView mainWinRate = (TextView) findViewById(R.id.main_win_rate);
         mainWinRate.setText(sp.getString("WIN_RATE", "00.0") + "%");
     }
 
@@ -1389,12 +1268,12 @@ public class MultiActivity extends Activity
         int loseCnt = Integer.parseInt(sp.getString("LOSE", "0"));
         float winRate = Float.parseFloat(sp.getString("WIN_RATE", "00.0"));
 
-        if(result.equals("WIN"))
+        if (result.equals("WIN"))
             winCnt++;
         else
             loseCnt++;
 
-        winRate = ((float)winCnt / (float)(winCnt + loseCnt)) * 100;
+        winRate = ((float) winCnt / (float) (winCnt + loseCnt)) * 100;
 
         spEditor.putString("WIN", winCnt + "");
         spEditor.putString("LOSE", loseCnt + "");
@@ -1404,7 +1283,7 @@ public class MultiActivity extends Activity
         // 서버에 저장된 전적을 업데이트 한다.
         String url = getString(R.string.server) + getString(R.string.update_record);
         String param = "gmail=" + Plus.AccountApi.getAccountName(mGoogleApiClient)
-                 + "&game_result=" + result;
+                + "&game_result=" + result;
 
         new HttpAsyncTask(url, param) {
 
@@ -1418,19 +1297,8 @@ public class MultiActivity extends Activity
     // 게임 종료 다이얼로그를 생성하는 메소드
     private void makeGameEndDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        mGameEndDialogLayout = (RelativeLayout)getLayoutInflater().inflate(R.layout.dialog_multiplay_end, null);
+        mGameEndDialogLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.dialog_multiplay_end, null);
         builder.setView(mGameEndDialogLayout);
-        /*builder.setOnKeyListener(new Dialog.OnKeyListener() {
-
-            @Override
-            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                *//*if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    showAnswer();
-                    dialog.dismiss();
-                }*//*
-                return false;
-            }
-        });*/
 
         // exit 버튼 클릭
         mGameEndDialogLayout.findViewById(R.id.exit).setOnClickListener(new View.OnClickListener() {
@@ -1497,7 +1365,7 @@ public class MultiActivity extends Activity
     // 개임 종료 다이얼로그 출력
     void showGameEndDialog(String result) {
         // 결과 출력
-        TextView txtGameResult = (TextView)mGameEndDialogLayout.findViewById(R.id.txt_game_result);
+        TextView txtGameResult = (TextView) mGameEndDialogLayout.findViewById(R.id.txt_game_result);
         txtGameResult.setText(result);
 
         mGameEndDialog.show();
@@ -1520,6 +1388,7 @@ public class MultiActivity extends Activity
                 .setNegativeButton(R.string.NO, null)
                 .create().show();
     }
+
     // 벽을 보여주는 메소드
     void showAnswer() {
         // 게임 종료 후 필요한 버튼들 및 뷰를 출력한다.
@@ -1541,15 +1410,10 @@ public class MultiActivity extends Activity
 
         // 말의 위치를 초기화 시킨다.
         if (mParticipants.get(0).getParticipantId().equals(mMyId)) {
-            myMarker = LEFT_MARKER;                             // 내가 조작하게될 말
             myMarkerStartPosition = LEFT_START_POSITION;        // 내 말의 시작 위치
             myMarkerGoalPosition = LEFT_GOAL_POSITION;          // 내 말의 도착 위치
             myMarkerPosition = LEFT_START_POSITION;             // 내 말의 현재 위치
-            myRealStartPosition = MAP_LEFT_START_POSITION;      // 나의 실제 시작 위치
-            myRealPosition = MAP_LEFT_START_POSITION;           // 나의 실제 현재 위치
-            Log.i(TAG, "my real position : " + myRealPosition);
 
-            peerMarker = RIGHT_MARKER;
             peerMarkerStartPosition = RIGHT_START_POSITION;
             peerMarkerPosition = RIGHT_START_POSITION;
 
@@ -1560,15 +1424,10 @@ public class MultiActivity extends Activity
             Games.RealTimeMultiplayer.sendReliableMessage(mGoogleApiClient, null, msg.getBytes(), mRoomId, mPeerId);
         } else {
             // 상대방이 왼쪽 말을 가졌으므로 오른쪽 말을 갖는다.
-            myMarker = RIGHT_MARKER;
             myMarkerStartPosition = RIGHT_START_POSITION;
             myMarkerGoalPosition = RIGHT_GOAL_POSITION;
             myMarkerPosition = RIGHT_START_POSITION;
-            myRealStartPosition = MAP_RIGHT_START_POSITION;
-            myRealPosition = MAP_RIGHT_START_POSITION;
-            Log.i(TAG, "my real position : " + myRealPosition);
 
-            peerMarker = LEFT_MARKER;
             peerMarkerStartPosition = LEFT_START_POSITION;
             peerMarkerPosition = LEFT_START_POSITION;
         }
@@ -1587,7 +1446,7 @@ public class MultiActivity extends Activity
         findViewById(R.id.end_button_set).setVisibility(View.GONE);
         findViewById(R.id.playing_button_set).setVisibility(View.VISIBLE);
         findViewById(R.id.button_rematch).setEnabled(true);
-        TextView state = (TextView)findViewById(R.id.txt_rematch_state);
+        TextView state = (TextView) findViewById(R.id.txt_rematch_state);
         state.setText("");
         state.setVisibility(View.INVISIBLE);
 
@@ -1620,7 +1479,10 @@ public class MultiActivity extends Activity
     @Override
     public void onAnimationEnd(Animation animation) {
 
-        if(isBlockedByWall(myPreviousPosition, myMarkerPosition)) {
+        if (isBlockedByWall(myPreviousPosition, myMarkerPosition)) {
+            Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            vibe.vibrate(300);
+
             // 벽으로 막혔으면 시작위치로 재설정한다.
             myPreviousPosition = myMarkerPosition = myMarkerStartPosition;
             // 이동에 실패했음을 상대방에게 알린다.
@@ -1628,8 +1490,7 @@ public class MultiActivity extends Activity
 
             // 이동 가능 수를 0으로 설정하여 더이상 이동할 수 없도록 한다(턴이 넘어감)
             remainingMoveCnt = 0;
-        }
-        else {
+        } else {
             // 이동이 완료된 후 이전 위치를 현재 위치와 같게 해준다.(애니메이션이 동작하지 않도록)
             myPreviousPosition = myMarkerPosition;
             // 이동에 성공했음을 상대방에게 알린다.
@@ -1639,7 +1500,7 @@ public class MultiActivity extends Activity
         mapViewAdapter.notifyDataSetChanged();
 
         // 목적지에 도착했을 때
-        if(myMarkerPosition == myMarkerGoalPosition) {
+        if (myMarkerPosition == myMarkerGoalPosition) {
             // 내가 이겼으므로 전적에 1승을 추가한다.
             updateMyRecord("WIN");
 
@@ -1654,7 +1515,7 @@ public class MultiActivity extends Activity
         } else {
 
             // 턴이 끝났으면 상대방에게 턴을 넘긴다.
-            if( remainingMoveCnt <= 0 )
+            if (remainingMoveCnt <= 0)
                 passTurn();
         }
 
@@ -1667,7 +1528,7 @@ public class MultiActivity extends Activity
     }
 
     // 그리드뷰에 이미지를 출력해주는 어댑터 클래스
-    public class MapViewAdpater extends BaseAdapter {
+    public class MapViewAdapter extends BaseAdapter {
 
         private Context mContext;
         private LayoutInflater mInflater;
@@ -1680,9 +1541,9 @@ public class MultiActivity extends Activity
         private Animation disappearToRigntNoLsnr, disappearToLeftNoLsnr, disappearToUpNoLsnr, disappearToDownNoLsnr;
         private Animation blink;
 
-        public MapViewAdpater(Context c) {
+        public MapViewAdapter(Context c) {
             mContext = c;
-            mInflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             // 애니메이션 생성
             disappearToRignt = AnimationUtils.loadAnimation(mContext, R.anim.disappear_to_right);
@@ -1711,7 +1572,7 @@ public class MultiActivity extends Activity
         }
 
         public int getCount() {
-            return gridItems.length;
+            return MAP_SIZE * MAP_SIZE;
         }
 
         public Object getItem(int position) {
@@ -1736,34 +1597,30 @@ public class MultiActivity extends Activity
 
         private void displayDirectionMarker(View v, int position) {
             // 이동 가능한 방향 표시
-            ImageView directionMarker = (ImageView)v.findViewById(R.id.direction_marker);
+            ImageView directionMarker = (ImageView) v.findViewById(R.id.direction_marker);
 
-            if(isMyTurn) {
-                if(position == myMarkerPosition - 5) {
+            if (isMyTurn) {
+                if (position == myMarkerPosition - 5) {
                     // 위쪽 방향 표시
                     directionMarker.setImageResource(R.drawable.arrow_up);
                     directionMarker.setVisibility(View.VISIBLE);
                     directionMarker.startAnimation(blink);
-                }
-                else if(position == myMarkerPosition + 5) {
+                } else if (position == myMarkerPosition + 5) {
                     // 아래쪽 방향 표시
                     directionMarker.setImageResource(R.drawable.arrow_down);
                     directionMarker.setVisibility(View.VISIBLE);
                     directionMarker.startAnimation(blink);
-                }
-                else if(position == myMarkerPosition - 1 && myMarkerPosition % 5 != 0) {
+                } else if (position == myMarkerPosition - 1 && myMarkerPosition % 5 != 0) {
                     // 왼쪽 방향 표시
                     directionMarker.setImageResource(R.drawable.arrow_left);
                     directionMarker.setVisibility(View.VISIBLE);
                     directionMarker.startAnimation(blink);
-                }
-                else if(position == myMarkerPosition + 1 && myMarkerPosition % 5 != 4) {
+                } else if (position == myMarkerPosition + 1 && myMarkerPosition % 5 != 4) {
                     // 오른쪽 방향 표시
                     directionMarker.setImageResource(R.drawable.arrow_right);
                     directionMarker.setVisibility(View.VISIBLE);
                     directionMarker.startAnimation(blink);
-                }
-                else {
+                } else {
                     directionMarker.setVisibility(View.INVISIBLE);
                     directionMarker.clearAnimation();
                 }
@@ -1775,10 +1632,10 @@ public class MultiActivity extends Activity
 
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            RelativeLayout v = (RelativeLayout)convertView;
+            RelativeLayout v = (RelativeLayout) convertView;
 
-            if(v == null) {
-                v = (RelativeLayout)mInflater.inflate(R.layout.activity_multi_gridview_item, null);
+            if (v == null) {
+                v = (RelativeLayout) mInflater.inflate(R.layout.activity_multi_gridview_item, null);
             }
 
             v.findViewById(R.id.top_wall).setVisibility(View.INVISIBLE);
@@ -1786,24 +1643,24 @@ public class MultiActivity extends Activity
             v.findViewById(R.id.left_wall).setVisibility(View.INVISIBLE);
             v.findViewById(R.id.right_wall).setVisibility(View.INVISIBLE);
 
-            ImageView marker = (ImageView)v.findViewById(R.id.marker);
-            ImageView leftMarker = (ImageView)v.findViewById(R.id.left_marker);
-            ImageView rightMarker = (ImageView)v.findViewById(R.id.right_marker);
+            ImageView marker = (ImageView) v.findViewById(R.id.marker);
+            ImageView leftMarker = (ImageView) v.findViewById(R.id.left_marker);
+            ImageView rightMarker = (ImageView) v.findViewById(R.id.right_marker);
 
             // 이동 가능 방향 이미지
-            ImageView directionMarker = (ImageView)v.findViewById(R.id.direction_marker);
+            ImageView directionMarker = (ImageView) v.findViewById(R.id.direction_marker);
             directionMarker.setVisibility(View.INVISIBLE);
             directionMarker.clearAnimation();
 
             // 위치에 따른 배경색 처리
-            if(position % 2 == 0)
+            if (position % 2 == 0)
                 v.setBackgroundColor(getResources().getColor(R.color.map_tile_dark));
             else
                 v.setBackgroundColor(getResources().getColor(R.color.map_tile_light));
 
             // 종료 위치, 시작 위치 표시
-            TextView startGoal = (TextView)v.findViewById(R.id.start_goal);
-            if(position == LEFT_GOAL_POSITION ) {
+            TextView startGoal = (TextView) v.findViewById(R.id.start_goal);
+            if (position == LEFT_GOAL_POSITION) {
                 v.setBackgroundColor(getResources().getColor(R.color.blue));
                 startGoal.setText("GOAL");
                 startGoal.setVisibility(View.VISIBLE);
@@ -1811,11 +1668,11 @@ public class MultiActivity extends Activity
                 v.setBackgroundColor(getResources().getColor(R.color.red));
                 startGoal.setText("GOAL");
                 startGoal.setVisibility(View.VISIBLE);
-            } else if(position == LEFT_START_POSITION) {
+            } else if (position == LEFT_START_POSITION) {
                 v.setBackgroundColor(getResources().getColor(R.color.blue));
                 startGoal.setText("START");
                 startGoal.setVisibility(View.VISIBLE);
-            } else if(position == RIGHT_START_POSITION) {
+            } else if (position == RIGHT_START_POSITION) {
                 v.setBackgroundColor(getResources().getColor(R.color.red));
                 startGoal.setText("START");
                 startGoal.setVisibility(View.VISIBLE);
@@ -1825,11 +1682,10 @@ public class MultiActivity extends Activity
             /* 말 표시 */
 
             ImageView myMarker, peerMarker;
-            if(myMarkerStartPosition == LEFT_START_POSITION) {
+            if (myMarkerStartPosition == LEFT_START_POSITION) {
                 myMarker = leftMarker;
                 peerMarker = rightMarker;
-            }
-            else {
+            } else {
                 myMarker = rightMarker;
                 peerMarker = leftMarker;
             }
@@ -1840,18 +1696,18 @@ public class MultiActivity extends Activity
             marker.setVisibility(View.INVISIBLE);
 
             // 내 말이 사라지는 포지션일때
-            if(position == myPreviousPosition && position != myMarkerPosition) {
+            if (position == myPreviousPosition && position != myMarkerPosition) {
 
                 // 상대방의 말과 같은 위치인지 확인한다.
-                if(position == peerMarkerPosition)
+                if (position == peerMarkerPosition)
                     peerMarker.setVisibility(View.VISIBLE);
 
                 // 사라지는 애니메이션 적용
-                if(myMarkerPosition == myPreviousPosition + 1 )
+                if (myMarkerPosition == myPreviousPosition + 1)
                     myMarker.startAnimation(disappearToRignt);
-                else if(myMarkerPosition == myPreviousPosition - 1 )
+                else if (myMarkerPosition == myPreviousPosition - 1)
                     myMarker.startAnimation(disappearToLeft);
-                else if(myMarkerPosition == myPreviousPosition + MAP_SIZE)
+                else if (myMarkerPosition == myPreviousPosition + MAP_SIZE)
                     myMarker.startAnimation(disappearToDown);
                 else
                     myMarker.startAnimation(disappearToUp);
@@ -1860,34 +1716,35 @@ public class MultiActivity extends Activity
             }
 
             // 내 말이 나타나는 포지션일때
-            if(position == myMarkerPosition && position != myPreviousPosition) {
+            if (position == myMarkerPosition && position != myPreviousPosition) {
                 // 상대방의 말과 같은 위치인지 확인한다.
-                if(position == peerMarkerPosition)
+                if (position == peerMarkerPosition)
                     peerMarker.setVisibility(View.VISIBLE);
 
                 // 나타나는 애니메이션 적용
-                if(myMarkerPosition == myPreviousPosition + 1 )
+                if (myMarkerPosition == myPreviousPosition + 1)
                     myMarker.startAnimation(appearFromLeft);
-                else if(myMarkerPosition == myPreviousPosition - 1 )
+                else if (myMarkerPosition == myPreviousPosition - 1)
                     myMarker.startAnimation(appearFromRight);
-                else if(myMarkerPosition == myPreviousPosition + MAP_SIZE)
+                else if (myMarkerPosition == myPreviousPosition + MAP_SIZE)
                     myMarker.startAnimation(appearFromUp);
                 else
                     myMarker.startAnimation(appearFromDown);
+                myMarker.setVisibility(View.VISIBLE);
             }
 
             // 상대방의 말이 사라지는 포지션일때
-            if(position == peerPreviousPosition && position != peerMarkerPosition) {
+            if (position == peerPreviousPosition && position != peerMarkerPosition) {
                 // 나의 말과 같은 위치인지 확인한다.
-                if(position == myMarkerPosition)
+                if (position == myMarkerPosition)
                     myMarker.setVisibility(View.VISIBLE);
 
                 // 사라지는 애니메이션 적용
-                if(peerMarkerPosition == peerPreviousPosition + 1 )
+                if (peerMarkerPosition == peerPreviousPosition + 1)
                     peerMarker.startAnimation(disappearToRigntNoLsnr);
-                else if(peerMarkerPosition == peerPreviousPosition - 1 )
+                else if (peerMarkerPosition == peerPreviousPosition - 1)
                     peerMarker.startAnimation(disappearToLeftNoLsnr);
-                else if(peerMarkerPosition == peerPreviousPosition + MAP_SIZE)
+                else if (peerMarkerPosition == peerPreviousPosition + MAP_SIZE)
                     peerMarker.startAnimation(disappearToDownNoLsnr);
                 else
                     peerMarker.startAnimation(disappearToUpNoLsnr);
@@ -1896,45 +1753,46 @@ public class MultiActivity extends Activity
             }
 
             // 상대방의 말이 나타나는 포지션일때
-            if(position == peerMarkerPosition && position != peerPreviousPosition) {
+            if (position == peerMarkerPosition && position != peerPreviousPosition) {
                 // 나의 말과 같은 위치인지 확인한다.
-                if(position == myMarkerPosition)
+                if (position == myMarkerPosition)
                     myMarker.setVisibility(View.VISIBLE);
 
                 // 나타나는 애니메이션 적용
-                if(peerMarkerPosition == peerPreviousPosition + 1 )
+                if (peerMarkerPosition == peerPreviousPosition + 1)
                     peerMarker.startAnimation(appearFromLeft);
-                else if(peerMarkerPosition == peerPreviousPosition - 1 )
+                else if (peerMarkerPosition == peerPreviousPosition - 1)
                     peerMarker.startAnimation(appearFromRight);
-                else if(peerMarkerPosition == peerPreviousPosition + MAP_SIZE)
+                else if (peerMarkerPosition == peerPreviousPosition + MAP_SIZE)
                     peerMarker.startAnimation(appearFromUp);
                 else
                     peerMarker.startAnimation(appearFromDown);
+
+                peerMarker.setVisibility(View.VISIBLE);
             }
 
             // 내 말이 움직이지 않고 고정되어 있을 때
-            if(position == myMarkerPosition && position == myPreviousPosition && position != peerMarkerPosition)
+            if (position == myMarkerPosition && position == myPreviousPosition && position != peerMarkerPosition)
                 myMarker.setVisibility(View.VISIBLE);
 
             // 상대방의 말이 움직이지 않고 고정되어 있을 때
-            if(position == peerMarkerPosition && position == peerPreviousPosition && position != myMarkerPosition)
+            if (position == peerMarkerPosition && position == peerPreviousPosition && position != myMarkerPosition)
                 peerMarker.setVisibility(View.VISIBLE);
 
             // 내 말과 상대방의 말이 같은 포지션이 고정되어 있을 때
-            if(position == myMarkerPosition && position == myPreviousPosition && position == peerMarkerPosition && position == peerPreviousPosition)
+            if (position == myMarkerPosition && position == myPreviousPosition && position == peerMarkerPosition && position == peerPreviousPosition)
                 marker.setVisibility(View.VISIBLE);
 
             /* 이동 가능한 방향 표시 */
-            if(myPreviousPosition != myMarkerPosition) {
+            if (myPreviousPosition != myMarkerPosition) {
                 // 애니메이션이 작동할 때는 방향 표시를 하지 않는다.
                 v.findViewById(R.id.direction_marker).setVisibility(View.INVISIBLE);
                 v.findViewById(R.id.direction_marker).clearAnimation();
-            }
-            else
+            } else
                 displayDirectionMarker(v, position);
 
             /* 벽 출력 */
-            if(wallVisibility) {
+            if (wallVisibility) {
                 int rPos = convertPosition(position);
                 int wPos;
 

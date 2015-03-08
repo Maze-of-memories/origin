@@ -351,8 +351,8 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
             personPhotoUrl = currentPerson.getImage().getUrl();
             personGooglePlusProfile = currentPerson.getUrl();
             personEmail = Plus.AccountApi.getAccountName(mGoogleApiClient);
-
         }
+
         Log.i("personName", personName);
         Log.i("personPhotoUrl", personPhotoUrl);
         Log.i("personGooglePlusProfile", personGooglePlusProfile);

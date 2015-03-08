@@ -13,7 +13,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical"
-            android:visibility="invisible">
+            android:visibility="visible">
 
             <RelativeLayout
                 android:layout_width="fill_parent"
@@ -23,8 +23,8 @@
                 <RelativeLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:layout_centerInParent="true">
 
                     <RelativeLayout
                         android:id="@+id/R_Logo"
@@ -35,9 +35,11 @@
 
                         <ImageView
                             android:id="@+id/Logo"
-                            android:layout_width="130dp"
-                            android:layout_height="130dp"
-                            android:background="@drawable/main_logo" />
+                            android:layout_width="250dp"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/main_logo4"
+                            android:adjustViewBounds="true"
+                            android:scaleType="centerInside" />
 
                     </RelativeLayout>
 
@@ -46,7 +48,8 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/R_Logo"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:layout_marginBottom="20dp">
 
                         <RelativeLayout
                             android:layout_width="250dp"
@@ -57,28 +60,33 @@
                             <Button
                                 android:id="@+id/single"
                                 android:layout_width="fill_parent"
-                                android:layout_height="80dp"
-                                android:background="@drawable/btn_play_change"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/button_red_round"
                                 android:soundEffectsEnabled="false"
-                                android:text="Single" />
+                                android:text="Single"
+                                android:textColor="#FFFFFF" />
 
                             <Button
                                 android:id="@+id/multi"
                                 android:layout_width="fill_parent"
-                                android:layout_height="80dp"
+                                android:layout_height="wrap_content"
                                 android:layout_below="@+id/single"
                                 android:layout_marginTop="10dp"
                                 android:soundEffectsEnabled="false"
-                                android:text="Multi" />
+                                android:text="Multi"
+                                android:background="@drawable/button_red_round"
+                                android:textColor="#FFFFFF" />
 
                             <Button
                                 android:id="@+id/button3"
                                 android:layout_width="fill_parent"
-                                android:layout_height="80dp"
+                                android:layout_height="wrap_content"
                                 android:layout_below="@+id/multi"
                                 android:layout_marginTop="10dp"
                                 android:soundEffectsEnabled="false"
-                                android:text="Store" />
+                                android:text="Store"
+                                android:background="@drawable/button_red_round"
+                                android:textColor="#FFFFFF" />
                         </RelativeLayout>
                     </RelativeLayout>
 
@@ -139,18 +147,20 @@
             android:layout_height="fill_parent"
             android:background="#ffffff"
             android:orientation="horizontal"
-            android:visibility="invisible">
+            android:visibility="gone"
+            android:padding="10dp">
 
             <RelativeLayout
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:gravity="center">
 
                 <ImageView
-                    android:layout_width="250dp"
-                    android:layout_height="100dp"
-                    android:background="@drawable/intro_logo" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/main_logo2"
+                    android:adjustViewBounds="true" />
             </RelativeLayout>
 
             <RelativeLayout
