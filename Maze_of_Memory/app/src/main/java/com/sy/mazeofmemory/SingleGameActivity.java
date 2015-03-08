@@ -9,15 +9,18 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,16 +33,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 
-public class SingleGameActivity extends Activity {
+public class SingleGameActivity extends Activity implements AdapterView.OnItemClickListener, Animation.AnimationListener {
 
-    private Integer[] chess = {
-            0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0,
-            R.drawable.left_game_profile, 0, 0, 0, 0
-    };
-    private ImageAdapter imageAdapter;
     private int move_cnt = 0;
     private int fail_cnt = 0;
     private int perfect_cnt = 0;
@@ -61,9 +56,6 @@ public class SingleGameActivity extends Activity {
             "0", "0", "0", "0", "0", "0", "0", "0", "0"
     };
 
-    private int map_info_startPosition = 72;
-    private int map_info_Postion = map_info_startPosition;
-
     private static final String dbName = "single.db";
     private static final String tableName = "SINGLE_MAP_5";
     public static final int dbVersion = 1;
@@ -72,6 +64,39 @@ public class SingleGameActivity extends Activity {
     private int position;
     boolean game_clear = false;
 
+    // size of map
+    final static int MAP_SIZE = 5;
+    final static int REAL_MAP_SIZE = MAP_SIZE * 2 - 1;
+
+    // 말의 위치
+    final int LEFT_MARKER = 1;
+
+    // 말
+    int myMarker;
+
+    // 화면 상(그리드뷰) 각 플레이어의 시작 위치와 종료 위치
+    private static final int LEFT_START_POSITION = 20;
+    private static final int LEFT_GOAL_POSITION = 4;
+
+    // 화면 상 플레이어의 위치
+    private int myMarkerStartPosition;
+    private int myMarkerGoalPosition;
+    private int myMarkerPosition = LEFT_START_POSITION;
+    private int myPreviousPosition;
+
+    // 실제 맵에서 각 플레어의 시작위치
+    private static final int MAP_LEFT_START_POSITION = 72;
+
+    // 실제 맵에서 플레이어의 현재 위치
+    private int myRealPosition;
+    private int myRealStartPosition;
+
+    // 맵을 표현하는 그리드뷰
+    GridView mapView;
+    MapViewAdpater mapViewAdapter;
+
+    private Integer[] gridItems;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,9 +104,16 @@ public class SingleGameActivity extends Activity {
 
         init();
 
-        GridView gridView = (GridView) findViewById(R.id.game_move);
-        gridView.setAdapter(imageAdapter = new ImageAdapter(this));
-        gridView.setOnItemClickListener(gridviewOnItemClickListener);
+        // 말의 위치를 나타내는 배열 초기화
+        gridItems = new Integer[MAP_SIZE * MAP_SIZE];
+        for (int i = 0; i < MAP_SIZE * MAP_SIZE; i++)
+            gridItems[i] = new Integer(0);
+
+        // 미로 그리드뷰 초기화
+        mapView = (GridView) findViewById(R.id.game_move);
+        mapViewAdapter = new MapViewAdpater(this);
+        mapView.setAdapter(mapViewAdapter);
+        mapView.setOnItemClickListener(this);
 
         if (!isDBExists()) {
             copyDB();
@@ -105,84 +137,44 @@ public class SingleGameActivity extends Activity {
         TextView textView = (TextView) findViewById(R.id.stage_num);
         textView.setText("Stage" + stage_num);
 
+        myMarker = LEFT_MARKER;                             // 내가 조작하게될 말
+        myMarkerStartPosition = LEFT_START_POSITION;        // 내 말의 시작 위치
+        myMarkerGoalPosition = LEFT_GOAL_POSITION;          // 내 말의 도착 위치
+        myMarkerPosition = LEFT_START_POSITION;             // 내 말의 현재 위치
+        myRealStartPosition = MAP_LEFT_START_POSITION;      // 나의 실제 시작 위치
+        myRealPosition = MAP_LEFT_START_POSITION;           // 나의 실제 현재 위치
+
+
+        // 각자의 현재 위치와 이전위치를 동일하게 설정해준다.
+        myPreviousPosition = myMarkerPosition;
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //게임조작
-
     public void game_init() {
 
         for (int i = 0; i < map.length; i++) {
             map[i] = map_info.get(0).substring(i, i + 1);
         }
-        for (int i = 0; i < chess.length; i++) {
-            chess[i] = 0;
-        }
-        chess[chess_startPosition] = R.drawable.left_game_profile;
-
-        pre_chess_Position = chess_startPosition;
-        map_info_Postion = map_info_startPosition;
-
     }
 
     public void move(int position) {
 
         move_cnt++;
-        chess[pre_chess_Position] = 0;
-        chess[position] = R.drawable.left_game_profile;
+
+        /////////////////////////////////////////////////////////
+        myPreviousPosition = myMarkerPosition;
+        myMarkerPosition = position;
+
+        mapViewAdapter.notifyDataSetChanged();
+
+        /////////////////////////////////////////////////////////////
         pre_chess_Position = position;
 
     }
 
-    public void game_Move(int position) {
-        //아래 클릭
-        if (position == pre_chess_Position + 5 && map[map_info_Postion + 9].equals("o")) {
-            move(position);
-            map_info_Postion = map_info_Postion + 18;
-        }
-        //위 클릭
-        else if (position == pre_chess_Position - 5 && map[map_info_Postion - 9].equals("o")) {
-            move(position);
-            map_info_Postion = map_info_Postion - 18;
-        }
-        //왼쪽 클릭
-        else if (position == pre_chess_Position - 1 && map[map_info_Postion - 1].equals("o") && (position + 1) % 5 != 0) {
-            move(position);
-            map_info_Postion = map_info_Postion - 2;
-        }
-        //오른쪽 클릭
-        else if (position == pre_chess_Position + 1 && map[map_info_Postion + 1].equals("o") && (position % 5) != 0) {
-            move(position);
-            map_info_Postion = map_info_Postion + 2;
-        } else if ((position == pre_chess_Position + 5 && map[map_info_Postion + 9].equals("x"))
-                || (position == pre_chess_Position - 5 && map[map_info_Postion - 9].equals("x"))
-                || (position == pre_chess_Position - 1 && map[map_info_Postion - 1].equals("x") && (position + 1) % 5 != 0)
-                || (position == pre_chess_Position + 1 && map[map_info_Postion + 1].equals("x") && (position % 5) != 0)) {
-            move_cnt = 0;
-            fail_cnt++;
-            Toast.makeText(this, "틀렸습니다. 시작 위치로 돌아갑니다.", Toast.LENGTH_SHORT).show();
-            game_init();
-        }
-    }
-
-    public GridView.OnItemClickListener gridviewOnItemClickListener
-            = new GridView.OnItemClickListener() {
-
-        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-
-            if (!game_clear) {
-                game_Move(position);
-                setText();
-
-                if (pre_chess_Position == 4) {
-                    game_clear();
-                }
-
-                imageAdapter.notifyDataSetChanged();
-            }
-        }
-    };
-
+    /*
     public void setText() {
         TextView textView = (TextView) findViewById(R.id.move_cnt);
         textView.setText("Move : " + move_cnt);
@@ -193,16 +185,125 @@ public class SingleGameActivity extends Activity {
         textView = (TextView) findViewById(R.id.perfect_cnt);
         textView.setText("Perfect : " + perfect_cnt);
     }
+    */
 
-    public class ImageAdapter extends BaseAdapter {
+    //추가
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        if (!game_clear) {
+            // 위치 검증(상하좌우로만 이동가능)
+            if ((position == myMarkerPosition + MAP_SIZE)
+                    || (position == myMarkerPosition - MAP_SIZE)
+                    || (position == myMarkerPosition - 1 && myMarkerPosition % MAP_SIZE != 0)
+                    || (position == myMarkerPosition + 1 && myMarkerPosition % MAP_SIZE != MAP_SIZE - 1))
+                move(position);
+
+            TextView textView = (TextView) findViewById(R.id.move_cnt);
+            textView.setText("Move : " + move_cnt);
+
+            if (pre_chess_Position == 4) {
+                game_clear();
+            }
+        }
+    }
+
+    // 이동하기 전과 후의 위치를 비교하여 벽으로 막혔는지 검사하는 메소드
+    public boolean isBlockedByWall(int prePos, int curPos) {
+
+        // 그리드뷰 상의 위치를 실제 미로상의 위치로 변환한다.
+        prePos = mapViewAdapter.convertPosition(prePos);
+        curPos = mapViewAdapter.convertPosition(curPos);
+
+        // 이동한 방향으로 벽이 없으면 true를 리턴한다.
+        if ((curPos == prePos + (REAL_MAP_SIZE * 2) && map[prePos + REAL_MAP_SIZE].equals("o"))
+                || (curPos == prePos - (REAL_MAP_SIZE * 2) && map[prePos - REAL_MAP_SIZE].equals("o"))
+                || (curPos == prePos + 2 && map[prePos + 1].equals("o"))
+                || (curPos == prePos - 2 && map[prePos - 1].equals("o")))
+            return false;
+        else
+            return true;
+
+    }
+
+    ///////////////////////////////////////////////////////////////
+    @Override
+    public void onAnimationStart(Animation animation) {
+        mapView.setEnabled(false);
+    }
+
+    @Override
+    public void onAnimationEnd(Animation animation) {
+
+        if (isBlockedByWall(myPreviousPosition, myMarkerPosition)) {
+            // 벽으로 막혔으면 시작위치로 재설정한다.
+            myPreviousPosition = myMarkerPosition = myMarkerStartPosition;
+            move_cnt = 0;
+            fail_cnt++;
+            Toast.makeText(this, "틀렸습니다. 시작 위치로 돌아갑니다.", Toast.LENGTH_SHORT).show();
+
+            TextView textView = (TextView) findViewById(R.id.move_cnt);
+            textView.setText("Move : " + move_cnt);
+
+            textView = (TextView) findViewById(R.id.fail_cnt);
+            textView.setText("Fail : " + fail_cnt + " / 8");
+
+        } else {
+            // 이동이 완료된 후 이전 위치를 현재 위치와 같게 해준다.(애니메이션이 동작하지 않도록)
+            myPreviousPosition = myMarkerPosition;
+        }
+
+        mapViewAdapter.notifyDataSetChanged();
+
+        mapView.setEnabled(true);
+    }
+
+    @Override
+    public void onAnimationRepeat(Animation animation) {
+
+    }
+
+    //////////////////////////////////////////////////////////////
+
+    // 그리드뷰에 이미지를 출력해주는 어댑터 클래스
+    public class MapViewAdpater extends BaseAdapter {
+
         private Context mContext;
+        private LayoutInflater mInflater;
+        private final int MAP_SIZE = 5;
+        private final int REAL_SIZE = MAP_SIZE * 2 - 1;
+        private boolean wallVisibility = false;
 
-        public ImageAdapter(Context c) {
+        private Animation disappearToRignt, disappearToLeft, disappearToUp, disappearToDown;
+        private Animation appearFromRight, appearFromLeft, appearFromUp, appearFromDown;
+        private Animation blink;
+
+        public MapViewAdpater(Context c) {
             mContext = c;
+            mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            // 애니메이션 생성
+            disappearToRignt = AnimationUtils.loadAnimation(mContext, R.anim.disappear_to_right);
+            disappearToLeft = AnimationUtils.loadAnimation(mContext, R.anim.disappear_to_left);
+            disappearToUp = AnimationUtils.loadAnimation(mContext, R.anim.disappear_to_up);
+            disappearToDown = AnimationUtils.loadAnimation(mContext, R.anim.disappear_to_down);
+
+            disappearToRignt.setAnimationListener(SingleGameActivity.this);
+            disappearToLeft.setAnimationListener(SingleGameActivity.this);
+            disappearToUp.setAnimationListener(SingleGameActivity.this);
+            disappearToDown.setAnimationListener(SingleGameActivity.this);
+
+            appearFromRight = AnimationUtils.loadAnimation(mContext, R.anim.appear_from_right);
+            appearFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.appear_from_left);
+            appearFromUp = AnimationUtils.loadAnimation(mContext, R.anim.appear_from_up);
+            appearFromDown = AnimationUtils.loadAnimation(mContext, R.anim.appear_from_down);
+
+            // 깜빡이는 애니메이션
+            blink = AnimationUtils.loadAnimation(mContext, R.anim.blink);
         }
 
         public int getCount() {
-            return chess.length;
+            return gridItems.length;
         }
 
         public Object getItem(int position) {
@@ -213,24 +314,147 @@ public class SingleGameActivity extends Activity {
             return position;
         }
 
+        public int convertPosition(int pos) {
+            int q = pos / MAP_SIZE;
+            int r = pos % MAP_SIZE;
+
+            int realPosition = (q * REAL_SIZE * 2) + (r * 2);
+            return realPosition;
+        }
+
+        public void setWallVisibility(boolean visibility) {
+            wallVisibility = visibility;
+        }
+
+        private void displayDirectionMarker(View v, int position) {
+            // 이동 가능한 방향 표시
+            ImageView directionMarker = (ImageView) v.findViewById(R.id.direction_marker);
+
+            if (position == myMarkerPosition - 5) {
+                // 위쪽 방향 표시
+                directionMarker.setImageResource(R.drawable.arrow_up);
+                directionMarker.setVisibility(View.VISIBLE);
+                directionMarker.startAnimation(blink);
+            } else if (position == myMarkerPosition + 5) {
+                // 아래쪽 방향 표시
+                directionMarker.setImageResource(R.drawable.arrow_down);
+                directionMarker.setVisibility(View.VISIBLE);
+                directionMarker.startAnimation(blink);
+            } else if (position == myMarkerPosition - 1 && myMarkerPosition % 5 != 0) {
+                // 왼쪽 방향 표시
+                directionMarker.setImageResource(R.drawable.arrow_left);
+                directionMarker.setVisibility(View.VISIBLE);
+                directionMarker.startAnimation(blink);
+            } else if (position == myMarkerPosition + 1 && myMarkerPosition % 5 != 4) {
+                // 오른쪽 방향 표시
+                directionMarker.setImageResource(R.drawable.arrow_right);
+                directionMarker.setVisibility(View.VISIBLE);
+                directionMarker.startAnimation(blink);
+            } else {
+                directionMarker.setVisibility(View.INVISIBLE);
+                directionMarker.clearAnimation();
+            }
+        }
+
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            ImageView imageView;
+            RelativeLayout v = (RelativeLayout) convertView;
 
-            final int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, getResources().getDisplayMetrics());
-
-            final int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, getResources().getDisplayMetrics());
-
-            if (convertView == null) {
-                imageView = new ImageView(mContext);
-            } else {
-                imageView = (ImageView) convertView;
+            if (v == null) {
+                v = (RelativeLayout) mInflater.inflate(R.layout.activity_multi_gridview_item, null);
             }
-            imageView.setLayoutParams(new GridView.LayoutParams(width, height));
 
-            imageView.setImageResource(chess[position]);
+            v.findViewById(R.id.top_wall).setVisibility(View.INVISIBLE);
+            v.findViewById(R.id.bottom_wall).setVisibility(View.INVISIBLE);
+            v.findViewById(R.id.left_wall).setVisibility(View.INVISIBLE);
+            v.findViewById(R.id.right_wall).setVisibility(View.INVISIBLE);
 
-            return imageView;
+            ImageView marker = (ImageView) v.findViewById(R.id.marker);
+            ImageView leftMarker = (ImageView) v.findViewById(R.id.left_marker);
+            ImageView rightMarker = (ImageView) v.findViewById(R.id.right_marker);
+
+            // 이동 가능 방향 이미지
+            ImageView directionMarker = (ImageView) v.findViewById(R.id.direction_marker);
+            directionMarker.setVisibility(View.INVISIBLE);
+            directionMarker.clearAnimation();
+
+            // 위치에 따른 배경색 처리
+            if (position % 2 == 0)
+                v.setBackgroundColor(getResources().getColor(R.color.map_tile_dark));
+            else
+                v.setBackgroundColor(getResources().getColor(R.color.map_tile_light));
+
+            // 종료 위치, 시작 위치 표시
+            TextView startGoal = (TextView) v.findViewById(R.id.start_goal);
+            if (position == LEFT_GOAL_POSITION) {
+                v.setBackgroundColor(getResources().getColor(R.color.blue));
+                startGoal.setText("GOAL");
+                startGoal.setVisibility(View.VISIBLE);
+            } else if (position == LEFT_START_POSITION) {
+                v.setBackgroundColor(getResources().getColor(R.color.blue));
+                startGoal.setText("START");
+                startGoal.setVisibility(View.VISIBLE);
+            } else
+                startGoal.setVisibility(View.INVISIBLE);
+
+            /* 말 표시 */
+            ImageView myMarker, peerMarker;
+            if (myMarkerStartPosition == LEFT_START_POSITION) {
+                myMarker = leftMarker;
+                peerMarker = rightMarker;
+            } else {
+                myMarker = rightMarker;
+                peerMarker = leftMarker;
+            }
+
+            // 기본적으로 모든 말이 안보이는 상태에서 시작한다.
+            myMarker.setVisibility(View.INVISIBLE);
+            peerMarker.setVisibility(View.INVISIBLE);
+            marker.setVisibility(View.INVISIBLE);
+
+            // 내 말이 사라지는 포지션일때
+            if (position == myPreviousPosition && position != myMarkerPosition) {
+
+                // 사라지는 애니메이션 적용
+                if (myMarkerPosition == myPreviousPosition + 1)
+                    myMarker.startAnimation(disappearToRignt);
+                else if (myMarkerPosition == myPreviousPosition - 1)
+                    myMarker.startAnimation(disappearToLeft);
+                else if (myMarkerPosition == myPreviousPosition + MAP_SIZE)
+                    myMarker.startAnimation(disappearToDown);
+                else
+                    myMarker.startAnimation(disappearToUp);
+
+                myMarker.setVisibility(View.INVISIBLE);
+            }
+
+            // 내 말이 나타나는 포지션일때
+            if (position == myMarkerPosition && position != myPreviousPosition) {
+
+                // 나타나는 애니메이션 적용
+                if (myMarkerPosition == myPreviousPosition + 1)
+                    myMarker.startAnimation(appearFromLeft);
+                else if (myMarkerPosition == myPreviousPosition - 1)
+                    myMarker.startAnimation(appearFromRight);
+                else if (myMarkerPosition == myPreviousPosition + MAP_SIZE)
+                    myMarker.startAnimation(appearFromUp);
+                else
+                    myMarker.startAnimation(appearFromDown);
+            }
+
+            // 내 말이 움직이지 않고 고정되어 있을 때
+            if (position == myMarkerPosition && position == myPreviousPosition)
+                myMarker.setVisibility(View.VISIBLE);
+
+            /* 이동 가능한 방향 표시 */
+            if (myPreviousPosition != myMarkerPosition) {
+                // 애니메이션이 작동할 때는 방향 표시를 하지 않는다.
+                v.findViewById(R.id.direction_marker).setVisibility(View.INVISIBLE);
+                v.findViewById(R.id.direction_marker).clearAnimation();
+            } else
+                displayDirectionMarker(v, position);
+
+            return v;
         }
     }
 
@@ -297,9 +521,9 @@ public class SingleGameActivity extends Activity {
                 findViewById(R.id.R_single_clear).setVisibility(View.GONE);
                 fail_cnt = 0;
                 move_cnt = 0;
-                setText();
+                //setText();
                 game_init();
-                imageAdapter.notifyDataSetChanged();
+                //imageAdapter.notifyDataSetChanged();
 
             }
         });
@@ -330,8 +554,6 @@ public class SingleGameActivity extends Activity {
 
         Log.i("map_info", map_info.get(0).toString());
         Log.i("perfect_cnt", "" + perfect_cnt);
-
-        setText();
 
     }
 

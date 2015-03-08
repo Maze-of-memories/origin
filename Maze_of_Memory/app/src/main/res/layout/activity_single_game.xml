@@ -10,16 +10,19 @@
         android:background="#ffffff"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="visible"
+        android:padding="15dp">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <RelativeLayout
-                android:layout_width="300dp"
-                android:layout_height="wrap_content">
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
                 <RelativeLayout
                     android:id="@+id/stage_info"
@@ -46,28 +49,46 @@
                 <RelativeLayout
                     android:id="@+id/R_single_map"
                     android:layout_width="fill_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="wrap_content"
                     android:layout_below="@+id/stage_info"
-                    android:layout_centerHorizontal="true">
+                    android:layout_centerHorizontal="true"
+
+                    android:layout_weight="1">
 
                     <ImageView
                         android:id="@+id/map"
                         android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:background="@drawable/game" />
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/multi_game_sq"
+                        android:visibility="invisible" />
 
                     <GridView
                         android:id="@+id/game_move"
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:columnWidth="60dp"
-                        android:numColumns="5" />
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_alignBottom="@+id/map"
+                        android:layout_alignLeft="@+id/map"
+                        android:layout_alignRight="@+id/map"
+                        android:layout_alignTop="@+id/map"
+                        android:layout_centerInParent="true"
+                        android:layout_gravity="center"
+                        android:background="@drawable/map_background"
+                        android:drawSelectorOnTop="false"
+                        android:nestedScrollingEnabled="false"
+                        android:numColumns="5"
+                        android:padding="10dp"
+                        android:visibility="visible" />
 
                 </RelativeLayout>
 
                 <RelativeLayout
                     android:id="@+id/R_move"
-                    android:layout_width="300dp"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/R_single_map"
                     android:layout_gravity="center">
@@ -106,7 +127,7 @@
 
             </RelativeLayout>
 
-        </RelativeLayout>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -119,11 +140,11 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:layout_alignParentEnd="false"
             android:alpha="0.3"
             android:background="#fff6ffbd"
             android:gravity="center"
-            android:orientation="horizontal"
-            android:layout_alignParentEnd="false"></LinearLayout>
+            android:orientation="horizontal"></LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
