@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF">
@@ -10,36 +9,36 @@
         android:id="@+id/screen_main"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:visibility="visible"
         android:gravity="center"
-        android:padding="10dp">
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:visibility="gone">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
+            android:orientation="horizontal"
             android:weightSum="5">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
                 android:layout_weight="2"
                 android:gravity="center_horizontal"
-                android:layout_marginRight="10dp">
+                android:orientation="vertical">
 
                 <ImageView
                     android:id="@+id/personphoto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scaleType="fitXY"
-                    android:text="image"
-                    android:src="@drawable/photo"
                     android:layout_centerHorizontal="true"
+                    android:adjustViewBounds="true"
                     android:background="@drawable/picture_background"
-                    android:adjustViewBounds="true" />
+                    android:scaleType="fitXY"
+                    android:src="@drawable/photo"
+                    android:text="image" />
 
                 <TextView
                     android:id="@+id/main_nickname"
@@ -47,17 +46,17 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/personphoto"
                     android:layout_centerHorizontal="true"
-                    android:text="Loading..."
-                    android:textSize="20dp"
+                    android:gravity="center"
                     android:singleLine="true"
-                    android:gravity="center" />
+                    android:text="Loading..."
+                    android:textSize="20dp" />
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
-                android:layout_weight="3">
+                android:layout_weight="3"
+                android:orientation="horizontal">
 
                 <TableLayout
                     android:layout_width="match_parent"
@@ -67,86 +66,86 @@
                     <TableRow
                         android:layout_width="fill_parent"
                         android:layout_height="0dp"
+                        android:layout_marginBottom="5dp"
                         android:layout_weight="1"
-                        android:weightSum="2"
-                        android:gravity="center_vertical"
                         android:background="@drawable/multi_record_background"
+                        android:gravity="center_vertical"
                         android:padding="5dp"
-                        android:layout_marginBottom="5dp">
+                        android:weightSum="2">
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Win"
                             android:id="@+id/textView5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:text="Win"
                             android:textSize="18dp"
                             android:textStyle="bold" />
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
                             android:id="@+id/main_win_cnt"
-                            android:layout_weight="1"
-                            android:textSize="18dp"
-                            android:gravity="right" />
-                    </TableRow>
-
-                    <TableRow
-                        android:layout_width="fill_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:background="@drawable/multi_record_background"
-                        android:padding="5dp"
-                        android:layout_marginBottom="5dp">
-
-                        <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Lose"
-                            android:id="@+id/textView10"
                             android:layout_weight="1"
-                            android:textSize="18dp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:gravity="right"
                             android:text="0"
-                            android:id="@+id/main_lose_cnt"
-                            android:layout_weight="1"
-                            android:textSize="18dp"
-                            android:gravity="right" />
+                            android:textSize="18dp" />
                     </TableRow>
 
                     <TableRow
                         android:layout_width="fill_parent"
                         android:layout_height="0dp"
+                        android:layout_marginBottom="5dp"
                         android:layout_weight="1"
-                        android:gravity="center_vertical"
                         android:background="@drawable/multi_record_background"
-                        android:padding="5dp"
-                        android:layout_marginBottom="5dp">
+                        android:gravity="center_vertical"
+                        android:padding="5dp">
 
                         <TextView
+                            android:id="@+id/textView10"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="W.R"
-                            android:id="@+id/textView12"
                             android:layout_weight="1"
+                            android:text="Lose"
                             android:textSize="18dp"
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/main_lose_cnt"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="00.0%"
-                            android:id="@+id/main_win_rate"
                             android:layout_weight="1"
+                            android:gravity="right"
+                            android:text="0"
+                            android:textSize="18dp" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="fill_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/multi_record_background"
+                        android:gravity="center_vertical"
+                        android:padding="5dp">
+
+                        <TextView
+                            android:id="@+id/textView12"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="W.R"
                             android:textSize="18dp"
-                            android:gravity="right" />
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/main_win_rate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="right"
+                            android:text="00.0%"
+                            android:textSize="18dp" />
                     </TableRow>
                 </TableLayout>
             </LinearLayout>
@@ -154,25 +153,25 @@
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:weightSum="3"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="3">
 
             <Button
                 android:id="@+id/button_play"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="PLAY"
-                android:textSize="30dp"
+                android:layout_weight="2"
                 android:background="@drawable/button_green_round"
-                android:textColor="#FFFFFF"
-                android:minWidth="0dp"
                 android:minHeight="0dp"
+                android:minWidth="0dp"
                 android:paddingLeft="30dp"
                 android:paddingRight="30dp"
-                android:layout_weight="2" />
+                android:text="PLAY"
+                android:textColor="#FFFFFF"
+                android:textSize="30dp" />
         </LinearLayout>
 
         <RelativeLayout
@@ -198,109 +197,111 @@
 
     <!-- "WAITING ROOM" 화면  : 테스트중 -->
 
-    <LinearLayout android:id="@+id/screen_waiting_room"
+    <LinearLayout
+        android:id="@+id/screen_waiting_room"
         style="@style/LLScreen"
         android:orientation="vertical"
         android:visibility="gone">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
-            android:weightSum="7"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="7">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="3">
+                android:layout_weight="3"
+                android:orientation="vertical">
 
                 <ImageView
+                    android:id="@+id/my_picture"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/my_picture"
+                    android:adjustViewBounds="true"
                     android:background="@drawable/picture_background"
-                    android:src="@drawable/photo"
-                    android:adjustViewBounds="true" />
+                    android:src="@drawable/photo" />
 
                 <TextView
+                    android:id="@+id/my_nick"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="MyNick"
-                    android:id="@+id/my_nick"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center"
                     android:singleLine="true"
+                    android:text="MyNick"
                     android:textStyle="bold" />
             </LinearLayout>
 
             <TextView
+                android:id="@+id/textView7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="VS"
-                android:id="@+id/textView7"
                 android:layout_gravity="center"
                 android:layout_margin="15dp"
+                android:text="VS"
                 android:textSize="20dp"
                 android:textStyle="bold" />
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="3">
+                android:layout_weight="3"
+                android:orientation="vertical">
 
                 <ImageView
+                    android:id="@+id/peer_picture"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/peer_picture"
+                    android:adjustViewBounds="true"
                     android:background="@drawable/picture_background"
-                    android:src="@drawable/photo"
-                    android:adjustViewBounds="true" />
+                    android:src="@drawable/photo" />
 
                 <TextView
+                    android:id="@+id/peer_nick"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="searching..."
-                    android:id="@+id/peer_nick"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center"
                     android:singleLine="true"
+                    android:text="searching..."
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <ProgressBar
                 android:id="@+id/progcircle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
-                />
+                android:visibility="visible" />
 
-            <TextView style="@style/Blurb"
-                android:text="waiting for player..."
-                android:id="@+id/waiting_room_status" />
+            <TextView
+                android:id="@+id/waiting_room_status"
+                style="@style/Blurb"
+                android:text="waiting for player..." />
         </LinearLayout>
 
     </LinearLayout>
 
     <!-- "GAME PLAY" 화면 -->
-    <LinearLayout android:id="@+id/screen_game"
-        android:visibility="gone"
-        android:orientation="vertical"
+    <LinearLayout
+        android:id="@+id/screen_game"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#FFFFFF"
         android:gravity="center"
+        android:orientation="vertical"
         android:padding="15dp"
-        android:background="#FFFFFF">
+        android:visibility="visible">
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -309,351 +310,351 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:weightSum="5"
-                android:gravity="right">
-
-                <ProgressBar
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="0dp"
-                    android:layout_height="10dp"
-                    android:id="@+id/peer_progressBar"
-                    android:max="1500"
-                    android:progress="0"
-                    android:indeterminate="false"
-                    android:indeterminateOnly="false"
-                    android:mirrorForRtl="false"
-                    android:visibility="visible"
-                    android:progressDrawable="@drawable/game_progress_bar_rtl"
-                    android:layout_gravity="right"
-                    android:layout_weight="3" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="peer nick"
-                android:id="@+id/playing_peernick"
-                android:textStyle="bold"
-                android:singleLine="true"
-                android:layout_gravity="right" />
-
-            <LinearLayout
+                android:gravity="right"
                 android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:gravity="left">
-
-                    <ImageView
-                        android:layout_width="55dp"
-                        android:layout_height="55dp"
-                        android:id="@+id/playing_my_picture"
-                        android:src="@drawable/photo"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitCenter"
-                        android:layout_marginRight="5dp"
-                        android:padding="5dp"
-                        android:background="@drawable/playing_picture_background" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:gravity="right"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:id="@+id/my_win_cnt" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:id="@+id/my_lose_cnt" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:id="@+id/my_win_rate" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:gravity="center"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="WIN"
-                        android:id="@+id/textView"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="LOSE"
-                        android:id="@+id/textView8"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="W.R"
-                        android:id="@+id/textView9"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:layout_weight="1">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:id="@+id/peer_win_cnt" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:id="@+id/peer_lose_cnt" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:id="@+id/peer_win_rate" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="right">
-
-                    <ImageView
-                        android:layout_width="55dp"
-                        android:layout_height="55dp"
-                        android:id="@+id/playing_peer_picture"
-                        android:src="@drawable/photo"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitCenter"
-                        android:layout_marginLeft="5dp"
-                        android:padding="5dp"
-                        android:background="@drawable/playing_picture_background" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="my nick"
-                android:id="@+id/playing_mynick"
-                android:textStyle="bold"
-                android:singleLine="true" />
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
                 android:weightSum="5">
 
                 <ProgressBar
+                    android:id="@+id/peer_progressBar"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="0dp"
                     android:layout_height="10dp"
-                    android:id="@+id/my_progressBar"
-                    android:progress="0"
-                    android:max="1500"
-                    android:progressDrawable="@drawable/game_progress_bar_ltr"
+                    android:layout_gravity="right"
+                    android:layout_weight="3"
                     android:indeterminate="false"
-                    android:layout_weight="3" />
+                    android:indeterminateOnly="false"
+                    android:max="1500"
+                    android:mirrorForRtl="false"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/game_progress_bar_rtl"
+                    android:visibility="visible" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/playing_peernick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:singleLine="true"
+                android:text="peer nick"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:gravity="left"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/playing_my_picture"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        android:layout_marginRight="5dp"
+                        android:adjustViewBounds="true"
+                        android:background="@drawable/playing_picture_background"
+                        android:padding="5dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/photo" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/my_win_cnt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0" />
+
+                    <TextView
+                        android:id="@+id/my_lose_cnt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0" />
+
+                    <TextView
+                        android:id="@+id/my_win_rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WIN"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textView8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="LOSE"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textView9"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="W.R"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/peer_win_cnt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0" />
+
+                    <TextView
+                        android:id="@+id/peer_lose_cnt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0" />
+
+                    <TextView
+                        android:id="@+id/peer_win_rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/playing_peer_picture"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        android:layout_marginLeft="5dp"
+                        android:adjustViewBounds="true"
+                        android:background="@drawable/playing_picture_background"
+                        android:padding="5dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/photo" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/playing_mynick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="my nick"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal"
+                android:weightSum="5">
+
+                <ProgressBar
+                    android:id="@+id/my_progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="10dp"
+                    android:layout_weight="3"
+                    android:indeterminate="false"
+                    android:max="1500"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/game_progress_bar_ltr" />
             </LinearLayout>
 
         </LinearLayout>
 
         <RelativeLayout
+            android:id="@+id/game_board_layout"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:id="@+id/game_board_layout"
             android:gravity="center">
 
             <ImageView
+                android:id="@+id/map"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/map"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:layout_gravity="center"
+                android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
-                android:visibility="invisible"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
                 android:src="@drawable/multi_game_sq"
-                android:layout_alignParentEnd="true" />
+                android:visibility="invisible" />
 
             <GridView
+                android:id="@+id/gridView"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:id="@+id/gridView"
-                android:layout_gravity="center"
-                android:numColumns="5"
-                android:drawSelectorOnTop="false"
-                android:visibility="visible"
-                android:layout_alignTop="@+id/map"
-                android:layout_alignLeft="@+id/map"
                 android:layout_alignBottom="@+id/map"
+                android:layout_alignLeft="@+id/map"
                 android:layout_alignRight="@+id/map"
-                android:nestedScrollingEnabled="false"
-                android:padding="10dp"
+                android:layout_alignTop="@+id/map"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
                 android:background="@drawable/map_background"
-                android:layout_centerInParent="true" />
+                android:drawSelectorOnTop="false"
+                android:nestedScrollingEnabled="false"
+                android:numColumns="5"
+                android:padding="10dp"
+                android:visibility="visible" />
 
         </RelativeLayout>
 
         <TextView
+            android:id="@+id/txt_rematch_state"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/txt_rematch_state"
-            android:visibility="invisible"
-            android:gravity="left" />
+            android:gravity="left"
+            android:visibility="invisible" />
 
         <RelativeLayout
+            android:id="@+id/playing_button_set"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/playing_button_set"
             android:visibility="visible">
 
             <Button
+                android:id="@+id/button_give_up"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Give up"
-                android:id="@+id/button_give_up"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:textColor="#FFFFFF"
+                android:layout_toLeftOf="@+id/linearLayout"
+                android:layout_toStartOf="@+id/linearLayout"
                 android:background="@drawable/button_red_round"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
-                android:layout_toLeftOf="@+id/linearLayout"
-                android:layout_toStartOf="@+id/linearLayout" />
+                android:text="Give up"
+                android:textColor="#FFFFFF" />
 
             <LinearLayout
-                android:orientation="vertical"
+                android:id="@+id/linearLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:id="@+id/linearLayout"
+                android:orientation="vertical"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp">
 
                 <TextView
+                    android:id="@+id/textView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Turn"
-                    android:id="@+id/textView2"
                     android:layout_gravity="center_horizontal"
+                    android:text="Turn"
                     android:textSize="11dp" />
 
                 <TextView
+                    android:id="@+id/txt_turn_left"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3"
-                    android:id="@+id/txt_turn_left"
                     android:layout_gravity="center_horizontal"
-                    android:textStyle="bold"
-                    android:textSize="11dp" />
+                    android:text="3"
+                    android:textSize="11dp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <Button
+                android:id="@+id/button_pass_turn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pass turn"
-                android:id="@+id/button_pass_turn"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/linearLayout"
+                android:layout_toRightOf="@+id/linearLayout"
                 android:background="@drawable/button_orange_round"
-                android:textColor="#FFFFFF"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
-                android:layout_toRightOf="@+id/linearLayout"
-                android:layout_toEndOf="@+id/linearLayout" />
+                android:text="Pass turn"
+                android:textColor="#FFFFFF" />
 
         </RelativeLayout>
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/end_button_set"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/end_button_set"
+            android:orientation="vertical"
             android:visibility="visible">
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/button_rematch"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Rematch"
-                    android:id="@+id/button_rematch"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
                     android:layout_alignParentEnd="true"
-                    android:textColor="#FFFFFF"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:background="@drawable/button_orange_round"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
                     android:layout_centerInParent="true"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:background="@drawable/button_orange_round"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:text="Rematch"
+                    android:textColor="#FFFFFF" />
 
                 <Button
+                    android:id="@+id/button_newmatch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="New match"
-                    android:id="@+id/button_newmatch"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:background="@drawable/button_green_round"
                     android:minHeight="0dp"
                     android:minWidth="0dp"
-                    android:background="@drawable/button_green_round"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp" />
+                    android:text="New match"
+                    android:textColor="#FFFFFF" />
 
                 <Button
+                    android:id="@+id/button_exit"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Exit"
-                    android:id="@+id/button_exit"
-                    android:background="@drawable/button_red_round"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:textColor="#FFFFFF"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="false"
                     android:layout_centerInParent="true"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:background="@drawable/button_red_round"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+                    android:text="Exit"
+                    android:textColor="#FFFFFF" />
             </LinearLayout>
 
         </LinearLayout>
