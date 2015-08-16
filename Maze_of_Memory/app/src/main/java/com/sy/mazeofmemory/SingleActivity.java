@@ -32,6 +32,7 @@ public class SingleActivity extends FragmentActivity {
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .addTestDevice("TEST_DEVICE_ID")
+                .addTestDevice("D69C8A1906CE1CC38958923B886C1F00")
                 .build();
 
         mAdView.loadAd(adRequest);

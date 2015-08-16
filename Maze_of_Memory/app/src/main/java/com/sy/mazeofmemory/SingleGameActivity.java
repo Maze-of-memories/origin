@@ -144,7 +144,6 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
         myRealStartPosition = MAP_LEFT_START_POSITION;      // 나의 실제 시작 위치
         myRealPosition = MAP_LEFT_START_POSITION;           // 나의 실제 현재 위치
 
-
         // 각자의 현재 위치와 이전위치를 동일하게 설정해준다.
         myPreviousPosition = myMarkerPosition;
 
@@ -174,18 +173,17 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
 
     }
 
-    /*
     public void setText() {
         TextView textView = (TextView) findViewById(R.id.move_cnt);
         textView.setText("Move : " + move_cnt);
 
         textView = (TextView) findViewById(R.id.fail_cnt);
         textView.setText("Fail : " + fail_cnt + " / 8");
-
+        /*
         textView = (TextView) findViewById(R.id.perfect_cnt);
         textView.setText("Perfect : " + perfect_cnt);
+        */
     }
-    */
 
     //추가
     @Override
@@ -242,11 +240,7 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
             fail_cnt++;
             Toast.makeText(this, "틀렸습니다. 시작 위치로 돌아갑니다.", Toast.LENGTH_SHORT).show();
 
-            TextView textView = (TextView) findViewById(R.id.move_cnt);
-            textView.setText("Move : " + move_cnt);
-
-            textView = (TextView) findViewById(R.id.fail_cnt);
-            textView.setText("Fail : " + fail_cnt + " / 8");
+            setText();
 
         } else {
             // 이동이 완료된 후 이전 위치를 현재 위치와 같게 해준다.(애니메이션이 동작하지 않도록)
@@ -515,13 +509,12 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
         btn = (Button) findViewById(R.id.retry);
         btn.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-
                 game_clear = false;
 
                 findViewById(R.id.R_single_clear).setVisibility(View.GONE);
                 fail_cnt = 0;
                 move_cnt = 0;
-                //setText();
+                setText();
                 game_init();
                 //imageAdapter.notifyDataSetChanged();
 

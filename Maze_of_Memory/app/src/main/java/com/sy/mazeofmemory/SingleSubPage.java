@@ -35,9 +35,8 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
         super.onCreate(savedInstanceState);
 
         for (int i = 0; i < btn.length; i++) {
-            btn[i] = R.drawable.bo;
+            btn[i] = this.getResources().getIdentifier("f_"+ (i+1), "drawable", "com.sy.mazeofmemory");
         }
-
     }
 
     @Override
