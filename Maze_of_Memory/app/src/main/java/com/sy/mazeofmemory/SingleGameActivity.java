@@ -104,21 +104,9 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
 
         init();
 
-        // 말의 위치를 나타내는 배열 초기화
-        gridItems = new Integer[MAP_SIZE * MAP_SIZE];
-        for (int i = 0; i < MAP_SIZE * MAP_SIZE; i++)
-            gridItems[i] = new Integer(0);
-
-        // 미로 그리드뷰 초기화
-        mapView = (GridView) findViewById(R.id.game_move);
-        mapViewAdapter = new MapViewAdpater(this);
-        mapView.setAdapter(mapViewAdapter);
-        mapView.setOnItemClickListener(this);
-
         if (!isDBExists()) {
             copyDB();
         }
-
         opener = new MySQLiteOpenHelper(SingleGameActivity.this, dbName, null, dbVersion);
         db = opener.getReadableDatabase();
         select();
@@ -147,6 +135,17 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
         // 각자의 현재 위치와 이전위치를 동일하게 설정해준다.
         myPreviousPosition = myMarkerPosition;
 
+        // 말의 위치를 나타내는 배열 초기화
+        gridItems = new Integer[MAP_SIZE * MAP_SIZE];
+        for (int i = 0; i < MAP_SIZE * MAP_SIZE; i++)
+            gridItems[i] = new Integer(0);
+
+        // 미로 그리드뷰 초기화
+        mapView = (GridView) findViewById(R.id.game_move);
+        mapViewAdapter = new MapViewAdpater(this);
+        mapView.setAdapter(mapViewAdapter);
+        mapView.setOnItemClickListener(this);
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +166,6 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
         myMarkerPosition = position;
 
         mapViewAdapter.notifyDataSetChanged();
-
         /////////////////////////////////////////////////////////////
         pre_chess_Position = position;
 
@@ -515,8 +513,7 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
                 fail_cnt = 0;
                 move_cnt = 0;
                 setText();
-                game_init();
-                //imageAdapter.notifyDataSetChanged();
+                init();
 
             }
         });
@@ -535,7 +532,6 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     //DB
-
     public void select() {
 
         Cursor cursr = db.query(tableName, null, null, null, null, null, null);
