@@ -12,8 +12,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
 public class SingleSubPage extends android.support.v4.app.Fragment {
 
@@ -25,7 +23,7 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
     private int pageCnt;
 
 
-    public SingleSubPage(Context context, int position) {
+    SingleSubPage(Context context, int position) {
         this.context = context;
         this.pageCnt = position;
     }
@@ -35,7 +33,13 @@ public class SingleSubPage extends android.support.v4.app.Fragment {
         super.onCreate(savedInstanceState);
 
         for (int i = 0; i < btn.length; i++) {
-            btn[i] = this.getResources().getIdentifier("f_"+ (i+1), "drawable", "com.sy.mazeofmemory");
+            if(pageCnt == 0) {
+                btn[i] = this.getResources().getIdentifier("f_" + (i + 1), "drawable", "com.sy.mazeofmemory");
+            }else if(pageCnt == 1) {
+                btn[i] = this.getResources().getIdentifier("s_" + (i+1), "drawable", "com.sy.mazeofmemory");
+            }else if(pageCnt == 2) {
+                btn[i] = this.getResources().getIdentifier("t_" + (i+1), "drawable", "com.sy.mazeofmemory");
+            }
         }
     }
 

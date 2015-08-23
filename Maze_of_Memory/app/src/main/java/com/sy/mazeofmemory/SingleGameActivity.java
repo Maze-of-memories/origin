@@ -102,8 +102,6 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_game);
 
-        init();
-
         if (!isDBExists()) {
             copyDB();
         }
@@ -112,8 +110,8 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
         select();
         db.close();
 
+        init();
         game_init();
-
     }
 
     public void init() {
@@ -124,8 +122,9 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
 
         TextView textView = (TextView) findViewById(R.id.stage_num);
         textView.setText("Stage" + stage_num);
+        setText();
 
-        myMarker = LEFT_MARKER;                             // 내가 조작하게될 말
+        myMarker = LEFT_MARKER;                               // 내가 조작하게될 말
         myMarkerStartPosition = LEFT_START_POSITION;        // 내 말의 시작 위치
         myMarkerGoalPosition = LEFT_GOAL_POSITION;          // 내 말의 도착 위치
         myMarkerPosition = LEFT_START_POSITION;             // 내 말의 현재 위치
@@ -177,10 +176,10 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
 
         textView = (TextView) findViewById(R.id.fail_cnt);
         textView.setText("Fail : " + fail_cnt + " / 8");
-        /*
+
         textView = (TextView) findViewById(R.id.perfect_cnt);
         textView.setText("Perfect : " + perfect_cnt);
-        */
+
     }
 
     //추가
@@ -539,7 +538,7 @@ public class SingleGameActivity extends Activity implements AdapterView.OnItemCl
         cursr.moveToPosition(position);
 
         map_info.add(cursr.getString(cursr.getColumnIndex("MAP_INFO")));
-        perfect_cnt = cursr.getInt(cursr.getColumnIndex("DISTANCE"));
+        perfect_cnt = cursr.getInt(cursr.getColumnIndex("PERFECT"));
 
         Log.i("map_info", map_info.get(0).toString());
         Log.i("perfect_cnt", "" + perfect_cnt);

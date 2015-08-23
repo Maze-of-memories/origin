@@ -14,21 +14,20 @@
 
         <ImageView
             android:id="@+id/star"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:scaleType="fitXY"
             android:src="@android:drawable/btn_star_big_on" />
 
         <TextView
             android:id="@+id/star_cnt"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:layout_toRightOf="@+id/star"
-            android:background="#fffffda3"
             android:gravity="center_vertical|right"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:text="0"
+            android:text="X 0"
             android:textSize="25dp" />
 
     </RelativeLayout>
@@ -43,7 +42,7 @@
             android:layout_height="match_parent" />
 
         <com.google.android.gms.ads.AdView
-            android:id="@+id/adView"
+            android:id="@+id/adView2"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

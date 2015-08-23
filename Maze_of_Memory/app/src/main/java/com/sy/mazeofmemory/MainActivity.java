@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -60,6 +62,8 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
 
     Button background_sound;
     Button sound_btn;
+
+    AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +153,15 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
                 return true;
             }
         });
+
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("TEST_DEVICE_ID")
+                .addTestDevice("D69C8A1906CE1CC38958923B886C1F00")
+                .build();
+
+        mAdView.loadAd(adRequest);
     }
 
     protected void onStart() {
@@ -180,10 +193,28 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         }
     }
 
+    protected void onPause() {
+        if (mAdView != null) {
+            mAdView.pause();
+        }
+        super.onPause();
+    }
+
+    protected void onResume() {
+        super.onResume();
+        if (mAdView != null) {
+            mAdView.resume();
+        }
+    }
+
     protected void onDestroy() {
         super.onDestroy();
         if (bg_sound)
             stopService(new Intent("backgroundSound"));
+        //advertise
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
     }
 
     private void getPreferences() {

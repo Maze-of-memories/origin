@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="WIN / LOSE"
+            android:id="@+id/txt_game_result"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:paddingTop="70dp"
+            android:paddingBottom="70dp"
+            android:textStyle="bold"
+            android:textSize="30dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_rematch_state"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:weightSum="2"
+            android:layout_marginBottom="10dp">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Rematch"
+                android:id="@+id/rematch"
+                android:layout_weight="1"
+                android:layout_marginRight="10dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:background="@drawable/button_orange_round"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="New match"
+                android:id="@+id/newmatch"
+                android:layout_weight="1"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:background="@drawable/button_green_round"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:weightSum="2">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Exit"
+                android:id="@+id/exit"
+                android:layout_weight="1"
+                android:layout_marginRight="10dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:background="@drawable/button_red_round"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Answer"
+                android:id="@+id/answer"
+                android:layout_weight="1"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:background="@drawable/button_blue_round"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
